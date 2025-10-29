@@ -5,9 +5,10 @@ interface ReservaModalProps {
   onClose: () => void;
   service: { nome: string; preco: number };
   barbeariaId: number;
+  onReservationSuccess: () => void;
 }
 
-const ReservaModal: React.FC<ReservaModalProps> = ({ isOpen, onClose, service }) => {
+const ReservaModal: React.FC<ReservaModalProps> = ({ isOpen, onClose, service, onReservationSuccess }) => {
   // Inicializa com o domingo da semana atual
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -116,8 +117,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({ isOpen, onClose, service })
       profissional: selectedProfessional
     });
     
-    // Aqui você pode adicionar a lógica para enviar a reserva para o backend
-    alert('Reserva confirmada!');
+    onReservationSuccess();
     onClose();
   };
 

@@ -23,6 +23,7 @@ const InicioPage: React.FC = () => {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
   // Dados mock das barbearias - Carrossel 1
   const barbearias1: Barbearia[] = [
@@ -458,13 +459,9 @@ const InicioPage: React.FC = () => {
     startIndex2 + itemsPerPage
   );
 
-  
-
   const handleNext1 = () => {
     setCurrentPage1((prev) => (prev < totalPages1 - 1 ? prev + 1 : 0));
   };
-
-  
 
   const handleNext2 = () => {
     setCurrentPage2((prev) => (prev < totalPages2 - 1 ? prev + 1 : 0));
@@ -480,10 +477,50 @@ const InicioPage: React.FC = () => {
     setSelectedBarbearia(null);
   };
 
+  const handleShowNotification = () => {
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
+  };
+
   return (
     <div className="min-h-screen w-screen bg-[#1a1a1a] text-white pb-10 m-0">
       <Header />
       <Navigation />
+
+      {/* Notificação de sucesso */}
+      {showNotification && (
+        <div className="fixed top-28 right-10 bg-[#1f1f1f] rounded-lg shadow-lg p-3 flex items-center gap-3 z-50 overflow-hidden">
+          <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M5 13l4 4L19 7"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div>
+            <h4 className="font-semibold text-white text-sm">
+              Horário agendado
+            </h4>
+            <p className="text-xs text-gray-400">
+              Seu horário foi agendado com suceso!
+            </p>
+          </div>
+
+          {/* Barra de progresso com animação de 3 segundos */}
+          <div 
+            className="absolute bottom-0 left-0 h-1 bg-indigo-500"
+            style={{
+              animation: 'progress-bar-timer 3s linear forwards'
+            }}
+          />
+        </div>
+      )}
 
       {/* Search Bar */}
       <div className="max-w-[600px] mx-auto mt-10 px-16 flex gap-3">
@@ -608,6 +645,7 @@ const InicioPage: React.FC = () => {
           barbearia={selectedBarbearia}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
+          onReservationSuccess={handleShowNotification}
         />
       )}
     </div>

@@ -26,3 +26,12 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+@keyframes progress-bar-timer {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

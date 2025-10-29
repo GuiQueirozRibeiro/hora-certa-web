@@ -31,12 +31,14 @@ interface BarbeariaModalProps {
   barbearia: Barbearia;
   isOpen: boolean;
   onClose: () => void;
+  onReservationSuccess: () => void;
 }
 
 const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
   barbearia,
   isOpen,
   onClose,
+  onReservationSuccess,
 }) => {
   const [activeTab, setActiveTab] = useState<
     "servicos" | "profissionais" | "detalhes"
@@ -52,6 +54,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
   const handleCloseReservaModal = () => {
     setIsReservaOpen(false);
     setSelectedService(null);
+    onClose();
   };
   // Dados mock de serviços
   const servicos: Servico[] = [
@@ -415,6 +418,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
         isOpen={isReservaOpen}
         onClose={handleCloseReservaModal}
         service={selectedService}
+        onReservationSuccess={onReservationSuccess}
       />
     </div>
   );
