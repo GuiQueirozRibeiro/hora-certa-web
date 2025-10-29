@@ -45,6 +45,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
   >("servicos");
   const [isReservaOpen, setIsReservaOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
 
   const handleOpenReservaModal = (servico) => {
     setSelectedService(servico);
@@ -56,6 +57,50 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
     setSelectedService(null);
     onClose();
   };
+
+  // Extrair número de telefone de uma URL do WhatsApp
+  const extractPhoneFromUrl = (telefoneOrUrl: string): string => {
+    // Se for uma URL do WhatsApp, extrair o número
+    if (telefoneOrUrl.includes('wa.me/')) {
+      const match = telefoneOrUrl.match(/wa\.me\/(\d+)/);
+      return match ? match[1] : telefoneOrUrl;
+    }
+    // Se já for um número, retornar diretamente
+    return telefoneOrUrl.replace(/\D/g, '');
+  };
+
+  // Formatar número de telefone para exibição
+  const formatPhoneNumber = (telefoneOrUrl: string): string => {
+    const phoneNumber = extractPhoneFromUrl(telefoneOrUrl);
+    
+    // Remover todos os caracteres não numéricos
+    const cleaned = phoneNumber.replace(/\D/g, '');
+    
+    // Formatar para (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+    if (cleaned.length === 13) {
+      // Formato: +55 (XX) XXXXX-XXXX
+      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 9)}-${cleaned.slice(9)}`;
+    } else if (cleaned.length === 12) {
+      // Formato: +55 (XX) XXXX-XXXX
+      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 8)}-${cleaned.slice(8)}`;
+    } else if (cleaned.length === 11) {
+      // Formato: (XX) XXXXX-XXXX
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      // Formato: (XX) XXXX-XXXX
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+    
+    return phoneNumber;
+  };
+
+  const handleCopyPhone = (telefone: string) => {
+    const phoneNumber = extractPhoneFromUrl(telefone);
+    navigator.clipboard.writeText(phoneNumber);
+    setCopiedPhone(telefone);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
   // Dados mock de serviços
   const servicos: Servico[] = [
     {
@@ -240,7 +285,10 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                         R$ {servico.preco.toFixed(2)}
                       </p>
                     </div>
-                    <button onClick={() => handleOpenReservaModal(servico)} className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0">
+                    <button 
+                      onClick={() => handleOpenReservaModal(servico)} 
+                      className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
+                    >
                       Agendar
                     </button>
                   </div>
@@ -283,30 +331,26 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
           {/* Aba Detalhes */}
           {activeTab === "detalhes" && (
             <div className="p-5">
-              {/* Mapa */}
+              {/* Mapa - Clicável para abrir no Google Maps */}
               <div className="mb-6">
-                <div className="relative w-full h-48 bg-[#2a2a2a] rounded-lg overflow-hidden">
-                  <img
-                    src={`https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/${barbearia.localizacao.lng},${barbearia.localizacao.lat},14,0/800x400@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`}
-                    alt="Mapa"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                          fill="white"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${barbearia.localizacao.lat},${barbearia.localizacao.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative w-full h-48 bg-[#2a2a2a] rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer group"
+                >
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, pointerEvents: 'none' }}
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.google.com/maps?q=${barbearia.localizacao.lat},${barbearia.localizacao.lng}&z=16&output=embed`}
+                    className="absolute inset-0"
+                  ></iframe>
+                  <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+                </a>
                 <p className="text-white font-semibold text-base mt-3 mb-0.5">
                   {barbearia.nome}
                 </p>
@@ -327,36 +371,47 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                 </p>
               </div>
 
-              {/* Telefones */}
+              {/* Contato - Seguindo design do Figma */}
               <div className="mb-6">
                 {barbearia.telefones.map((telefone, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-[#2a2a2a] rounded-lg p-3 mb-2"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#1a1a1a] rounded flex items-center justify-center flex-shrink-0">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"
-                            fill="#888"
-                          />
-                          <path
-                            d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 00-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 00.043-1.391L6.859 3.513a1 1 0 00-1.391-.087l-2.17 1.861a1 1 0 00-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 00.648-.291l1.86-2.171a.997.997 0 00-.086-1.391l-4.064-3.696z"
-                            fill="#888"
-                          />
-                        </svg>
+                  <div key={index} className="mb-3 space-y-2">
+                    {/* Botão de entrar em contato via WhatsApp */}
+                    <a
+                      href={telefone.includes('wa.me/') ? telefone : `https://wa.me/${extractPhoneFromUrl(telefone)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors w-full"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                      Entrar em contato
+                    </a>
+                    
+                    {/* Número do telefone com botão de copiar - Estilo do Figma */}
+                    <div className="flex items-center justify-between bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" fill="none" stroke="#888"/>
+                          </svg>
+                        </div>
+                        <span className="text-white text-sm font-medium">{formatPhoneNumber(telefone)}</span>
                       </div>
-                      <span className="text-white text-sm">{telefone}</span>
+                      <button 
+                        onClick={() => handleCopyPhone(telefone)}
+                        className="bg-transparent text-indigo-500 text-sm font-semibold hover:text-indigo-400 transition-colors px-3 py-1.5"
+                      >
+                        {copiedPhone === telefone ? 'Copiado!' : 'Copiar'}
+                      </button>
                     </div>
-                    <button className="text-indigo-500 text-xs font-semibold hover:text-indigo-400">
-                      Copiar
-                    </button>
                   </div>
                 ))}
               </div>
