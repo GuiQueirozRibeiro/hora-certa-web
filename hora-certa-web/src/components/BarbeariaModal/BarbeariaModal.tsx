@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReservaModal from "../ReservaModal/ReservaModal";
+import { useProfessionals } from "../../hooks/useProfessionals";
 
 interface Servico {
   id: number;
@@ -9,14 +10,8 @@ interface Servico {
   imagem: string;
 }
 
-interface Profissional {
-  id: number;
-  nome: string;
-  foto: string;
-}
-
 interface Barbearia {
-  id: number;
+  id: string;
   nome: string;
   endereco: string;
   horario: string;
@@ -46,7 +41,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
   const [isReservaOpen, setIsReservaOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
-
+const { professionals, loading, error } = useProfessionals(barbearia.id.toString());
   const handleOpenReservaModal = (servico) => {
     setSelectedService(servico);
     setIsReservaOpen(true);
@@ -61,36 +56,44 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
   // Extrair número de telefone de uma URL do WhatsApp
   const extractPhoneFromUrl = (telefoneOrUrl: string): string => {
     // Se for uma URL do WhatsApp, extrair o número
-    if (telefoneOrUrl.includes('wa.me/')) {
+    if (telefoneOrUrl.includes("wa.me/")) {
       const match = telefoneOrUrl.match(/wa\.me\/(\d+)/);
       return match ? match[1] : telefoneOrUrl;
     }
     // Se já for um número, retornar diretamente
-    return telefoneOrUrl.replace(/\D/g, '');
+    return telefoneOrUrl.replace(/\D/g, "");
   };
 
   // Formatar número de telefone para exibição
   const formatPhoneNumber = (telefoneOrUrl: string): string => {
     const phoneNumber = extractPhoneFromUrl(telefoneOrUrl);
-    
+
     // Remover todos os caracteres não numéricos
-    const cleaned = phoneNumber.replace(/\D/g, '');
-    
+    const cleaned = phoneNumber.replace(/\D/g, "");
+
     // Formatar para (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
     if (cleaned.length === 13) {
       // Formato: +55 (XX) XXXXX-XXXX
-      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 9)}-${cleaned.slice(9)}`;
+      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 9)}-${cleaned.slice(
+        9
+      )}`;
     } else if (cleaned.length === 12) {
       // Formato: +55 (XX) XXXX-XXXX
-      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 8)}-${cleaned.slice(8)}`;
+      return `(${cleaned.slice(2, 4)}) ${cleaned.slice(4, 8)}-${cleaned.slice(
+        8
+      )}`;
     } else if (cleaned.length === 11) {
       // Formato: (XX) XXXXX-XXXX
-      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(
+        7
+      )}`;
     } else if (cleaned.length === 10) {
       // Formato: (XX) XXXX-XXXX
-      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(
+        6
+      )}`;
     }
-    
+
     return phoneNumber;
   };
 
@@ -142,40 +145,6 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
       preco: 20.0,
       imagem:
         "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=100&h=100&fit=crop",
-    },
-  ];
-
-  // Dados mock de profissionais
-  const profissionais: Profissional[] = [
-    {
-      id: 1,
-      nome: "Rafael Pereira 1",
-      foto: "https://i.pravatar.cc/150?img=12",
-    },
-    {
-      id: 2,
-      nome: "Rafael Pereira 2",
-      foto: "https://i.pravatar.cc/150?img=13",
-    },
-    {
-      id: 3,
-      nome: "Rafael Pereira 3",
-      foto: "https://i.pravatar.cc/150?img=14",
-    },
-    {
-      id: 4,
-      nome: "Rafael Pereira 4",
-      foto: "https://i.pravatar.cc/150?img=15",
-    },
-    {
-      id: 5,
-      nome: "Rafaela Pereira 5",
-      foto: "https://i.pravatar.cc/150?img=16",
-    },
-    {
-      id: 6,
-      nome: "Rafael Pereira 6",
-      foto: "https://i.pravatar.cc/150?img=17",
     },
   ];
 
@@ -285,8 +254,8 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                         R$ {servico.preco.toFixed(2)}
                       </p>
                     </div>
-                    <button 
-                      onClick={() => handleOpenReservaModal(servico)} 
+                    <button
+                      onClick={() => handleOpenReservaModal(servico)}
                       className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
                     >
                       Agendar
@@ -298,33 +267,63 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
           )}
 
           {/* Aba Profissionais */}
+
+          {/* Aba Profissionais */}
           {activeTab === "profissionais" && (
             <div className="p-5">
               <h3 className="text-white font-semibold text-base mb-4">
                 Profissionais
               </h3>
-              <div className="space-y-3">
-                {profissionais.map((profissional) => (
-                  <div
-                    key={profissional.id}
-                    className="flex items-center justify-between bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={profissional.foto}
-                        alt={profissional.nome}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <span className="text-white font-medium text-sm">
-                        {profissional.nome}
-                      </span>
-                    </div>
-                    <button className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
-                      Ver mais
-                    </button>
-                  </div>
-                ))}
-              </div>
+
+              {/* -> 4. ADICIONE A LÓGICA DE CARREGAMENTO E ERRO */}
+              {loading && (
+                <p className="text-gray-400 text-center">
+                  Carregando profissionais...
+                </p>
+              )}
+              {error && (
+                <p className="text-red-500 text-center">
+                  Erro ao buscar profissionais: {error}
+                </p>
+              )}
+
+              {/* -> 5. RENDERIZE A LISTA DE PROFISSIONAIS DO HOOK */}
+              {!loading && !error && (
+                <div className="space-y-3">
+                  {/* Verifique se há profissionais antes de mapear */}
+                  {professionals.length > 0 ? (
+                    professionals.map((profissional) => (
+                      <div
+                        key={profissional.id} // Use o ID real do profissional
+                        className="flex items-center justify-between bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <img
+                            // Use a URL do avatar do usuário associado
+                            src={
+                              profissional.user_avatar_url ||
+                              "https://i.pravatar.cc/150"
+                            } // Uma imagem padrão caso não haja avatar
+                            alt={profissional.user_name} // Use o nome real
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <span className="text-white font-medium text-sm">
+                            {profissional.user_name} {/* Use o nome real */}
+                          </span>
+                        </div>
+                        <button className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
+                          Ver mais
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    // Mensagem para quando não houver profissionais cadastrados
+                    <p className="text-gray-500 text-center">
+                      Nenhum profissional encontrado para esta barbearia.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -342,7 +341,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                   <iframe
                     width="100%"
                     height="100%"
-                    style={{ border: 0, pointerEvents: 'none' }}
+                    style={{ border: 0, pointerEvents: "none" }}
                     loading="lazy"
                     allowFullScreen
                     referrerPolicy="no-referrer-when-downgrade"
@@ -377,17 +376,26 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                   <div key={index} className="mb-3 space-y-2">
                     {/* Botão de entrar em contato via WhatsApp */}
                     <a
-                      href={telefone.includes('wa.me/') ? telefone : `https://wa.me/${extractPhoneFromUrl(telefone)}`}
+                      href={
+                        telefone.includes("wa.me/")
+                          ? telefone
+                          : `https://wa.me/${extractPhoneFromUrl(telefone)}`
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors w-full"
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                       </svg>
                       Entrar em contato
                     </a>
-                    
+
                     {/* Número do telefone com botão de copiar - Estilo do Figma */}
                     <div className="flex items-center justify-between bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a]">
                       <div className="flex items-center gap-3">
@@ -400,16 +408,22 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
                             stroke="currentColor"
                             strokeWidth="2"
                           >
-                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" fill="none" stroke="#888"/>
+                            <path
+                              d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"
+                              fill="none"
+                              stroke="#888"
+                            />
                           </svg>
                         </div>
-                        <span className="text-white text-sm font-medium">{formatPhoneNumber(telefone)}</span>
+                        <span className="text-white text-sm font-medium">
+                          {formatPhoneNumber(telefone)}
+                        </span>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleCopyPhone(telefone)}
                         className="bg-transparent text-indigo-500 text-sm font-semibold hover:text-indigo-400 transition-colors px-3 py-1.5"
                       >
-                        {copiedPhone === telefone ? 'Copiado!' : 'Copiar'}
+                        {copiedPhone === telefone ? "Copiado!" : "Copiar"}
                       </button>
                     </div>
                   </div>
@@ -469,7 +483,7 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
         </div>
       </div>
 
-      <ReservaModal 
+      <ReservaModal
         isOpen={isReservaOpen}
         onClose={handleCloseReservaModal}
         service={selectedService}

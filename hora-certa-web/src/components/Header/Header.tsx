@@ -1,28 +1,111 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import LoginModal from '../LoginModal/LoginModal';
 
 const Header: React.FC = () => {
+  const { user, signOut } = useAuth();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    setShowUserMenu(false);
+  };
+
   return (
-    <header className="flex justify-between items-center px-16 py-5 bg-[#0f0f0f] border-b border-[#2a2a2a]">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white"/>
-            <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
-            <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
-          </svg>
+    <>
+      <header className="flex justify-between items-center px-16 py-5 bg-[#0f0f0f] border-b border-[#2a2a2a]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white"/>
+              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
+              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
+            </svg>
+          </div>
+          <span className="text-[28px] font-bold tracking-tight">
+            <span className="text-indigo-500">Hora</span> <span className="text-white">Certa</span>
+          </span>
         </div>
-        <span className="text-[28px] font-bold tracking-tight">
-          <span className="text-indigo-500">Hora</span> <span className="text-white">Certa</span>
-        </span>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col items-end">
-          <span className="text-sm font-semibold text-white">Miguel De Silva</span>
-          <span className="text-xs text-gray-500 mt-0.5">Segunda-feira, 2 de Fevereiro</span>
+        
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-semibold text-white">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'}
+                </span>
+                <span className="text-xs text-gray-500 mt-0.5">
+                  {new Date().toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                  })}
+                </span>
+              </div>
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors"
+                >
+                  {user.user_metadata?.avatar_url ? (
+                    <img 
+                      src={user.user_metadata.avatar_url} 
+                      alt="Avatar" 
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="uppercase">
+                      {user.email?.[0] || 'U'}
+                    </span>
+                  )}
+                </button>
+                
+                {/* Menu dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] rounded-lg shadow-lg border border-[#2a2a2a] py-2 z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-[#2a2a2a] transition-colors"
+                    >
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-semibold text-white">Visitante</span>
+                <span className="text-xs text-gray-500 mt-0.5">
+                  {new Date().toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                  })}
+                </span>
+              </div>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-4 py-2 bg-indigo-500 text-white text-sm font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+              >
+                Entrar
+              </button>
+            </>
+          )}
         </div>
-        <div className="w-10 h-10 rounded-full bg-gray-300"></div>
-      </div>
-    </header>
+      </header>
+
+      {/* Modal de Login */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={() => {
+          console.log('Login realizado com sucesso!');
+        }}
+      />
+    </>
   );
 };
 

@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
-import Header from "./../components/Header/Header";
-import Navigation from "./../components/NavBar/Navigation";
 import BarbeariaModal from "./../components/BarbeariaModal/BarbeariaModal";
+import NextAppointments from "../components/_Nextappointments/Nextappointments";
 import { useBusinessesWithAddresses } from "../hooks/Usebusinesseswithaddresses ";
 
 interface Barbearia {
-  id: number;
+  id: string;
   nome: string;
   endereco: string;
   horario: string;
@@ -68,7 +67,7 @@ const InicioPage: React.FC = () => {
         ];
 
     return {
-      id: parseInt(business.id.substring(0, 8), 16),
+      id: business.id,
       nome: business.name,
       endereco: addressString,
       horario: "08:00 as 18:00",
@@ -140,14 +139,10 @@ const InicioPage: React.FC = () => {
   // Renderizar estados de loading e erro
   if (loading) {
     return (
-      <div className="min-h-screen w-screen bg-[#1a1a1a] text-white pb-10 m-0">
-        <Header />
-        <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-            <p className="text-gray-400">Carregando estabelecimentos...</p>
-          </div>
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Carregando estabelecimentos...</p>
         </div>
       </div>
     );
@@ -155,25 +150,15 @@ const InicioPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen w-screen bg-[#1a1a1a] text-white pb-10 m-0">
-        <Header />
-        <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <div className="text-red-500 mb-4">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-              </svg>
-            </div>
-            <p className="text-gray-400 mb-2">Erro ao carregar estabelecimentos</p>
-            <p className="text-sm text-gray-500">{error}</p>
-            <details className="mt-4 text-left max-w-md mx-auto">
-              <summary className="text-indigo-500 cursor-pointer">Ver detalhes técnicos</summary>
-              <pre className="mt-2 text-xs bg-black/50 p-4 rounded overflow-auto">
-                {JSON.stringify({ error, loading, businessesCount: businesses?.length }, null, 2)}
-              </pre>
-            </details>
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="text-red-500 mb-4">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
           </div>
+          <p className="text-gray-400 mb-2">Erro ao carregar estabelecimentos</p>
+          <p className="text-sm text-gray-500">{error}</p>
         </div>
       </div>
     );
@@ -181,19 +166,6 @@ const InicioPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-screen bg-[#1a1a1a] text-white pb-10 m-0">
-      <Header />
-      <Navigation />
-
-      {/* DEBUG INFO - Remover em produção */}
-      <div className="fixed bottom-4 left-4 bg-black/80 text-white text-xs p-3 rounded-lg z-50 max-w-xs">
-        <p className="font-bold mb-1">Debug Info:</p>
-        <p>Loading: {loading ? 'Sim' : 'Não'}</p>
-        <p>Error: {error || 'Nenhum'}</p>
-        <p>Businesses: {businesses?.length || 0}</p>
-        <p>Barbeararias: {barbeariasList.length}</p>
-        <p>Search: {searchTerm || 'vazio'}</p>
-      </div>
-
       {/* Notificação de sucesso */}
       {showNotification && (
         <div className="fixed top-28 right-10 bg-[#1f1f1f] rounded-lg shadow-lg p-3 flex items-center gap-3 z-50 overflow-hidden">
@@ -224,6 +196,9 @@ const InicioPage: React.FC = () => {
           />
         </div>
       )}
+
+      {/* Próximos Agendamentos (se houver) */}
+      <NextAppointments />
 
       {/* Search Bar */}
       <div className="max-w-[600px] mx-auto mt-10 px-16 flex gap-3">
@@ -258,9 +233,6 @@ const InicioPage: React.FC = () => {
             <p className="text-gray-400 text-lg mb-2">Nenhum estabelecimento encontrado</p>
             <p className="text-sm text-gray-500">
               {searchTerm ? `Não encontramos resultados para "${searchTerm}"` : 'Não há estabelecimentos cadastrados'}
-            </p>
-            <p className="text-xs text-gray-600 mt-2">
-              Verifique se há dados na tabela 'businesses' do Supabase
             </p>
           </div>
         </div>

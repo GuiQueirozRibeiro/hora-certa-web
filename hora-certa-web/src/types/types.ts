@@ -41,3 +41,25 @@ export type Address = {
 export type BusinessWithAddress = Business & {
   address?: Address;
 };
+
+export type Appointment = {
+  id: string;
+  client_id: string | null;
+  business_id: string | null;
+  professional_id: string | null;
+  service_id: string | null;
+  appointment_date: string;
+  appointment_time: string;
+  duration_minutes: number;
+  total_price: number;
+  status: 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AppointmentWithDetails = Appointment & {
+  business?: Business & { address?: Address };
+  service_name?: string;
+  professional_name?: string;
+};
