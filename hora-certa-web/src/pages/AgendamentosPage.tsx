@@ -8,6 +8,7 @@ const AgendamentosPage: React.FC = () => {
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithDetails | null>(null);
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
 
   // Buscar todos os agendamentos
   const { appointments: allAppointments, loading } = useAppointments({});
@@ -52,6 +53,39 @@ const AgendamentosPage: React.FC = () => {
     return phone;
   };
 
+  const handleCopyPhone = (telefone: string) => {
+    const phoneNumber = telefone.replace(/\D/g, '');
+    navigator.clipboard.writeText(phoneNumber);
+    setCopiedPhone(telefone);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+    
+    try {
+      // Aqui você faria a chamada à API para cancelar o agendamento
+      // await updateAppointmentStatus(appointmentId, 'cancelled');
+      alert('Agendamento cancelado com sucesso!');
+      // refetch(); // Atualizar lista
+    } catch (error) {
+      alert('Erro ao cancelar agendamento');
+    }
+  };
+
+  const handleCompleteAppointment = async (appointmentId: string) => {
+    if (!confirm('Marcar este agendamento como finalizado?')) return;
+    
+    try {
+      // Aqui você faria a chamada à API para finalizar o agendamento
+      // await updateAppointmentStatus(appointmentId, 'completed');
+      alert('Agendamento marcado como finalizado!');
+      // refetch(); // Atualizar lista
+    } catch (error) {
+      alert('Erro ao finalizar agendamento');
+    }
+  };
+
   const AppointmentCard = ({ 
     appointment, 
     statusLabel, 
@@ -66,39 +100,41 @@ const AgendamentosPage: React.FC = () => {
     const date = formatDate(appointment.appointment_date);
     const profissional = appointment.professional_name || 'Fulano Taldo';
 
+
     return (
       <div
         onClick={() => setSelectedAppointment(appointment)}
-        className={`rounded-lg p-3 mb-2 cursor-pointer transition-all ${
+        className={`rounded-lg p-4 mb-3 cursor-pointer transition-all flex items-center justify-between ${
           isSelected 
             ? 'bg-[#2a2a2a] border-2 border-indigo-500' 
             : 'bg-[#1a1a1a] border-2 border-transparent hover:border-[#2a2a2a]'
         }`}
       >
-        {/* Badge de status */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className={`${statusColor} text-white text-xs font-semibold px-2.5 py-1 rounded`}>
-            {statusLabel}
-          </span>
+        {/* Lado esquerdo - Informações */}
+        <div className="flex-1">
+          {/* Badge de status */}
+          <div className="mb-2">
+            <span className={`${statusColor} text-white text-xs font-semibold px-2.5 py-1 rounded`}>
+              {statusLabel}
+            </span>
+          </div>
+
+          {/* Nome do serviço */}
+          <h3 className="text-white font-semibold text-base mb-1">
+            {appointment.service_name || 'Corte de cabelo'}
+          </h3>
+          
+          {/* Nome do profissional */}
+          <p className="text-gray-400 text-sm">
+            {profissional}
+          </p>
         </div>
 
-        {/* Informações */}
-        <h3 className="text-white font-semibold text-sm mb-1">
-          {appointment.service_name || 'Corte de cabelo'}
-        </h3>
-        <p className="text-gray-400 text-xs mb-3">
-          {profissional}
-        </p>
-
-        {/* Data e hora */}
-        <div className="bg-[#2a2a2a] rounded-md px-3 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-center">
-              <div className="text-gray-500 text-[10px] uppercase">{date.month}</div>
-              <div className="text-white text-lg font-bold leading-none">{date.day}</div>
-            </div>
-          </div>
-          <div className="text-white text-sm font-semibold">
+        {/* Lado direito - Data e hora em quadrado cinza */}
+        <div className="bg-[#3a3a3a] rounded-lg px-5 py-4 text-center min-w-[90px]">
+          <div className="text-gray-400 text-xs uppercase mb-1">{date.month}</div>
+          <div className="text-white text-3xl font-bold leading-none mb-2">{date.day}</div>
+          <div className="text-white text-sm font-medium">
             {formatTime(appointment.appointment_time)}
           </div>
         </div>
@@ -143,7 +179,7 @@ const AgendamentosPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-6">
+    <div className="max-w-[1400px] mx-auto px-8 py-6 min-h-screen">
       {/* Cabeçalho */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-white mb-1">Agendamentos</h1>
@@ -212,46 +248,53 @@ const AgendamentosPage: React.FC = () => {
           {/* COLUNA DIREITA - Detalhes do agendamento/empresa */}
           <div className="col-span-8">
             {selectedAppointment ? (
-              <div className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a]">
-                {/* Imagem do estabelecimento com mapa */}
-                <div className="relative h-48 w-full bg-[#2a2a2a]">
+              <div>
+                {/* Mapa - Clicável para abrir no Google Maps */}
+                <div className="mb-6">
                   {selectedAppointment.business?.address?.latitude && 
                    selectedAppointment.business?.address?.longitude ? (
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      allowFullScreen
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps?q=${selectedAppointment.business.address.latitude},${selectedAppointment.business.address.longitude}&z=16&output=embed`}
-                    ></iframe>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${selectedAppointment.business.address.latitude},${selectedAppointment.business.address.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative w-full h-48 bg-[#2a2a2a] rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer group"
+                    >
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0, pointerEvents: "none" }}
+                        loading="lazy"
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps?q=${selectedAppointment.business.address.latitude},${selectedAppointment.business.address.longitude}&z=16&output=embed`}
+                        className="absolute inset-0"
+                      ></iframe>
+                      <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+                    </a>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-48 bg-[#2a2a2a] rounded-lg flex items-center justify-center">
                       <p className="text-gray-500">Mapa não disponível</p>
                     </div>
                   )}
                   
-                  {/* Nome da empresa sobre o mapa */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={selectedAppointment.business?.image_url || 
-                             selectedAppointment.business?.cover_image_url || 
-                             'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=80&h=80&fit=crop'}
-                        alt={selectedAppointment.business?.name || 'Estabelecimento'}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <h2 className="text-white font-bold text-lg">
-                          {selectedAppointment.business?.name || 'Estabelecimento'}
-                        </h2>
-                        <p className="text-gray-300 text-xs">
-                          {selectedAppointment.business?.address?.street_address || 
-                           selectedAppointment.business?.address?.city || 
-                           'Endereço não disponível'}
-                        </p>
-                      </div>
+                  {/* Informações da empresa abaixo do mapa */}
+                  <div className="flex items-center gap-3 mt-4">
+                    <img
+                      src={selectedAppointment.business?.image_url || 
+                           selectedAppointment.business?.cover_image_url || 
+                           'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=80&h=80&fit=crop'}
+                      alt={selectedAppointment.business?.name || 'Estabelecimento'}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <h2 className="text-white font-bold text-base">
+                        {selectedAppointment.business?.name || 'Estabelecimento'}
+                      </h2>
+                      <p className="text-gray-400 text-xs">
+                        {selectedAppointment.business?.address?.street_address || 
+                         selectedAppointment.business?.address?.city || 
+                         'Endereço não disponível'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -288,7 +331,7 @@ const AgendamentosPage: React.FC = () => {
                       </a>
 
                       {/* Telefone */}
-                      <div className="flex items-center justify-between bg-[#0d0d0d] rounded-lg p-4 border border-[#2a2a2a]">
+                      <div className="flex items-center justify-between bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a]">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2">
@@ -300,20 +343,17 @@ const AgendamentosPage: React.FC = () => {
                           </span>
                         </div>
                         <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(selectedAppointment.business!.phone);
-                            alert('Número copiado!');
-                          }}
+                          onClick={() => handleCopyPhone(selectedAppointment.business!.phone)}
                           className="text-indigo-500 text-sm font-semibold hover:text-indigo-400"
                         >
-                          Copiar
+                          {copiedPhone === selectedAppointment.business!.phone ? 'Copiado!' : 'Copiar'}
                         </button>
                       </div>
                     </div>
                   )}
 
                   {/* Detalhes do serviço */}
-                  <div className="bg-[#0d0d0d] rounded-lg p-4 border border-[#2a2a2a]">
+                  <div className="bg-[#0d0d0d] rounded-lg p-4 border border-[#2a2a2a] mb-6">
                     <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">
                       Confirmado
                     </h3>
@@ -337,16 +377,80 @@ const AgendamentosPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Botão de ação */}
-                  <button
-                    className="w-full mt-6 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition-colors"
-                  >
-                    Alterar Horário
-                  </button>
+                  {/* Horários de Funcionamento */}
+                  {selectedAppointment.business?.opening_hours && 
+                   selectedAppointment.business.opening_hours.length > 0 && (
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-white font-semibold text-base">
+                          Horários de Funcionamento
+                        </h3>
+                        <button className="text-indigo-500 text-xs font-semibold hover:text-indigo-400">
+                          Aberto
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        {selectedAppointment.business.opening_hours.map((item: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span className="text-gray-400">{item.day_of_week || item.dia}</span>
+                            <span className="text-white">{item.hours || item.horario}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Em parceria com */}
+                  <div className="mb-6 text-center py-4">
+                    <p className="text-gray-500 text-xs mb-2">Em parceria com</p>
+                    <div className="inline-flex items-center gap-2 text-white font-bold text-xl">
+                      <span className="text-indigo-500">FSW</span>
+                      <span>BARBER</span>
+                    </div>
+                  </div>
+
+                  {/* Formas de pagamento */}
+                  {selectedAppointment.business?.payment_methods && 
+                   selectedAppointment.business.payment_methods.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-white font-semibold text-base mb-3">
+                        Formas de pagamento
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedAppointment.business.payment_methods.map((forma: string, index: number) => (
+                          <span
+                            key={index}
+                            className="bg-[#2a2a2a] text-gray-400 text-xs px-3 py-2 rounded-lg"
+                          >
+                            {forma}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Botões de ação */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleCancelAppointment(selectedAppointment.id)}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                    >
+                      Cancelar Agendamento
+                    </button>
+                    <button
+                      onClick={() => handleCompleteAppointment(selectedAppointment.id)}
+                      className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition-colors"
+                    >
+                      Marcar como Finalizado
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-[#1a1a1a] rounded-xl p-12 text-center border border-[#2a2a2a]">
+              <div className="rounded-xl p-12 text-center">
                 <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                     <path

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import BarbeariaModal from "./../components/BarbeariaModal/BarbeariaModal";
-import NextAppointments from "../components/_Nextappointments/Nextappointments";
+import NextAppointments from "../components/Nextappointments/Nextappointments";
 import { useBusinessesWithAddresses } from "../hooks/Usebusinesseswithaddresses ";
 
 interface Barbearia {
@@ -165,7 +165,7 @@ const InicioPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen bg-[#1a1a1a] text-white pb-10 m-0">
+    <div className="min-h-screen w-screen bg-[#26272B] text-white pb-10 m-0">
       {/* Notificação de sucesso */}
       {showNotification && (
         <div className="fixed top-28 right-10 bg-[#1f1f1f] rounded-lg shadow-lg p-3 flex items-center gap-3 z-50 overflow-hidden">
@@ -198,27 +198,51 @@ const InicioPage: React.FC = () => {
       )}
 
       {/* Próximos Agendamentos (se houver) */}
-      <NextAppointments />
+      {/* Layout de 2 colunas: Agendamentos à esquerda, Navbar + Search à direita */}
+      <div className="max-w-[1400px] mx-auto px-16 pt-8">
+        <div className="grid grid-cols-12 gap-6">
+          {/* COLUNA ESQUERDA - Próximos Agendamentos */}
+          <div className="col-span-5">
+            <NextAppointments />
+          </div>
 
-      {/* Search Bar */}
-      <div className="max-w-[600px] mx-auto mt-10 px-16 flex gap-3">
-        <input
-          type="text"
-          className="flex-1 bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
-          placeholder="Buscar Barbearia"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage1(0);
-            setCurrentPage2(0);
-          }}
-        />
-        <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
-            <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" />
-          </svg>
-        </button>
+          {/* COLUNA DIREITA - Navbar + Search Bar */}
+          <div className="col-span-7 flex flex-col gap-6">
+            {/* Navbar Inline */}
+            <div className="flex items-center justify-center gap-8">
+              <button className="text-indigo-500 font-semibold text-base border-b-2 border-indigo-500 pb-2">
+                Início
+              </button>
+              <button className="text-gray-400 font-semibold text-base hover:text-white transition-colors pb-2">
+                Agendamentos
+              </button>
+              <button className="text-gray-400 font-semibold text-base hover:text-white transition-colors pb-2">
+                Perfil
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex gap-3">
+              <input
+                type="text"
+                className="flex-1 bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
+                placeholder="Buscar Barbearia"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage1(0);
+                  setCurrentPage2(0);
+                }}
+              />
+              <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
+                  <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Mensagem quando não há resultados */}

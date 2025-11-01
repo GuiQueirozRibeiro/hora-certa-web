@@ -38,10 +38,11 @@ export const useAppointments = (filters?: {
 
       let query = supabase
         .from('appointments')
-        .select('*')
+        .select('*, professional:professionals (*), user:users (name)')
         .eq('client_id', user.id)
         .order('appointment_date', { ascending: true })
         .order('appointment_time', { ascending: true });
+        
 
       // Aplicar filtros
       if (filters?.status) {

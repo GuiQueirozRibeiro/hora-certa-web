@@ -29,7 +29,7 @@ function MainApp() {
   };
 
   return (
-    <div className="App min-h-screen bg-[#1a1a1a]">
+    <div className="App min-h-screen bg-[#26272B]">
       <Header />
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       {renderPage()}

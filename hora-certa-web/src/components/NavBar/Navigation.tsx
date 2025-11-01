@@ -7,7 +7,7 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   return (
-    <nav className="flex justify-center gap-10 py-6 bg-[#1a1a1a]">
+    <nav className="flex justify-center gap-10 py-6 bg-[#26272B]">
       <button
         onClick={() => onTabChange('inicio')}
         className={`relative text-sm font-medium px-4 py-2 transition-colors ${
