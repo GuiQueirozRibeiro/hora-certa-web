@@ -3,15 +3,19 @@ import { useAuth } from '../hooks/useAuth';
 import { useAppointments } from '../hooks/Useappointments';
 import LoginModal from '../components/LoginModal/LoginModal';
 import type { AppointmentWithDetails } from '../types/types';
+import { supabase } from '../lib/SupabaseClient';
 
 const AgendamentosPage: React.FC = () => {
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithDetails | null>(null);
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Buscar todos os agendamentos
-  const { appointments: allAppointments, loading } = useAppointments({});
+  const { appointments: allAppointments, loading, refetch } = useAppointments({});
 
   // Filtrar agendamentos confirmados (scheduled e confirmed)
   const confirmedAppointments = allAppointments.filter(
@@ -60,29 +64,66 @@ const AgendamentosPage: React.FC = () => {
     setTimeout(() => setCopiedPhone(null), 2000);
   };
 
-  const handleCancelAppointment = async (appointmentId: string) => {
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+  const openCancelModal = (appointmentId: string) => {
+    setAppointmentToCancel(appointmentId);
+    setShowCancelModal(true);
+  };
+
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setAppointmentToCancel(null);
+  };
+
+  const handleCancelAppointment = async () => {
+    if (!appointmentToCancel) return;
     
+    setIsProcessing(true);
     try {
-      // Aqui você faria a chamada à API para cancelar o agendamento
-      // await updateAppointmentStatus(appointmentId, 'cancelled');
-      alert('Agendamento cancelado com sucesso!');
-      // refetch(); // Atualizar lista
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', appointmentToCancel);
+
+      if (error) throw error;
+
+      // Atualizar lista de agendamentos
+      await refetch();
+      
+      // Fechar modal
+      closeCancelModal();
+      
+      // Se o agendamento cancelado era o selecionado, limpar seleção
+      if (selectedAppointment?.id === appointmentToCancel) {
+        setSelectedAppointment(null);
+      }
     } catch (error) {
-      alert('Erro ao cancelar agendamento');
+      console.error('Erro ao cancelar agendamento:', error);
+      alert('Erro ao cancelar agendamento. Tente novamente.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleCompleteAppointment = async (appointmentId: string) => {
-    if (!confirm('Marcar este agendamento como finalizado?')) return;
-    
+    setIsProcessing(true);
     try {
-      // Aqui você faria a chamada à API para finalizar o agendamento
-      // await updateAppointmentStatus(appointmentId, 'completed');
-      alert('Agendamento marcado como finalizado!');
-      // refetch(); // Atualizar lista
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'completed' })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      // Atualizar lista de agendamentos
+      await refetch();
+      
+      // Limpar seleção
+      setSelectedAppointment(null);
     } catch (error) {
-      alert('Erro ao finalizar agendamento');
+      console.error('Erro ao finalizar agendamento:', error);
+      alert('Erro ao finalizar agendamento. Tente novamente.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -248,13 +289,14 @@ const AgendamentosPage: React.FC = () => {
           {/* COLUNA DIREITA - Detalhes do agendamento/empresa */}
           <div className="col-span-8">
             {selectedAppointment ? (
-              <div>
+              <div className="bg-[#1E1E1E] rounded-xl p-6">
                 {/* Mapa - Clicável para abrir no Google Maps */}
                 <div className="mb-6">
-                  {selectedAppointment.business?.address?.latitude && 
-                   selectedAppointment.business?.address?.longitude ? (
+                  {selectedAppointment.business?.address?.street_address ? (
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${selectedAppointment.business.address.latitude},${selectedAppointment.business.address.longitude}`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${selectedAppointment.business.address.street_address}, ${selectedAppointment.business.address.number || ''} ${selectedAppointment.business.address.neighborhood || ''} ${selectedAppointment.business.address.city || ''}`
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block relative w-full h-48 bg-[#2a2a2a] rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer group"
@@ -266,7 +308,9 @@ const AgendamentosPage: React.FC = () => {
                         loading="lazy"
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
-                        src={`https://www.google.com/maps?q=${selectedAppointment.business.address.latitude},${selectedAppointment.business.address.longitude}&z=16&output=embed`}
+                        src={`https://www.google.com/maps?q=${encodeURIComponent(
+                          `${selectedAppointment.business.address.street_address}, ${selectedAppointment.business.address.number || ''} ${selectedAppointment.business.address.neighborhood || ''} ${selectedAppointment.business.address.city || ''}`
+                        )}&z=16&output=embed`}
                         className="absolute inset-0"
                       ></iframe>
                       <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors pointer-events-none"></div>
@@ -291,35 +335,35 @@ const AgendamentosPage: React.FC = () => {
                         {selectedAppointment.business?.name || 'Estabelecimento'}
                       </h2>
                       <p className="text-gray-400 text-xs">
-                        {selectedAppointment.business?.address?.street_address || 
-                         selectedAppointment.business?.address?.city || 
-                         'Endereço não disponível'}
+                        {selectedAppointment.business?.address?.street_address ? 
+                          `${selectedAppointment.business.address.street_address}, ${selectedAppointment.business.address.number || ''} - ${selectedAppointment.business.address.neighborhood || ''}, ${selectedAppointment.business.address.city || ''}` :
+                          'Endereço não disponível'}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Conteúdo */}
-                <div className="p-6">
-                  {/* Sobre nós */}
-                  <div className="mb-6">
-                    <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">
-                      Sobre nós
-                    </h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      Bem-vindo à {selectedAppointment.business?.name || 'nosso estabelecimento'}, onde tradição encontra estilo. 
-                      Neste espaço acolhedor e refinado, oferecemos serviços de barbearia com um toque de 
-                      modernidade. Nossa equipe de profissionais especializados está pronta para proporcionar 
-                      a você uma experiência única e personalizada.
-                    </p>
-                  </div>
+                {/* Sobre nós */}
+                <div className="mb-6">
+                  <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">
+                    Sobre nós
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Bem-vindo à {selectedAppointment.business?.name || 'nosso estabelecimento'}, onde tradição encontra estilo. 
+                    Neste espaço acolhedor e refinado, oferecemos serviços de barbearia com um toque de 
+                    modernidade. Nossa equipe de profissionais especializados está pronta para proporcionar 
+                    a você uma experiência única e personalizada.
+                  </p>
+                </div>
 
-                  {/* Contato */}
-                  {selectedAppointment.business?.phone && (
-                    <div className="mb-6">
-                      {/* Botão WhatsApp */}
+                {/* Contato */}
+                <div className="mb-6">
+                  {selectedAppointment.business?.whatsapp_link && (
+                    <>
                       <a
-                        href={`https://wa.me/${selectedAppointment.business.phone.replace(/\D/g, '')}`}
+                        href={selectedAppointment.business.whatsapp_link.includes('wa.me') 
+                          ? selectedAppointment.business.whatsapp_link 
+                          : `https://wa.me/${selectedAppointment.business.whatsapp_link.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors w-full mb-3"
@@ -331,7 +375,7 @@ const AgendamentosPage: React.FC = () => {
                       </a>
 
                       {/* Telefone */}
-                      <div className="flex items-center justify-between bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a]">
+                      <div className="flex items-center justify-between bg-[#0d0d0d] rounded-lg p-4 border border-[#2a2a2a]">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2">
@@ -339,114 +383,61 @@ const AgendamentosPage: React.FC = () => {
                             </svg>
                           </div>
                           <span className="text-white text-sm">
-                            {formatPhoneNumber(selectedAppointment.business.phone)}
+                            {formatPhoneNumber(selectedAppointment.business.whatsapp_link)}
                           </span>
                         </div>
                         <button
-                          onClick={() => handleCopyPhone(selectedAppointment.business!.phone)}
+                          onClick={() => handleCopyPhone(selectedAppointment.business!.whatsapp_link!)}
                           className="text-indigo-500 text-sm font-semibold hover:text-indigo-400"
                         >
-                          {copiedPhone === selectedAppointment.business!.phone ? 'Copiado!' : 'Copiar'}
+                          {copiedPhone === selectedAppointment.business!.whatsapp_link ? 'Copiado!' : 'Copiar'}
                         </button>
                       </div>
-                    </div>
+                    </>
                   )}
+                </div>
 
-                  {/* Detalhes do serviço */}
-                  <div className="bg-[#0d0d0d] rounded-lg p-4 border border-[#2a2a2a] mb-6">
-                    <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">
-                      Confirmado
-                    </h3>
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-white font-semibold text-base mb-1">
-                          {selectedAppointment.service_name || 'Corte de Cabelo'}
-                        </h4>
-                        <div className="text-gray-400 text-xs space-y-1">
-                          <p>Data: {formatDate(selectedAppointment.appointment_date).day} de {formatDate(selectedAppointment.appointment_date).month}</p>
-                          <p>Horário: {formatTime(selectedAppointment.appointment_time)}</p>
-                          <p>Barbearia: {selectedAppointment.business?.name || 'Não informado'}</p>
-                        </div>
+                {/* Detalhes do serviço - Card Confirmado */}
+                <div className="bg-[#0d0d0d] rounded-lg p-5 border border-[#2a2a2a] mb-6">
+                  <h3 className="text-white font-semibold text-sm mb-4 uppercase tracking-wide">
+                    Confirmado
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="text-white font-semibold text-base mb-2">
+                        {selectedAppointment.service_name || 'Corte de Cabelo'}
+                      </h4>
+                      <div className="text-gray-400 text-xs space-y-1">
+                        <p>Data: {formatDate(selectedAppointment.appointment_date).day} de {formatDate(selectedAppointment.appointment_date).month}</p>
+                        <p>Horário: {formatTime(selectedAppointment.appointment_time)}</p>
+                        <p>Barbearia: {selectedAppointment.business?.name || 'Não informado'}</p>
                       </div>
-                      <div className="pt-3 border-t border-[#2a2a2a] flex items-center justify-between">
-                        <span className="text-gray-400 text-sm">Total</span>
-                        <span className="text-white font-bold text-lg">
-                          R${Number(selectedAppointment.total_price || 0).toFixed(2)}
-                        </span>
-                      </div>
+                    </div>
+                    <div className="pt-3 border-t border-[#2a2a2a] flex items-center justify-between">
+                      <span className="text-gray-400 text-sm">Total</span>
+                      <span className="text-white font-bold text-lg">
+                        R${Number(selectedAppointment.total_price || 0).toFixed(2)}
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  {/* Horários de Funcionamento */}
-                  {selectedAppointment.business?.opening_hours && 
-                   selectedAppointment.business.opening_hours.length > 0 && (
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-white font-semibold text-base">
-                          Horários de Funcionamento
-                        </h3>
-                        <button className="text-indigo-500 text-xs font-semibold hover:text-indigo-400">
-                          Aberto
-                        </button>
-                      </div>
-                      <div className="space-y-2">
-                        {selectedAppointment.business.opening_hours.map((item: any, index: number) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between text-sm"
-                          >
-                            <span className="text-gray-400">{item.day_of_week || item.dia}</span>
-                            <span className="text-white">{item.hours || item.horario}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Em parceria com */}
-                  <div className="mb-6 text-center py-4">
-                    <p className="text-gray-500 text-xs mb-2">Em parceria com</p>
-                    <div className="inline-flex items-center gap-2 text-white font-bold text-xl">
-                      <span className="text-indigo-500">FSW</span>
-                      <span>BARBER</span>
-                    </div>
-                  </div>
-
-                  {/* Formas de pagamento */}
-                  {selectedAppointment.business?.payment_methods && 
-                   selectedAppointment.business.payment_methods.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-white font-semibold text-base mb-3">
-                        Formas de pagamento
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedAppointment.business.payment_methods.map((forma: string, index: number) => (
-                          <span
-                            key={index}
-                            className="bg-[#2a2a2a] text-gray-400 text-xs px-3 py-2 rounded-lg"
-                          >
-                            {forma}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Botões de ação */}
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleCancelAppointment(selectedAppointment.id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
-                    >
-                      Cancelar Agendamento
-                    </button>
-                    <button
-                      onClick={() => handleCompleteAppointment(selectedAppointment.id)}
-                      className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition-colors"
-                    >
-                      Marcar como Finalizado
-                    </button>
-                  </div>
+                {/* Botões de ação */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => openCancelModal(selectedAppointment.id)}
+                    disabled={isProcessing}
+                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    {isProcessing ? 'Processando...' : 'Cancelar Agendamento'}
+                  </button>
+                  <button
+                    onClick={() => handleCompleteAppointment(selectedAppointment.id)}
+                    disabled={isProcessing}
+                    className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    {isProcessing ? 'Processando...' : 'Marcar como Finalizado'}
+                  </button>
                 </div>
               </div>
             ) : (
@@ -467,6 +458,41 @@ const AgendamentosPage: React.FC = () => {
                 </p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Cancelamento */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#141518] rounded-xl max-w-sm w-full p-8 shadow-2xl">
+            {/* Cabeçalho */}
+            <div className="text-center mb-8">
+              <h3 className="text-xl font-bold text-white mb-3">
+                Cancelar Reserva
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Tem certeza que deseja cancelar esse agendamento?
+              </p>
+            </div>
+
+            {/* Botões */}
+            <div className="flex gap-3">
+              <button
+                onClick={closeCancelModal}
+                disabled={isProcessing}
+                className="flex-1 bg-[#26272B] hover:bg-[#2f3035] disabled:bg-[#26272B] disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleCancelAppointment}
+                disabled={isProcessing}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+              >
+                {isProcessing ? 'Cancelando...' : 'Cancelar'}
+              </button>
+            </div>
           </div>
         </div>
       )}

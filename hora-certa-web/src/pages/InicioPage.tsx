@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from "react";
 import BarbeariaModal from "./../components/BarbeariaModal/BarbeariaModal";
 import NextAppointments from "../components/Nextappointments/Nextappointments";
 import { useBusinessesWithAddresses } from "../hooks/Usebusinesseswithaddresses ";
+import { useAuth } from "../hooks/useAuth";
+import { useAppointments } from "../hooks/Useappointments";
 
 interface Barbearia {
   id: string;
@@ -24,6 +26,13 @@ const InicioPage: React.FC = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  
+  // Verificar se há agendamentos
+  const { user } = useAuth();
+  const { appointments } = useAppointments({});
+  const hasUpcomingAppointments = user && appointments.some(
+    (apt) => (apt.status === 'scheduled' || apt.status === 'confirmed')
+  );
 
   // Buscar estabelecimentos do Supabase
   const { businesses, loading, error } = useBusinessesWithAddresses({
@@ -197,31 +206,42 @@ const InicioPage: React.FC = () => {
         </div>
       )}
 
-      {/* Próximos Agendamentos (se houver) */}
-      {/* Layout de 2 colunas: Agendamentos à esquerda, Navbar + Search à direita */}
+      {/* Próximos Agendamentos e Search Bar */}
       <div className="max-w-[1400px] mx-auto px-16 pt-8">
-        <div className="grid grid-cols-12 gap-6">
-          {/* COLUNA ESQUERDA - Próximos Agendamentos */}
-          <div className="col-span-5">
-            <NextAppointments />
-          </div>
-
-          {/* COLUNA DIREITA - Navbar + Search Bar */}
-          <div className="col-span-7 flex flex-col gap-6">
-            {/* Navbar Inline */}
-            <div className="flex items-center justify-center gap-8">
-              <button className="text-indigo-500 font-semibold text-base border-b-2 border-indigo-500 pb-2">
-                Início
-              </button>
-              <button className="text-gray-400 font-semibold text-base hover:text-white transition-colors pb-2">
-                Agendamentos
-              </button>
-              <button className="text-gray-400 font-semibold text-base hover:text-white transition-colors pb-2">
-                Perfil
-              </button>
+        {hasUpcomingAppointments ? (
+          /* Layout: Agendamentos à esquerda ocupando espaço de 1 card, Search Bar ao lado */
+          <div className="flex gap-6 mb-8">
+            {/* Agendamentos - largura de 1 card */}
+            <div className="w-[calc((100%-4.5rem)/4)]">
+              <NextAppointments />
             </div>
 
-            {/* Search Bar */}
+            {/* Search Bar - ocupa o restante do espaço */}
+            <div className="flex-1">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  className="flex-1 bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
+                  placeholder="Buscar Barbearia"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage1(0);
+                    setCurrentPage2(0);
+                  }}
+                />
+                <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
+                    <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Layout sem agendamentos: Apenas Search Bar */
+          <div className="mb-8">
             <div className="flex gap-3">
               <input
                 type="text"
@@ -242,7 +262,7 @@ const InicioPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Mensagem quando não há resultados */}
