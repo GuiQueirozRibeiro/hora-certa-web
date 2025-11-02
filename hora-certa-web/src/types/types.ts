@@ -63,3 +63,16 @@ export type AppointmentWithDetails = Appointment & {
   service_name?: string;
   professional_name?: string;
 };
+
+export type Service = {
+  id: string;
+  business_id: string | null;
+  name: string;
+  description: string | null;
+  duration_minutes: number;
+  price: number;
+  category: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
