@@ -3,11 +3,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { useAppointments } from '../../hooks/Useappointments';
 import { useProfessionals } from '../../hooks/useProfessionals';
 import LoginModal from '../LoginModal/LoginModal';
+import type { Service } from '../../types/types';
 
 interface ReservaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  service: { nome: string; preco: number } | null;
+  service: Service | null;
   barbeariaId: string;
   onReservationSuccess: () => void;
 }
@@ -144,7 +145,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
       console.log('📝 Criando agendamento:', {
         business_id: barbeariaId,
         professional_id: selectedProfessionalId,
-        service_name: service.nome,
+        service_name: service.name,
         appointment_date: dateStr,
         appointment_time: selectedTime,
       });
@@ -153,14 +154,13 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
       const result = await createAppointment({
         business_id: barbeariaId,
         professional_id: selectedProfessionalId,
-        service_id: null,
-        service_name: service.nome,
+        service_id: service.id,
         appointment_date: dateStr,
         appointment_time: selectedTime,
-        duration_minutes: 60,
-        total_price: service.preco,
+        duration_minutes: service.duration_minutes,
+        total_price: service.price,
         status: 'scheduled',
-        notes: `Serviço: ${service.nome}`,
+        notes: `Serviço: ${service.name}`,
       });
 
       if (result.success) {
@@ -425,8 +425,8 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           {/* Resumo da Reserva */}
           <div className="border-t border-b border-gray-700 py-4 mb-6 space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-400">{service.nome}</span>
-              <span className="font-semibold">R$ {service.preco.toFixed(2)}</span>
+              <span className="text-gray-400">{service.name}</span>
+              <span className="font-semibold">R$ {service.price.toFixed(2)}</span>
             </div>
             {selectedProfessionalId && professionals.length > 0 && (
               <div className="flex justify-between">

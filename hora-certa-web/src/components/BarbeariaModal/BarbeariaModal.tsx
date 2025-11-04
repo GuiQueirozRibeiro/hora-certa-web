@@ -1,14 +1,8 @@
 import React, { useState } from "react";
 import ReservaModal from "../ReservaModal/ReservaModal";
 import { useProfessionals } from "../../hooks/useProfessionals";
-
-interface Servico {
-  id: number;
-  nome: string;
-  descricao: string;
-  preco: number;
-  imagem: string;
-}
+import { useServices } from "../../hooks/useServices";
+import type { Service } from "../../types/types";
 
 interface Barbearia {
   id: string;
@@ -39,13 +33,18 @@ const BarbeariaModal: React.FC<BarbeariaModalProps> = ({
     "servicos" | "profissionais" | "detalhes"
   >("servicos");
   const [isReservaOpen, setIsReservaOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
-const { professionals, loading, error } = useProfessionals(barbearia.id.toString());
-  const handleOpenReservaModal = (servico) => {
+
+  const { professionals, loading, error } = useProfessionals(barbearia.id.toString());
+
+  const { services, loading: loadingServices, error: errorServices } = useServices({businessId: barbearia.id, isActive: true});
+
+  const handleOpenReservaModal = (servico: Service) => {
     setSelectedService(servico);
     setIsReservaOpen(true);
   };
+
 
   const handleCloseReservaModal = () => {
     setIsReservaOpen(false);
@@ -103,50 +102,6 @@ const { professionals, loading, error } = useProfessionals(barbearia.id.toString
     setCopiedPhone(telefone);
     setTimeout(() => setCopiedPhone(null), 2000);
   };
-
-  // Dados mock de serviços
-  const servicos: Servico[] = [
-    {
-      id: 1,
-      nome: "Corte de Cabelo",
-      descricao: "Corte moderno e estilizado conforme seu gosto",
-      preco: 45.0,
-      imagem:
-        "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      nome: "Barba",
-      descricao: "Aparo e modelagem de barba profissional",
-      preco: 35.0,
-      imagem:
-        "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=100&h=100&fit=crop",
-    },
-    {
-      id: 3,
-      nome: "Sobrancelha",
-      descricao: "Design e modelagem de sobrancelhas",
-      preco: 15.0,
-      imagem:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
-    },
-    {
-      id: 4,
-      nome: "Hidratação",
-      descricao: "Tratamento capilar com produtos premium",
-      preco: 60.0,
-      imagem:
-        "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=100&h=100&fit=crop",
-    },
-    {
-      id: 5,
-      nome: "Pézinho",
-      descricao: "Finalização e contorno do corte",
-      preco: 20.0,
-      imagem:
-        "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=100&h=100&fit=crop",
-    },
-  ];
 
   if (!isOpen) return null;
 
@@ -232,41 +187,72 @@ const { professionals, loading, error } = useProfessionals(barbearia.id.toString
           {/* Aba Serviços */}
           {activeTab === "servicos" && (
             <div className="p-5">
-              <div className="space-y-3">
-                {servicos.map((servico) => (
-                  <div
-                    key={servico.id}
-                    className="flex items-center gap-3 bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
-                  >
-                    <img
-                      src={servico.imagem}
-                      alt={servico.nome}
-                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-semibold text-sm mb-0.5">
-                        {servico.nome}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-1 line-clamp-1">
-                        {servico.descricao}
-                      </p>
-                      <p className="text-sm font-bold text-white">
-                        R$ {servico.preco.toFixed(2)}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleOpenReservaModal(servico)}
-                      className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
-                    >
-                      Agendar
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {loadingServices && (
+                <p className="text-gray-400 text-center">Carregando serviços...</p>
+              )}
+
+              {errorServices && (
+                <p className="text-red-500 text-center">
+                  Erro ao buscar serviços: {errorServices}
+                </p>
+              )}
+
+              {!loadingServices && !errorServices && (
+                <div className="space-y-3">
+                  {services.length > 0 ? (
+                    services.map((service) => (
+                      <div
+                        key={service.id}
+                        className="flex items-center gap-4 bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
+                      >
+                        <div className="w-16 h-16 rounded-lg bg-[#3a3a3a] flex items-center justify-center flex-shrink-0">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-gray-500"
+                          >
+                            <circle cx="6" cy="6" r="3"></circle>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                            <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                            <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                          </svg>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-semibold text-sm mb-0.5">
+                            {service.name}
+                          </h3>
+                          <p className="text-xs text-gray-500 mb-1 line-clamp-1">
+                            {service.description}
+                          </p>
+                          <p className="text-sm font-bold text-white">
+                            R$ {service.price.toFixed(2)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleOpenReservaModal(service)}
+                          className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
+                        >
+                          Agendar
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center">
+                      Nenhum serviço encontrado para esta barbearia.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
-
-          {/* Aba Profissionais */}
 
           {/* Aba Profissionais */}
           {activeTab === "profissionais" && (
@@ -487,6 +473,7 @@ const { professionals, loading, error } = useProfessionals(barbearia.id.toString
         isOpen={isReservaOpen}
         onClose={handleCloseReservaModal}
         service={selectedService}
+        barbeariaId={barbearia.id}
         onReservationSuccess={onReservationSuccess}
       />
     </div>
