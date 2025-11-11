@@ -147,8 +147,8 @@ const AgendamentosPage: React.FC = () => {
         onClick={() => setSelectedAppointment(appointment)}
         className={`rounded-lg p-4 mb-3 cursor-pointer transition-all flex items-center justify-between ${
           isSelected 
-            ? 'bg-[#2a2a2a] border-2 border-indigo-500' 
-            : 'bg-[#1a1a1a] border-2 border-transparent hover:border-[#2a2a2a]'
+            ? 'bg-zinc-900 border-2 border-indigo-500' 
+            : 'bg-zinc-900 border-2 border-transparent hover:border-[#2a2a2a]'
         }`}
       >
         {/* Lado esquerdo - Informações */}
@@ -172,10 +172,10 @@ const AgendamentosPage: React.FC = () => {
         </div>
 
         {/* Lado direito - Data e hora em quadrado cinza */}
-        <div className="bg-[#3a3a3a] rounded-lg px-5 py-4 text-center min-w-[90px]">
-          <div className="text-gray-400 text-xs uppercase mb-1">{date.month}</div>
-          <div className="text-white text-3xl font-bold leading-none mb-2">{date.day}</div>
-          <div className="text-white text-sm font-medium">
+        <div className="bg-zinc-600 rounded-lg px-5 py-4 text-center min-w-[90px]">
+          <div className="text-zinc-800 text-xs uppercase mb-1">{date.month}</div>
+          <div className="text-zinc-200 text-3xl font-bold leading-none mb-2">{date.day}</div>
+          <div className="text-zinc-200 text-sm font-medium">
             {formatTime(appointment.appointment_time)}
           </div>
         </div>
@@ -223,7 +223,7 @@ const AgendamentosPage: React.FC = () => {
     <div className="max-w-[1400px] mx-auto px-8 py-6 min-h-screen">
       {/* Cabeçalho */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-1">Agendamentos</h1>
+        <h1 className="text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
       </div>
 
       {/* Loading */}

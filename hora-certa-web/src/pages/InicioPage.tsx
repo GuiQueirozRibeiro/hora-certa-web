@@ -290,7 +290,7 @@ const InicioPage: React.FC = () => {
               {barbeariasPagina1.map((barbearia) => (
                 <div
                   key={barbearia.id}
-                  className="bg-[#2a2a2a] rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
+                  className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
                   onClick={() => handleOpenModal(barbearia)}
                 >
                   <div className="w-full h-40 overflow-hidden relative">
@@ -304,11 +304,11 @@ const InicioPage: React.FC = () => {
                     <h3 className="text-base font-semibold text-white mb-2">
                       {barbearia.nome}
                     </h3>
-                    <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
+                    <p className="text-xs text-zinc-200 mb-1 flex items-center gap-1.5">
                       <span>📍</span>
                       {barbearia.endereco}
                     </p>
-                    <p className="text-xs text-gray-500 mb-4">
+                    <p className="text-xs text-zinc-200 mb-4">
                       {barbearia.horario}
                     </p>
                     <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors">
@@ -341,7 +341,7 @@ const InicioPage: React.FC = () => {
               {barbeariasPagina2.map((barbearia) => (
                 <div
                   key={barbearia.id}
-                  className="bg-[#2a2a2a] rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
+                  className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
                   onClick={() => handleOpenModal(barbearia)}
                 >
                   <div className="w-full h-40 overflow-hidden relative">
@@ -355,11 +355,11 @@ const InicioPage: React.FC = () => {
                     <h3 className="text-base font-semibold text-white mb-2">
                       {barbearia.nome}
                     </h3>
-                    <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
+                    <p className="text-xs text-zinc-200 mb-1 flex items-center gap-1.5">
                       <span>📍</span>
                       {barbearia.endereco}
                     </p>
-                    <p className="text-xs text-gray-500 mb-4">
+                    <p className="text-xs text-zinc-200 mb-4">
                       {barbearia.horario}
                     </p>
                     <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors">
