@@ -7,11 +7,11 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   return (
-    <nav className="flex justify-center gap-10 py-6 bg-[#26272B]">
+    <nav className="flex justify-center gap-10 py-3 bg-zinc-800">
       <button
         onClick={() => onTabChange('inicio')}
         className={`relative text-sm font-medium px-4 py-2 transition-colors ${
-          activeTab === 'inicio' ? 'text-indigo-500' : 'text-gray-500 hover:text-white'
+          activeTab === 'inicio' ? 'text-indigo-500' : 'text-zinc-200 hover:text-white hover:font-bold'
         }`}
       >
         Início
@@ -22,7 +22,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
       <button
         onClick={() => onTabChange('agendamentos')}
         className={`relative text-sm font-medium px-4 py-2 transition-colors ${
-          activeTab === 'agendamentos' ? 'text-indigo-500' : 'text-gray-500 hover:text-white'
+          activeTab === 'agendamentos' ? 'text-indigo-500' : 'text-zinc-200 hover:text-white font-bold'
         }`}
       >
         Agendamentos
@@ -33,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
       <button
         onClick={() => onTabChange('perfil')}
         className={`relative text-sm font-medium px-4 py-2 transition-colors ${
-          activeTab === 'perfil' ? 'text-indigo-500' : 'text-gray-500 hover:text-white'
+          activeTab === 'perfil' ? 'text-indigo-500' : 'text-zinc-200 hover:text-white hover:font-bold'
         }`}
       >
         Perfil

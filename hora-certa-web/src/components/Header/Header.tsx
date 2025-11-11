@@ -14,7 +14,7 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center px-16 py-5 bg-[#0f0f0f] border-b border-[#2a2a2a]">
+      <header className="flex justify-between items-center px-16 py-3 bg-zinc-900 border-b border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 flex items-center justify-center">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
