@@ -8,8 +8,10 @@ interface LoginModalProps {
 }
 
 type LoginMode = 'login' | 'signup' | 'reset';
+type LoginStep = 'initial' | 'email-login';
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+  const [step, setStep] = useState<LoginStep>('initial');
   const [mode, setMode] = useState<LoginMode>('login');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -78,13 +80,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
         const { error } = await signUpWithEmail(emailOrPhone, password);
         if (error) {
+          console.error('Erro de cadastro:', error);
           setError(error.message);
         } else {
-          setSuccessMessage('Cadastro realizado! Verifique seu email para confirmar.');
+          console.log('Cadastro realizado com sucesso! Usuário precisa confirmar email.');
+          setSuccessMessage('Cadastro realizado! Verifique seu email para confirmar sua conta antes de fazer login.');
+          // Não fecha o modal nem chama onLoginSuccess até confirmar email
           setTimeout(() => {
-            onClose();
-            onLoginSuccess?.();
-          }, 2000);
+            setMode('login');
+            setSuccessMessage(null);
+          }, 5000);
         }
       } else {
         // Login
@@ -101,7 +106,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
         }
 
         if (result.error) {
-          setError('Email/telefone ou senha incorretos');
+          // Log para debug
+          console.error('Erro de login:', result.error);
+          
+          // Mensagens de erro mais específicas
+          if (result.error.message.includes('Email not confirmed')) {
+            setError('Email não confirmado. Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login.');
+          } else if (result.error.message.includes('Invalid login credentials')) {
+            setError('Email ou senha incorretos. Se você acabou de se cadastrar, verifique seu email para confirmar sua conta.');
+          } else {
+            setError(`Erro ao fazer login: ${result.error.message}`);
+          }
         } else {
           onClose();
           onLoginSuccess?.();
@@ -136,6 +151,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   };
 
   const getTitle = () => {
+    if (step === 'initial') {
+      return 'Fazer Login';
+    }
     switch (mode) {
       case 'signup':
         return 'Criar Conta';
@@ -158,10 +176,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
     }
   };
 
+  const handleCloseModal = () => {
+    setStep('initial');
+    setMode('login');
+    setError(null);
+    setSuccessMessage(null);
+    setEmailOrPhone('');
+    setPassword('');
+    onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-      onClick={onClose}
+      onClick={handleCloseModal}
     >
       <div
         className="w-full max-w-md bg-[#1a1a1a] rounded-2xl p-6 text-white"
@@ -171,7 +199,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">{getTitle()}</h2>
           <button
-            onClick={onClose}
+            onClick={handleCloseModal}
             className="text-gray-500 hover:text-white transition-colors"
           >
             <svg
@@ -187,166 +215,198 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           </button>
         </div>
 
-        {/* Formulário */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campo Email/Telefone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              {mode === 'reset' ? 'E-mail' : 'E-mail ou telefone'}
-            </label>
-            <input
-              type="text"
-              value={emailOrPhone}
-              onChange={(e) => setEmailOrPhone(e.target.value)}
-              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors"
-              placeholder={mode === 'reset' ? 'Digite seu e-mail' : 'Digite seu e-mail ou telefone'}
-              required
-            />
-          </div>
+        {/* Passo 1: Opções de Login */}
+        {step === 'initial' && (
+          <div className="space-y-3">
+            {/* Botão Google */}
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('google')}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 rounded-lg py-3 px-4 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              Entrar com Google
+            </button>
 
-          {/* Campo Senha */}
-          {mode !== 'reset' && (
+            {/* Botão Apple */}
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('apple')}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 bg-black hover:bg-gray-900 border border-white/20 text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+              </svg>
+              Entrar com e-mail Apple
+            </button>
+
+            {/* Botão Entrar com Email */}
+            <button
+              type="button"
+              onClick={() => setStep('email-login')}
+              className="w-full flex items-center justify-center gap-3 bg-[#2a2a2a] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              Entrar com email
+            </button>
+
+            {/* Botão Novo Cadastro */}
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signup');
+                setStep('email-login');
+              }}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors"
+            >
+              Novo cadastro
+            </button>
+          </div>
+        )}
+
+        {/* Passo 2: Formulário de Email/Senha */}
+        {step === 'email-login' && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Campo Email/Telefone */}
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">
-                Senha
+                {mode === 'reset' ? 'E-mail' : 'E-mail ou telefone'}
               </label>
               <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="text"
+                value={emailOrPhone}
+                onChange={(e) => setEmailOrPhone(e.target.value)}
                 className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors"
-                placeholder="Digite sua senha"
+                placeholder={mode === 'reset' ? 'Digite seu e-mail' : 'Digite seu e-mail ou telefone'}
                 required
-                minLength={6}
               />
             </div>
-          )}
 
-          {/* Mensagens de erro e sucesso */}
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-              <p className="text-red-500 text-sm">{error}</p>
-            </div>
-          )}
+            {/* Campo Senha */}
+            {mode !== 'reset' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Senha
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors"
+                  placeholder="Digite sua senha"
+                  required
+                  minLength={6}
+                />
+              </div>
+            )}
 
-          {successMessage && (
-            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-              <p className="text-green-500 text-sm">{successMessage}</p>
-            </div>
-          )}
+            {/* Mensagens de erro e sucesso */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                <p className="text-red-500 text-sm">{error}</p>
+              </div>
+            )}
 
-          {/* Link Esqueci a senha */}
-          {mode === 'login' && (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setMode('reset')}
-                className="text-sm text-indigo-500 hover:text-indigo-400 transition-colors"
-              >
-                Esqueceu a senha?
-              </button>
-            </div>
-          )}
+            {successMessage && (
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                <p className="text-green-500 text-sm">{successMessage}</p>
+              </div>
+            )}
 
-          {/* Botão de submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors ${
-              loading
-                ? 'bg-gray-700 cursor-not-allowed'
-                : 'bg-indigo-500 hover:bg-indigo-600'
-            }`}
-          >
-            {getButtonText()}
-          </button>
+            {/* Link Esqueci a senha */}
+            {mode === 'login' && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setMode('reset')}
+                  className="text-sm text-indigo-500 hover:text-indigo-400 transition-colors"
+                >
+                  Esqueceu a senha?
+                </button>
+              </div>
+            )}
 
-          {/* Links para alternar entre modos */}
-          {mode === 'login' && (
-            <p className="text-center text-sm text-gray-400">
-              Não tem uma conta?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('signup');
-                  setError(null);
-                }}
-                className="text-indigo-500 hover:text-indigo-400 transition-colors"
-              >
-                Criar conta
-              </button>
-            </p>
-          )}
+            {/* Botão de submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors ${
+                loading
+                  ? 'bg-gray-700 cursor-not-allowed'
+                  : 'bg-indigo-500 hover:bg-indigo-600'
+              }`}
+            >
+              {getButtonText()}
+            </button>
 
-          {(mode === 'signup' || mode === 'reset') && (
-            <p className="text-center text-sm text-gray-400">
-              Já tem uma conta?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('login');
-                  setError(null);
-                  setSuccessMessage(null);
-                }}
-                className="text-indigo-500 hover:text-indigo-400 transition-colors"
-              >
-                Fazer login
-              </button>
-            </p>
-          )}
-        </form>
+            {/* Links para alternar entre modos */}
+            {mode === 'login' && (
+              <p className="text-center text-sm text-gray-400">
+                Não tem uma conta?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signup');
+                    setError(null);
+                  }}
+                  className="text-indigo-500 hover:text-indigo-400 transition-colors"
+                >
+                  Criar conta
+                </button>
+              </p>
+            )}
 
-        {/* Divisor */}
-        {mode === 'login' && (
-          <>
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-gray-700"></div>
-              <span className="text-sm text-gray-500">ou</span>
-              <div className="flex-1 h-px bg-gray-700"></div>
-            </div>
+            {(mode === 'signup' || mode === 'reset') && (
+              <p className="text-center text-sm text-gray-400">
+                Já tem uma conta?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setError(null);
+                    setSuccessMessage(null);
+                  }}
+                  className="text-indigo-500 hover:text-indigo-400 transition-colors"
+                >
+                  Fazer login
+                </button>
+              </p>
+            )}
 
-            {/* Botões de login social */}
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('google')}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg py-3 text-white text-sm font-medium hover:bg-[#333333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                Continuar com Google
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('apple')}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg py-3 text-white text-sm font-medium hover:bg-[#333333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                </svg>
-                Continuar com Apple
-              </button>
-            </div>
-          </>
+            {/* Botão Voltar */}
+            <button
+              type="button"
+              onClick={() => {
+                setStep('initial');
+                setMode('login');
+                setError(null);
+              }}
+              className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              ← Voltar
+            </button>
+          </form>
         )}
       </div>
     </div>
