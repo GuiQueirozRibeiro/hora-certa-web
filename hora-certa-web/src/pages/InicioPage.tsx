@@ -4,6 +4,7 @@ import NextAppointments from "../components/Nextappointments/Nextappointments";
 import { useBusinessesWithAddresses } from "../hooks/Usebusinesseswithaddresses ";
 import { useAuth } from "../hooks/useAuth";
 import { useAppointments } from "../hooks/Useappointments";
+import { useFavorites } from "../hooks/useFavorites";
 
 interface Barbearia {
   id: string;
@@ -33,6 +34,9 @@ const InicioPage: React.FC = () => {
   const hasUpcomingAppointments = user && appointments.some(
     (apt) => (apt.status === 'scheduled' || apt.status === 'confirmed')
   );
+
+  // Hook de favoritos
+  const { isFavorited, addFavorite, removeFavorite } = useFavorites();
 
   // Buscar estabelecimentos do Supabase
   const { businesses, loading, error } = useBusinessesWithAddresses({
@@ -143,6 +147,22 @@ const InicioPage: React.FC = () => {
     setTimeout(() => {
       setShowNotification(false);
     }, 3000);
+  };
+
+  const toggleFavorite = async (businessId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita abrir modal ao clicar no botão de favoritar
+    
+    if (!user) {
+      alert('Você precisa estar logado para favoritar');
+      return;
+    }
+
+    const favoritado = isFavorited(businessId);
+    if (favoritado) {
+      await removeFavorite(businessId, true);
+    } else {
+      await addFavorite(businessId);
+    }
   };
 
   // Renderizar estados de loading e erro
@@ -299,6 +319,21 @@ const InicioPage: React.FC = () => {
                       alt={barbearia.nome}
                       className="w-full h-full object-cover"
                     />
+                    {/* Botão de Favoritar */}
+                    <button
+                      onClick={(e) => toggleFavorite(barbearia.id, e)}
+                      className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+                    >
+                      {isFavorited(barbearia.id) ? (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                      )}
+                    </button>
                   </div>
                   <div className="p-4">
                     <h3 className="text-base font-semibold text-white mb-2">
@@ -350,6 +385,21 @@ const InicioPage: React.FC = () => {
                       alt={barbearia.nome}
                       className="w-full h-full object-cover"
                     />
+                    {/* Botão de Favoritar */}
+                    <button
+                      onClick={(e) => toggleFavorite(barbearia.id, e)}
+                      className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+                    >
+                      {isFavorited(barbearia.id) ? (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                      )}
+                    </button>
                   </div>
                   <div className="p-4">
                     <h3 className="text-base font-semibold text-white mb-2">

@@ -3,8 +3,7 @@ import { FormMeusDados } from "./Forms/FormMeusDados";
 import { FormPagamentos } from "./Forms/FormPagamento";
 import { FormSeguranca } from "./Forms/FormSeguranca";
 import { FormTermos } from "./Forms/FormTermos";
-// import { FormPagamento } from "./Forms/FormPagamento";
-// import { FormFavoritos } from "./Forms/FormFavoritos";
+import { FormFavoritos } from "./Forms/FormFavoritos";
 
 
 type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
@@ -31,7 +30,7 @@ export function AreaConteudo({abaAtiva} : AreaDeConteudoProps) {
         //     return <FormPagamentos/>;
 
         case 'favoritos':
-            return <h2 className="text-2xl font-bold text-white">Favoritos (WIP)</h2>;
+            return <FormFavoritos/>;
         default:
             return <FormMeusDados />;
             }
