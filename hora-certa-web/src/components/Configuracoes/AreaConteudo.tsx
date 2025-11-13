@@ -27,8 +27,8 @@ export function AreaConteudo({abaAtiva} : AreaDeConteudoProps) {
         case 'termos':
             return <FormTermos/>;
 
-        case 'pagamento':
-            return <FormPagamentos/>;
+        // case 'pagamento':
+        //     return <FormPagamentos/>;
 
         case 'favoritos':
             return <h2 className="text-2xl font-bold text-white">Favoritos (WIP)</h2>;

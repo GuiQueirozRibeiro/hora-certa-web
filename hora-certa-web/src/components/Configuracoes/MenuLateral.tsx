@@ -39,12 +39,12 @@ export function MenuLateral({abaAtiva, setAbaAtiva} : MenuLateralProps) {
                     <span>Termos</span>
                 </li>
 
-                <li onClick={() => setAbaAtiva('pagamento')}
+                {/* <li onClick={() => setAbaAtiva('pagamento')}
                     className={`flex cursor-pointer items-center gap-3 rounded-md p-2 
                     ${abaAtiva === 'pagamento' ? 'bg-zinc-600 text-white font-bold' : 'text-zinc-200 hover:text-white hover:font-bold'}`}>
                     <CreditCardIcon className="h-5 w-5"/>
                     <span>Pagamentos</span>
-                </li>
+                </li> */}
 
                 <li onClick={() => setAbaAtiva('favoritos')}
                     className={`flex cursor-pointer items-center gap-3 rounded-md p-2 
