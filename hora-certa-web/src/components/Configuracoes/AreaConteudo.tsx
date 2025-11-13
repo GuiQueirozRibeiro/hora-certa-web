@@ -1,6 +1,6 @@
 import { FormEndereco } from "./Forms/FormEndereco";
 import { FormMeusDados } from "./Forms/FormMeusDados";
-import { FormPagamentos } from "./Forms/FormPagamento";
+// import { FormPagamentos } from "./Forms/FormPagamento";
 import { FormSeguranca } from "./Forms/FormSeguranca";
 import { FormTermos } from "./Forms/FormTermos";
 import { FormFavoritos } from "./Forms/FormFavoritos";

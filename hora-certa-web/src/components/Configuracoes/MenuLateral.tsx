@@ -1,4 +1,4 @@
-import { CreditCardIcon, InfoIcon, MapPinHouseIcon, ReceiptIcon, ShieldIcon, StarIcon } from "lucide-react"
+import {  InfoIcon, MapPinHouseIcon, ReceiptIcon, ShieldIcon, StarIcon } from "lucide-react"
 
 type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
 
