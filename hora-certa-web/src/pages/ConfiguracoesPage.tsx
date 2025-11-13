@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MenuLateral } from '../components/Configuracoes/MenuLateral';
 import { AreaConteudo } from '../components/Configuracoes/AreaConteudo';
 
