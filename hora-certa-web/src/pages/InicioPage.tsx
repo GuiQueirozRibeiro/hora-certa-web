@@ -20,6 +20,7 @@ interface Barbearia {
 
 const InicioPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [currentPage1, setCurrentPage1] = useState(0);
   const [currentPage2, setCurrentPage2] = useState(0);
   const [selectedBarbearia, setSelectedBarbearia] = useState<Barbearia | null>(
@@ -38,10 +39,21 @@ const InicioPage: React.FC = () => {
   // Hook de favoritos
   const { isFavorited, addFavorite, removeFavorite } = useFavorites();
 
-  // Buscar estabelecimentos do Supabase
+  // Debounce para searchTerm - espera 500ms após o usuário parar de digitar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
+  // Buscar estabelecimentos do Supabase com o termo debounced
   const { businesses, loading, error } = useBusinessesWithAddresses({
     isActive: true,
-    searchTerm: searchTerm,
+    searchTerm: debouncedSearchTerm,
   });
 
   // DEBUG: Log para verificar o que está sendo retornado
@@ -128,8 +140,16 @@ const InicioPage: React.FC = () => {
     setCurrentPage1((prev) => (prev < totalPages1 - 1 ? prev + 1 : 0));
   };
 
+  const handlePrev1 = () => {
+    setCurrentPage1((prev) => (prev > 0 ? prev - 1 : totalPages1 - 1));
+  };
+
   const handleNext2 = () => {
     setCurrentPage2((prev) => (prev < totalPages2 - 1 ? prev + 1 : 0));
+  };
+
+  const handlePrev2 = () => {
+    setCurrentPage2((prev) => (prev > 0 ? prev - 1 : totalPages2 - 1));
   };
 
   const handleOpenModal = (barbearia: Barbearia) => {
@@ -164,34 +184,6 @@ const InicioPage: React.FC = () => {
       await addFavorite(businessId);
     }
   };
-
-  // Renderizar estados de loading e erro
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Carregando estabelecimentos...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-            </svg>
-          </div>
-          <p className="text-gray-400 mb-2">Erro ao carregar estabelecimentos</p>
-          <p className="text-sm text-gray-500">{error}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen w-screen bg-[#26272B] text-white pb-10 m-0">
@@ -239,17 +231,24 @@ const InicioPage: React.FC = () => {
             {/* Search Bar - ocupa o restante do espaço */}
             <div className="flex-1">
               <div className="flex gap-3">
-                <input
-                  type="text"
-                  className="flex-1 bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
-                  placeholder="Buscar Barbearia"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage1(0);
-                    setCurrentPage2(0);
-                  }}
-                />
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    className="w-full bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
+                    placeholder="Buscar Barbearia"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage1(0);
+                      setCurrentPage2(0);
+                    }}
+                  />
+                  {searchTerm !== debouncedSearchTerm && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-500 border-t-transparent"></div>
+                    </div>
+                  )}
+                </div>
                 <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
@@ -263,17 +262,24 @@ const InicioPage: React.FC = () => {
           /* Layout sem agendamentos: Apenas Search Bar */
           <div className="mb-8">
             <div className="flex gap-3">
-              <input
-                type="text"
-                className="flex-1 bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
-                placeholder="Buscar Barbearia"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage1(0);
-                  setCurrentPage2(0);
-                }}
-              />
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  className="w-full bg-[#0000009a] border border-[#3a3a3a] rounded-lg px-5 py-3 text-white text-sm outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-600"
+                  placeholder="Buscar Barbearia"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage1(0);
+                    setCurrentPage2(0);
+                  }}
+                />
+                {searchTerm !== debouncedSearchTerm && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-500 border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
               <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
@@ -285,8 +291,32 @@ const InicioPage: React.FC = () => {
         )}
       </div>
 
+      {/* Estados de Loading e Erro */}
+      {loading && (
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+            <p className="text-gray-400">Carregando estabelecimentos...</p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </div>
+            <p className="text-gray-400 mb-2">Erro ao carregar estabelecimentos</p>
+            <p className="text-sm text-gray-500">{error}</p>
+          </div>
+        </div>
+      )}
+
       {/* Mensagem quando não há resultados */}
-      {barbeariasList.length === 0 && (
+      {barbeariasList.length === 0 && !loading && !error && (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="text-gray-500 mb-4">
@@ -303,10 +333,10 @@ const InicioPage: React.FC = () => {
       )}
 
       {/* Primeiro Carrossel */}
-      {barbeariasPagina1.length > 0 && (
+      {!loading && !error && barbeariasPagina1.length > 0 && (
         <div className="max-w-[1400px] mx-auto px-16 mt-12">
           <div className="relative">
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-4 gap-6 transition-all duration-500 ease-in-out">
               {barbeariasPagina1.map((barbearia) => (
                 <div
                   key={barbearia.id}
@@ -355,24 +385,34 @@ const InicioPage: React.FC = () => {
             </div>
 
             {totalPages1 > 1 && (
-              <button
-                className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                onClick={handleNext1}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
-                </svg>
-              </button>
+              <>
+                <button
+                  className="absolute -left-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
+                  onClick={handlePrev1}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" />
+                  </svg>
+                </button>
+                <button
+                  className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
+                  onClick={handleNext1}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
+                  </svg>
+                </button>
+              </>
             )}
           </div>
         </div>
       )}
 
       {/* Segundo Carrossel */}
-      {barbeariasPagina2.length > 0 && (
+      {!loading && !error && barbeariasPagina2.length > 0 && (
         <div className="max-w-[1400px] mx-auto px-16 mt-12">
           <div className="relative">
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-4 gap-6 transition-all duration-500 ease-in-out">
               {barbeariasPagina2.map((barbearia) => (
                 <div
                   key={barbearia.id}
@@ -421,14 +461,24 @@ const InicioPage: React.FC = () => {
             </div>
 
             {totalPages2 > 1 && (
-              <button
-                className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                onClick={handleNext2}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
-                </svg>
-              </button>
+              <>
+                <button
+                  className="absolute -left-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
+                  onClick={handlePrev2}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" />
+                  </svg>
+                </button>
+                <button
+                  className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
+                  onClick={handleNext2}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
+                  </svg>
+                </button>
+              </>
             )}
           </div>
         </div>
