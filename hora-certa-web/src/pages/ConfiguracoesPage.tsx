@@ -4,7 +4,11 @@ import { AreaConteudo } from '../components/Configuracoes/AreaConteudo';
 
 type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
 
-export function ConfiguracoesPage() {
+interface ConfiguracoesPageProps {
+  onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;
+}
+
+export function ConfiguracoesPage({ onNavigateToTermos }: ConfiguracoesPageProps) {
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('meus-dados');
 
   // O 'h-full' faz a página preencher o <main>
@@ -23,7 +27,7 @@ export function ConfiguracoesPage() {
 
       {/* 2. A ÁREA DE CONTEÚDO */}
       <main className="flex-1 p-10">
-        <AreaConteudo abaAtiva={abaAtiva}/>
+        <AreaConteudo abaAtiva={abaAtiva} onNavigateToTermos={onNavigateToTermos} />
       </main>
     </div>
   );

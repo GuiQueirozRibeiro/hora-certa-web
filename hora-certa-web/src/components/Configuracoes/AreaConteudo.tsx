@@ -10,9 +10,10 @@ type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento'
 
 type AreaDeConteudoProps = {
   abaAtiva: AbaAtiva;
+  onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;
 }
 
-export function AreaConteudo({abaAtiva} : AreaDeConteudoProps) {
+export function AreaConteudo({abaAtiva, onNavigateToTermos} : AreaDeConteudoProps) {
     switch (abaAtiva) {
         case 'meus-dados':
             return <FormMeusDados/>;
@@ -24,7 +25,7 @@ export function AreaConteudo({abaAtiva} : AreaDeConteudoProps) {
             return <FormSeguranca/>;
     
         case 'termos':
-            return <FormTermos/>;
+            return <FormTermos onNavigateToTermos={onNavigateToTermos} />;
 
         // case 'pagamento':
         //     return <FormPagamentos/>;
