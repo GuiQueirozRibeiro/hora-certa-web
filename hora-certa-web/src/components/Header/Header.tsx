@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useUserProfile } from '../../hooks/useUserProfile';
 import LoginModal from '../LoginModal/LoginModal';
 
 const Header: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { profile } = useUserProfile();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -33,7 +35,7 @@ const Header: React.FC = () => {
             <>
               <div className="flex flex-col items-end">
                 <span className="text-sm font-semibold text-white">
-                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'}
+                  {profile?.name || user.email?.split('@')[0] || 'Usuário'}
                 </span>
                 <span className="text-xs text-gray-500 mt-0.5">
                   {new Date().toLocaleDateString('pt-BR', { 
@@ -48,15 +50,15 @@ const Header: React.FC = () => {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors"
                 >
-                  {user.user_metadata?.avatar_url ? (
+                  {profile?.image_url ? (
                     <img 
-                      src={user.user_metadata.avatar_url} 
+                      src={profile.image_url} 
                       alt="Avatar" 
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
                     <span className="uppercase">
-                      {user.email?.[0] || 'U'}
+                      {profile?.name?.[0] || user.email?.[0] || 'U'}
                     </span>
                   )}
                 </button>
