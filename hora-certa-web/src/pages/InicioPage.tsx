@@ -21,8 +21,6 @@ interface Barbearia {
 const InicioPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [currentPage1, setCurrentPage1] = useState(0);
-  const [currentPage2, setCurrentPage2] = useState(0);
   const [selectedBarbearia, setSelectedBarbearia] = useState<Barbearia | null>(
     null
   );
@@ -114,44 +112,6 @@ const InicioPage: React.FC = () => {
     return businesses.map(convertBusinessToBarbearia);
   }, [businesses]);
 
-  // Dividir em dois carrosséis (metade para cada um)
-  const midPoint = Math.ceil(barbeariasList.length / 2);
-  const barbearias1 = barbeariasList.slice(0, midPoint);
-  const barbearias2 = barbeariasList.slice(midPoint);
-
-  // Carrossel - 4 itens por página (1 linha de 4)
-  const itemsPerPage = 4;
-  const totalPages1 = Math.ceil(barbearias1.length / itemsPerPage);
-  const totalPages2 = Math.ceil(barbearias2.length / itemsPerPage);
-
-  const startIndex1 = currentPage1 * itemsPerPage;
-  const barbeariasPagina1 = barbearias1.slice(
-    startIndex1,
-    startIndex1 + itemsPerPage
-  );
-
-  const startIndex2 = currentPage2 * itemsPerPage;
-  const barbeariasPagina2 = barbearias2.slice(
-    startIndex2,
-    startIndex2 + itemsPerPage
-  );
-
-  const handleNext1 = () => {
-    setCurrentPage1((prev) => (prev < totalPages1 - 1 ? prev + 1 : 0));
-  };
-
-  const handlePrev1 = () => {
-    setCurrentPage1((prev) => (prev > 0 ? prev - 1 : totalPages1 - 1));
-  };
-
-  const handleNext2 = () => {
-    setCurrentPage2((prev) => (prev < totalPages2 - 1 ? prev + 1 : 0));
-  };
-
-  const handlePrev2 = () => {
-    setCurrentPage2((prev) => (prev > 0 ? prev - 1 : totalPages2 - 1));
-  };
-
   const handleOpenModal = (barbearia: Barbearia) => {
     setSelectedBarbearia(barbearia);
     setIsModalOpen(true);
@@ -239,8 +199,6 @@ const InicioPage: React.FC = () => {
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
-                      setCurrentPage1(0);
-                      setCurrentPage2(0);
                     }}
                   />
                   {searchTerm !== debouncedSearchTerm && (
@@ -270,8 +228,6 @@ const InicioPage: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    setCurrentPage1(0);
-                    setCurrentPage2(0);
                   }}
                 />
                 {searchTerm !== debouncedSearchTerm && (
@@ -332,154 +288,55 @@ const InicioPage: React.FC = () => {
         </div>
       )}
 
-      {/* Primeiro Carrossel */}
-      {!loading && !error && barbeariasPagina1.length > 0 && (
+      {/* Lista de Estabelecimentos com Grid Vertical */}
+      {!loading && !error && barbeariasList.length > 0 && (
         <div className="max-w-[1400px] mx-auto px-16 mt-12">
-          <div className="relative">
-            <div className="grid grid-cols-4 gap-6 transition-all duration-500 ease-in-out">
-              {barbeariasPagina1.map((barbearia) => (
-                <div
-                  key={barbearia.id}
-                  className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
-                  onClick={() => handleOpenModal(barbearia)}
-                >
-                  <div className="w-full h-40 overflow-hidden relative">
-                    <img
-                      src={barbearia.imagem}
-                      alt={barbearia.nome}
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Botão de Favoritar */}
-                    <button
-                      onClick={(e) => toggleFavorite(barbearia.id, e)}
-                      className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
-                    >
-                      {isFavorited(barbearia.id) ? (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                      ) : (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-base font-semibold text-white mb-2">
-                      {barbearia.nome}
-                    </h3>
-                    <p className="text-xs text-zinc-200 mb-1 flex items-center gap-1.5">
-                      <span>📍</span>
-                      {barbearia.endereco}
-                    </p>
-                    <p className="text-xs text-zinc-200 mb-4">
-                      {barbearia.horario}
-                    </p>
-                    <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors">
-                      Reservar horário
-                    </button>
-                  </div>
+          <div className="grid grid-cols-4 gap-6">
+            {barbeariasList.map((barbearia) => (
+              <div
+                key={barbearia.id}
+                className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
+                onClick={() => handleOpenModal(barbearia)}
+              >
+                <div className="w-full h-40 overflow-hidden relative">
+                  <img
+                    src={barbearia.imagem}
+                    alt={barbearia.nome}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Botão de Favoritar */}
+                  <button
+                    onClick={(e) => toggleFavorite(barbearia.id, e)}
+                    className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+                  >
+                    {isFavorited(barbearia.id) ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                    )}
+                  </button>
                 </div>
-              ))}
-            </div>
-
-            {totalPages1 > 1 && (
-              <>
-                <button
-                  className="absolute -left-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                  onClick={handlePrev1}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" />
-                  </svg>
-                </button>
-                <button
-                  className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                  onClick={handleNext1}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
-                  </svg>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Segundo Carrossel */}
-      {!loading && !error && barbeariasPagina2.length > 0 && (
-        <div className="max-w-[1400px] mx-auto px-16 mt-12">
-          <div className="relative">
-            <div className="grid grid-cols-4 gap-6 transition-all duration-500 ease-in-out">
-              {barbeariasPagina2.map((barbearia) => (
-                <div
-                  key={barbearia.id}
-                  className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
-                  onClick={() => handleOpenModal(barbearia)}
-                >
-                  <div className="w-full h-40 overflow-hidden relative">
-                    <img
-                      src={barbearia.imagem}
-                      alt={barbearia.nome}
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Botão de Favoritar */}
-                    <button
-                      onClick={(e) => toggleFavorite(barbearia.id, e)}
-                      className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
-                    >
-                      {isFavorited(barbearia.id) ? (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                      ) : (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-base font-semibold text-white mb-2">
-                      {barbearia.nome}
-                    </h3>
-                    <p className="text-xs text-zinc-200 mb-1 flex items-center gap-1.5">
-                      <span>📍</span>
-                      {barbearia.endereco}
-                    </p>
-                    <p className="text-xs text-zinc-200 mb-4">
-                      {barbearia.horario}
-                    </p>
-                    <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors">
-                      Reservar horário
-                    </button>
-                  </div>
+                <div className="p-4">
+                  <h3 className="text-base font-semibold text-white mb-2">
+                    {barbearia.nome}
+                  </h3>
+                  <p className="text-xs text-zinc-200 mb-1 flex items-center gap-1.5">
+                    <span>📍</span>
+                    {barbearia.endereco}
+                  </p>
+                  <p className="text-xs text-zinc-200 mb-4">
+                    {barbearia.horario}
+                  </p>
+                  <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors">
+                    Reservar horário
+                  </button>
                 </div>
-              ))}
-            </div>
-
-            {totalPages2 > 1 && (
-              <>
-                <button
-                  className="absolute -left-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                  onClick={handlePrev2}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" />
-                  </svg>
-                </button>
-                <button
-                  className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full w-10 h-10 flex items-center justify-center hover:bg-white/20 hover:border-indigo-500 transition-all"
-                  onClick={handleNext2}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" />
-                  </svg>
-                </button>
-              </>
-            )}
+              </div>
+            ))}
           </div>
         </div>
       )}
