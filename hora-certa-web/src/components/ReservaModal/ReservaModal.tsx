@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppointments } from '../../hooks/Useappointments';
 import { useProfessionals } from '../../hooks/useProfessionals';
+import { useProfessionalSchedules } from '../../hooks/useProfessionalSchedules';
 import LoginModal from '../LoginModal/LoginModal';
 import type { Service } from '../../types/types';
 
@@ -23,6 +24,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
   const { user } = useAuth();
   const { createAppointment } = useAppointments();
   const { professionals, loading: loadingProfessionals } = useProfessionals(barbeariaId);
+  const { schedules, loading: loadingSchedules, getScheduleForDay } = useProfessionalSchedules();
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Inicializa com o domingo da semana atual
@@ -41,20 +43,56 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<{ hora: string; disponivel: boolean }[]>([]);
 
-  // Horários disponíveis (exemplo)
-  const horariosDisponiveis = [
-    { hora: '09:00', disponivel: true },
-    { hora: '10:00', disponivel: true },
-    { hora: '11:00', disponivel: true },
-    { hora: '12:00', disponivel: false },
-    { hora: '13:00', disponivel: false },
-    { hora: '14:00', disponivel: true },
-    { hora: '15:00', disponivel: true },
-    { hora: '16:00', disponivel: true },
-    { hora: '17:00', disponivel: true },
-    { hora: '18:00', disponivel: false }
-  ];
+  // Gerar horários disponíveis baseado na agenda do profissional e dia selecionado
+  useEffect(() => {
+    if (!selectedProfessionalId || !selectedDate) {
+      setAvailableTimeSlots([]);
+      return;
+    }
+
+    const dayOfWeek = selectedDate.getDay();
+    const schedule = getScheduleForDay(selectedProfessionalId, dayOfWeek);
+
+    if (!schedule) {
+      setAvailableTimeSlots([]);
+      setError('O profissional não trabalha neste dia');
+      return;
+    }
+
+    // Gerar slots de horário a cada 30 minutos
+    const slots: { hora: string; disponivel: boolean }[] = [];
+    const startTime = schedule.start_time.substring(0, 5); // "HH:MM"
+    const endTime = schedule.end_time.substring(0, 5);
+    
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+    
+    while (
+      currentHour < endHour || 
+      (currentHour === endHour && currentMinute < endMinute)
+    ) {
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      slots.push({
+        hora: timeString,
+        disponivel: true // TODO: Verificar agendamentos existentes
+      });
+      
+      // Incrementar 30 minutos
+      currentMinute += 30;
+      if (currentMinute >= 60) {
+        currentMinute -= 60;
+        currentHour += 1;
+      }
+    }
+    
+    setAvailableTimeSlots(slots);
+    setError(null);
+  }, [selectedProfessionalId, selectedDate, getScheduleForDay]);
 
   if (!isOpen || !service) return null;
 
@@ -88,11 +126,21 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
     setSelectedTime(null);
   };
 
-  // Verificar se a data é hoje ou futura
+  // Verificar se a data é hoje ou futura E se o profissional trabalha neste dia
   const isDateAvailable = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return date >= today;
+    
+    if (date < today) return false;
+    
+    // Se nenhum profissional selecionado, permitir selecionar qualquer data
+    if (!selectedProfessionalId) return true;
+    
+    // Verificar se o profissional trabalha neste dia
+    const dayOfWeek = date.getDay();
+    const schedule = getScheduleForDay(selectedProfessionalId, dayOfWeek);
+    
+    return schedule !== null;
   };
 
   // Verificar se a data está selecionada
@@ -245,6 +293,8 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                       key={professional.id}
                       onClick={() => {
                         setSelectedProfessionalId(professional.id);
+                        setSelectedDate(null);
+                        setSelectedTime(null);
                         setError(null);
                       }}
                       className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
@@ -286,6 +336,23 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                             <span className="text-xs text-gray-400">
                               {professional.average_rating.toFixed(1)} ({professional.total_reviews} avaliações)
                             </span>
+                          </div>
+                        )}
+                        {/* Dias de trabalho */}
+                        {schedules.length > 0 && (
+                          <div className="mt-1">
+                            <p className="text-xs text-gray-500">
+                              {(() => {
+                                const professionalSchedules = schedules.filter(
+                                  s => s.professional_id === professional.id && s.is_active
+                                );
+                                const daysMap = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                                const workDays = [...new Set(professionalSchedules.map(s => s.day_of_week))]
+                                  .sort()
+                                  .map(day => daysMap[day]);
+                                return workDays.length > 0 ? `Trabalha: ${workDays.join(', ')}` : 'Sem agenda cadastrada';
+                              })()}
+                            </p>
                           </div>
                         )}
                       </div>
@@ -375,11 +442,18 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           </div>
 
           {/* Horários Disponíveis */}
-          {selectedDate && (
+          {selectedDate && selectedProfessionalId && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold mb-3">Horários disponíveis</h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                {horariosDisponiveis.map((horario) => (
+              {availableTimeSlots.length === 0 ? (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                  <p className="text-amber-500 text-sm">
+                    O profissional não trabalha neste dia. Selecione outra data.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                  {availableTimeSlots.map((horario) => (
                   <button
                     key={horario.hora}
                     onClick={() => {
@@ -411,7 +485,17 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                     </span>
                   </button>
                 ))}
-              </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Aviso para selecionar profissional */}
+          {selectedDate && !selectedProfessionalId && professionals.length > 0 && (
+            <div className="mb-6 bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+              <p className="text-amber-500 text-sm">
+                Selecione um profissional para ver os horários disponíveis
+              </p>
             </div>
           )}
 
