@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Se quiser uma rolagem suave na página inteira: */
+html {
+  scroll-behavior: smooth;
+}
