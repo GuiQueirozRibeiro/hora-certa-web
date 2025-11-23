@@ -6,3 +6,34 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* --- 1. Estilização para Chrome, Edge, Safari (Webkit) --- */
+
+/* A largura da barra vertical e altura da barra horizontal */
+::-webkit-scrollbar {
+  width: 8px;  /* Largura fina e elegante */
+  height: 8px; /* Altura para scroll horizontal */
+}
+
+/* O "trilho" (fundo por onde a barra corre) */
+::-webkit-scrollbar-track {
+  background: #18181b; /* Cor do fundo do seu site (zinc-900) */
+}
+
+/* A "pega" (a barra que se move) */
+::-webkit-scrollbar-thumb {
+  background-color: #3f3f46; /* Um cinza médio (zinc-700) */
+  border-radius: 4px;       /* Deixa redondinho */
+  border: 2px solid #18181b; /* Cria uma borda falsa para dar um respiro */
+}
+
+/* Efeito ao passar o mouse em cima da barra */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #6366f1; /* Sua cor de destaque (Indigo) */
+}
+
+/* --- 2. Estilização para Firefox (Padrão novo) --- */
+html {
+  scrollbar-width: thin;          /* "auto" ou "thin" */
+  scrollbar-color: #6366F1 #18181b; /* cor-da-barra cor-do-fundo */
+}
