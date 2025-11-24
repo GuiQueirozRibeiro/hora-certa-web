@@ -24,15 +24,15 @@ export function About() {
               Nossa Solução
             </div>
             
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-100 mb-4 md:mb-6">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-100 mb-4 md:mb-6">
               Sobre o Hora Certa
             </h2>
 
-            <p className="text-base md:text-lg text-zinc-200 mb-4 md:mb-6 leading-relaxed">
+            <p className="text-sm md:text-base text-zinc-200 mb-4 md:mb-6 leading-relaxed">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla magni dolor laudantium obcaecati velit odit necessitatibus inventore est enim architecto omnis iste a, optio, laboriosam.
             </p>
             
-            <p className="text-base md:text-lg text-zinc-200 leading-relaxed">
+            <p className="text-sm md:text-base text-zinc-200 leading-relaxed">
               Nosso objetivo é simplificar a gestão do seu negócio, conectando profissionais e clientes de forma eficiente e moderna.
             </p>
           </div>
@@ -51,8 +51,8 @@ export function About() {
               
               {/* Texto do Card */}
               <div>
-                <h3 className="text-lg md:text-xl font-bold text-zinc-100 mb-2">Módulo WebAdmin</h3>
-                <p className="text-sm md:text-base text-zinc-200 leading-relaxed">
+                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Módulo WebAdmin</h3>
+                <p className="text-xs md:text-sm text-zinc-200 leading-relaxed">
                   Gestão completa do estabelecimento: controle de profissionais, histórico de clientes, estoque e relatórios financeiros. Tudo na nuvem, seguro e acessível de qualquer lugar.
                 </p>
               </div>
@@ -69,8 +69,8 @@ export function About() {
               
               {/* Texto do Card */}
               <div>
-                <h3 className="text-lg md:text-xl font-bold text-zinc-100 mb-2">Módulo Aplicativo</h3>
-                <p className="text-sm md:text-base text-zinc-200 leading-relaxed">
+                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Módulo Aplicativo</h3>
+                <p className="text-xs md:text-sm text-zinc-200 leading-relaxed">
                   Para profissionais (agenda e comissões) e para clientes (agendamentos, promoções e lembretes). Aproximando a barbearia do seu público.
                 </p>
               </div>
