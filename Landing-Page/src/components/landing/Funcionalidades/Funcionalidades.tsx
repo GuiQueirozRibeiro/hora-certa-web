@@ -105,7 +105,7 @@ export function Funcionalidades() {
         {/* Título da Seção */}
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3">
-            Funcionalidades do AppBarber
+            Funcionalidades do HoraCerta
           </h2>
           <p className="text-zinc-400 text-xs md:text-sm max-w-2xl mx-auto">
             Tudo que você precisa para gerenciar sua barbearia em um único lugar
