@@ -2,6 +2,7 @@ import { About } from "./components/landing/About/About";
 import { Funcionalidades } from "./components/landing/Funcionalidades/Funcionalidades";
 import { Hero } from "./components/landing/Hero/Hero";
 import { NavBar } from "./components/landing/NavBar/NavBar";
+import { Objetivo } from "./components/landing/Objetivo/Objetivo";
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
       <NavBar/>
       <Hero/>
       <About/>
+      <Objetivo/>
       <Funcionalidades/>
     </div>
   )
