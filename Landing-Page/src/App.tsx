@@ -2,6 +2,7 @@ import { About } from "./components/landing/About/About";
 import { ComoIniciar } from "./components/landing/ComoIniciar/ComoIniciar";
 import { CTA } from "./components/landing/CTA/CTA";
 import { FAQ } from "./components/landing/FAQ/FAQ";
+import { Footer } from "./components/landing/Footer/Footer";
 import { Funcionalidades } from "./components/landing/Funcionalidades/Funcionalidades";
 import { Hero } from "./components/landing/Hero/Hero";
 import { NavBar } from "./components/landing/NavBar/NavBar";
@@ -18,8 +19,9 @@ export default function App() {
       <Funcionalidades/>
       <ComoIniciar/>
       <Precos/>
-      <CTA/>
       <FAQ/>
+      <CTA/>
+      <Footer/>
     </div>
   )
 }
