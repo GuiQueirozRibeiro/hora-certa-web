@@ -4,6 +4,7 @@ import { Funcionalidades } from "./components/landing/Funcionalidades/Funcionali
 import { Hero } from "./components/landing/Hero/Hero";
 import { NavBar } from "./components/landing/NavBar/NavBar";
 import { Objetivo } from "./components/landing/Objetivo/Objetivo";
+import { Precos } from "./components/landing/Precos/Precos";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Objetivo/>
       <Funcionalidades/>
       <ComoIniciar/>
+      <Precos/>
     </div>
   )
 }
