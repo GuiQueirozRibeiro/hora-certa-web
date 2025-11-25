@@ -3,10 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
 export function Precos() {
-  const [isAnual, setIsAnual] = useState(false);
-  const [displayPrecos, setDisplayPrecos] = useState([99, 199, 399]);
+  const [planoPeriodo, setPlanoPeriodo] = useState<'anual' | 'semestral' | 'mensal'>('anual');
+  const [displayPrecos, setDisplayPrecos] = useState([28.90, 49.90, 88.00, 126.90]);
   const priceRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const toggleRef = useRef<HTMLButtonElement>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLSpanElement>(null);
   const cardBadgeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationsRef = useRef<gsap.core.Tween[]>([]);
@@ -14,26 +14,32 @@ export function Precos() {
 
   const planos = [
     {
-      nome: "Básico",
-      descricao: "Ideal para pequenas barbearias",
-      precoMensal: 99,
-      precoAnual: 990,
+      nome: "1 Profissional",
+      descricao: "",
+      precoMensal: 49.90,
+      precoSemestral: 39.40,
+      precoAnual: 28.90,
+      descontoMensal: 0,
+      descontoSemestral: 15,
+      descontoAnual: 30,
       destaque: false,
       recursos: [
-        "Até 2 profissionais",
         "Agendamento online",
         "Gestão de clientes",
         "Suporte por email",
       ],
     },
     {
-      nome: "Premium",
-      descricao: "Para barbearias em crescimento",
-      precoMensal: 199,
-      precoAnual: 1990,
-      destaque: true,
+      nome: "2 a 5 Profissionais",
+      descricao: "",
+      precoMensal: 79.90,
+      precoSemestral: 64.90,
+      precoAnual: 49.90,
+      descontoMensal: 0,
+      descontoSemestral: 15,
+      descontoAnual: 30,
+      destaque: false,
       recursos: [
-        "Até 5 profissionais",
         "Todas funcionalidades",
         "Programa de fidelidade",
         "Relatórios avançados",
@@ -41,10 +47,31 @@ export function Precos() {
       ],
     },
     {
-      nome: "Enterprise",
-      descricao: "Para grandes estabelecimentos",
-      precoMensal: 399,
-      precoAnual: 3990,
+      nome: "6 a 15 Profissionais",
+      descricao: "",
+      precoMensal: 134.50,
+      precoSemestral: 111.00,
+      precoAnual: 88.00,
+      descontoMensal: 0,
+      descontoSemestral: 15,
+      descontoAnual: 30,
+      destaque: true,
+      recursos: [
+        "Múltiplas unidades",
+        "API personalizada",
+        "Treinamento dedicado",
+        "Suporte prioritário",
+      ],
+    },
+    {
+      nome: "+15 Profissionais",
+      descricao: "",
+      precoMensal: 189.90,
+      precoSemestral: 158.50,
+      precoAnual: 126.90,
+      descontoMensal: 0,
+      descontoSemestral: 15,
+      descontoAnual: 30,
       destaque: false,
       recursos: [
         "Profissionais ilimitados",
@@ -55,6 +82,28 @@ export function Precos() {
       ],
     },
   ];
+
+  const getPrecoAtual = (plano: typeof planos[0]) => {
+    switch (planoPeriodo) {
+      case 'anual':
+        return plano.precoAnual;
+      case 'semestral':
+        return plano.precoSemestral;
+      case 'mensal':
+        return plano.precoMensal;
+    }
+  };
+
+  const getDescontoAtual = (plano: typeof planos[0]) => {
+    switch (planoPeriodo) {
+      case 'anual':
+        return plano.descontoAnual;
+      case 'semestral':
+        return plano.descontoSemestral;
+      case 'mensal':
+        return plano.descontoMensal;
+    }
+  };
 
   useEffect(() => {
     // Previne cliques rápidos
@@ -71,7 +120,7 @@ export function Precos() {
     // Anima o toggle
     if (toggleRef.current) {
       const toggleAnim = gsap.to(toggleRef.current, {
-        scale: 0.95,
+        scale: 0.98,
         duration: 0.1,
         yoyo: true,
         repeat: 1,
@@ -79,27 +128,18 @@ export function Precos() {
       animationsRef.current.push(toggleAnim);
     }
 
-    // Anima o badge de desconto
-    if (badgeRef.current && isAnual) {
-      const badgeAnim = gsap.fromTo(
-        badgeRef.current,
-        { scale: 0, opacity: 0, x: -10 },
-        { scale: 1, opacity: 1, x: 0, duration: 0.5, ease: "back.out(1.7)" }
-      );
-      animationsRef.current.push(badgeAnim);
-    }
-
     // Anima os badges dos cards
     cardBadgeRefs.current.forEach((badge, index) => {
       if (badge) {
-        if (isAnual) {
+        if (planoPeriodo !== 'mensal') {
           const cardBadgeAnim = gsap.fromTo(
             badge,
-            { scale: 0, opacity: 0, y: -20 },
+            { scale: 0, opacity: 0, y: -20, x: '-50%' },
             { 
               scale: 1, 
               opacity: 1, 
-              y: 0, 
+              y: 0,
+              x: '-50%',
               duration: 0.5, 
               delay: index * 0.1,
               ease: "back.out(1.7)" 
@@ -111,6 +151,7 @@ export function Precos() {
             scale: 0,
             opacity: 0,
             y: -20,
+            x: '-50%',
             duration: 0.5,
             delay: index * 0.1,
             ease: "back.in(1.7)"
@@ -121,9 +162,9 @@ export function Precos() {
     });
 
     // Anima os preços com contagem
-    const targetPrices = planos.map(plano => isAnual ? plano.precoAnual : plano.precoMensal);
+    const targetPrices = planos.map(plano => getPrecoAtual(plano));
     
-    planos.forEach((plano, index) => {
+    planos.forEach((_plano, index) => {
       const targetPrice = targetPrices[index];
       const currentPrice = displayPrecos[index];
       
@@ -144,7 +185,7 @@ export function Precos() {
           ease: "power2.out",
           onUpdate: () => {
             if (priceRefs.current[index]) {
-              priceRefs.current[index]!.textContent = `$${Math.round(obj.value)}`;
+              priceRefs.current[index]!.textContent = obj.value.toFixed(2).replace('.', ',');
             }
           },
           onComplete: () => {
@@ -157,7 +198,7 @@ export function Precos() {
         animationsRef.current.push(countAnim);
       }
     });
-  }, [isAnual]);
+  }, [planoPeriodo]);
 
   return (
     <section className="w-full py-12 md:py-16 bg-zinc-800 overflow-hidden">
@@ -169,39 +210,69 @@ export function Precos() {
             Escolha o plano ideal para seu negócio
           </h2>
           <p className="text-zinc-400 text-xs md:text-sm">
-            Escolha entre nossos 3 planos acessíveis
+            Escolha entre nossos 4 planos acessíveis
           </p>
         </div>
 
-        {/* Toggle Mensal/Anual */}
-        <div className="flex items-center justify-center gap-3 mb-8 md:mb-10">
-          <span className={`text-sm transition-all duration-300 ${!isAnual ? 'text-white font-semibold' : 'text-zinc-400'}`}>
-            Mensal
-          </span>
+        {/* Toggle Anual/Semestral/Mensal */}
+        <div 
+          ref={toggleRef}
+          className="flex items-center justify-center gap-0 mb-8 md:mb-10 bg-zinc-700 rounded-lg p-1 max-w-md mx-auto"
+        >
           <button
-            ref={toggleRef}
             onClick={() => {
               if (!isAnimatingRef.current) {
-                setIsAnual(!isAnual);
+                setPlanoPeriodo('anual');
               }
             }}
-            className={`relative w-14 h-7 rounded-full transition-all duration-300 ${
-              isAnual ? 'bg-indigo-600' : 'bg-zinc-700'
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+              planoPeriodo === 'anual' 
+                ? 'bg-indigo-600 text-white shadow-lg' 
+                : 'text-zinc-300 hover:text-white'
             }`}
           >
-            <div
-              className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
-                isAnual ? 'translate-x-7' : 'translate-x-0'
-              }`}
-            />
+            <div className="text-center">
+              <div>ANUAL</div>
+              <div className="text-xs mt-0.5">30% DE DESCONTO</div>
+            </div>
           </button>
-          <span className={`text-sm transition-all duration-300 ${isAnual ? 'text-white font-semibold' : 'text-zinc-400'}`}>
-            Anual
-          </span>
+          <button
+            onClick={() => {
+              if (!isAnimatingRef.current) {
+                setPlanoPeriodo('semestral');
+              }
+            }}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+              planoPeriodo === 'semestral' 
+                ? 'bg-indigo-600 text-white shadow-lg' 
+                : 'text-zinc-300 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div>SEMESTRAL</div>
+              <div className="text-xs mt-0.5">15% DE DESCONTO</div>
+            </div>
+          </button>
+          <button
+            onClick={() => {
+              if (!isAnimatingRef.current) {
+                setPlanoPeriodo('mensal');
+              }
+            }}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+              planoPeriodo === 'mensal' 
+                ? 'bg-indigo-600 text-white shadow-lg' 
+                : 'text-zinc-300 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div>MENSAL</div>
+            </div>
+          </button>
         </div>
 
         {/* Grid de Planos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {planos.map((plano, index) => (
             <div
               key={index}
@@ -216,11 +287,11 @@ export function Precos() {
                 ref={(el) => {
                   cardBadgeRefs.current[index] = el;
                 }}
-                className="absolute -top-3 left-1/2 -translate-x-1/2 pointer-events-none"
+                className="absolute -top-3 left-1/2 pointer-events-none"
                 style={{ opacity: 0, transform: 'translateX(-50%) scale(0)' }}
               >
                 <span className="text-xs bg-green-600 text-white px-3 py-1 rounded-full font-semibold shadow-lg">
-                  Economize 20%
+                  {getDescontoAtual(plano)}% OFF
                 </span>
               </div>
 
@@ -231,17 +302,20 @@ export function Precos() {
                 
                 {/* Preço */}
                 <div className="mb-4 overflow-hidden">
-                  <span 
-                    ref={(el) => {
-                      priceRefs.current[index] = el;
-                    }}
-                    className="inline-block text-3xl md:text-4xl font-bold text-white"
-                  >
-                    ${displayPrecos[index]}
-                  </span>
-                  <span className="text-zinc-400 text-sm">
-                    /{isAnual ? 'ano' : 'mês'}
-                  </span>
+                  <div className="flex items-start justify-center gap-1">
+                    <span className="text-sm text-zinc-400 mt-1">R$</span>
+                    <span 
+                      ref={(el) => {
+                        priceRefs.current[index] = el;
+                      }}
+                      className="inline-block text-3xl md:text-4xl font-bold text-white"
+                    >
+                      {displayPrecos[index].toFixed(2).replace('.', ',')}
+                    </span>
+                    <span className="text-zinc-400 text-sm mt-1">
+                      /mês
+                    </span>
+                  </div>
                 </div>
 
                 {/* Botão */}
