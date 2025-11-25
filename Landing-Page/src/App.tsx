@@ -1,5 +1,6 @@
 import { About } from "./components/landing/About/About";
 import { ComoIniciar } from "./components/landing/ComoIniciar/ComoIniciar";
+import { CTA } from "./components/landing/CTA/CTA";
 import { Funcionalidades } from "./components/landing/Funcionalidades/Funcionalidades";
 import { Hero } from "./components/landing/Hero/Hero";
 import { NavBar } from "./components/landing/NavBar/NavBar";
@@ -16,6 +17,7 @@ export default function App() {
       <Funcionalidades/>
       <ComoIniciar/>
       <Precos/>
+      <CTA/>
     </div>
   )
 }
