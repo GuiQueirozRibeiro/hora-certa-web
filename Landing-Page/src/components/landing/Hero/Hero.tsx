@@ -1,4 +1,5 @@
-import { FaGoogle, FaApple } from "react-icons/fa";
+import appStoreBadge from '@/assets/app-store-badge.png';
+import googlePlayBadge from '@/assets/GooglePlay.png';
 
 export function Hero() {
   return (
@@ -31,19 +32,16 @@ export function Hero() {
           <p className="text-sm md:text-base mb-2 sm:mb-0">Baixe o aplicativo nas Stores</p>
         </div>
 
-        <div className="flex justify-center mt-4 md:mt-5 text-white px-4">
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto max-w-sm sm:max-w-none">
-            <button className="border border-white/30 rounded-lg p-3 md:p-2 flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
-              <FaApple size={22}/>
-              <span className="text-sm md:text-xs font-bold">App Store</span>
-            </button>
-            <button className="border border-white/30 rounded-lg p-3 md:p-2 flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
-              <FaGoogle size={20}/>
-              <span className="text-sm md:text-xs font-bold">Google Play</span>
-            </button>
+        <div className="flex justify-center mt-4 md:mt-5 px-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto max-w-sm sm:max-w-none items-center">
+            <a href="#" className="hover:opacity-80 transition-opacity flex items-center">
+              <img src={appStoreBadge} alt="Baixar na App Store" className="h-12 md:h-14" />
+            </a>
+            <a href="#" className="hover:opacity-80 transition-opacity flex items-center">
+              <img src={googlePlayBadge} alt="Disponível no Google Play" className="h-12 md:h-14" />
+            </a>
           </div>
         </div>
-
       </div>
     </section>
   );

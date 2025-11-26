@@ -7,7 +7,6 @@ export function Precos() {
   const [displayPrecos, setDisplayPrecos] = useState([28.90, 49.90, 88.00, 126.90]);
   const priceRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const toggleRef = useRef<HTMLDivElement>(null);
-  const badgeRef = useRef<HTMLSpanElement>(null);
   const cardBadgeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationsRef = useRef<gsap.core.Tween[]>([]);
   const isAnimatingRef = useRef(false);
