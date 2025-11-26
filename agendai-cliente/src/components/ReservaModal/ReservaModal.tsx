@@ -24,7 +24,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
   const { user } = useAuth();
   const { createAppointment } = useAppointments();
   const { professionals, loading: loadingProfessionals } = useProfessionals(barbeariaId);
-  const { schedules, loading: loadingSchedules, getScheduleForDay } = useProfessionalSchedules();
+  const { schedules, getScheduleForDay } = useProfessionalSchedules();
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Inicializa com o domingo da semana atual

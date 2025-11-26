@@ -1,5 +1,5 @@
 // src/components/Configuracoes/FormPagamentos.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, CreditCard } from 'lucide-react';
 import { SiNubank } from "react-icons/si";
 import { SiPicpay } from "react-icons/si";

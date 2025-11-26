@@ -1,5 +1,5 @@
 import React from 'react';
-import { useProfessionals } from '../../hooks/Useprofessionals';
+import { useProfessionals } from '../../hooks/useProfessionals';
 
 interface ProfessionalsTabProps {
   businessId: string;

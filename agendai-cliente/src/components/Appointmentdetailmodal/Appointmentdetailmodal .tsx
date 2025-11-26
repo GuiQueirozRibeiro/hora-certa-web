@@ -26,7 +26,7 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const badges = {
+    const badges: Record<string, { text: string; color: string }> = {
       scheduled: { text: 'Confirmado', color: 'bg-green-500' },
       confirmed: { text: 'Confirmado', color: 'bg-green-500' },
       cancelled: { text: 'Cancelado', color: 'bg-red-500' },

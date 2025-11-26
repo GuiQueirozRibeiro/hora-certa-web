@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppointments } from '../../hooks/Useappointments';
-import type { AppointmentWithDetails } from '../../types/types';
 
 const NextAppointments: React.FC = () => {
   const { user } = useAuth();
-  const { appointments, loading } = useAppointments({});
+  const { appointments } = useAppointments({});
 
   // Filtrar apenas agendamentos confirmados (scheduled e confirmed) futuros
   const upcomingAppointments = appointments
