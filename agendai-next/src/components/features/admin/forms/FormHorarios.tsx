@@ -6,6 +6,8 @@ import { Calendar, Copy, Save, RotateCcw } from 'lucide-react';
 import { DiaFuncionamentoCard, HorarioFuncionamento } from '../DiaFuncionamentoCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { ToastContainer } from '@/components/ui/Toast';
+import { useToast } from '@/hooks/useToast';
 
 // ========================================
 // DADOS MOCK (Temporário - substituir por API)
@@ -87,6 +89,11 @@ const horariosPadrao: HorarioFuncionamento[] = [
  */
 export function FormHorarios() {
   // ========================================
+  // HOOKS
+  // ========================================
+  const { toasts, removeToast, success, warning, info } = useToast();
+
+  // ========================================
   // ESTADO
   // ========================================
   const [horarios, setHorarios] = useState<HorarioFuncionamento[]>(horariosPadrao);
@@ -110,6 +117,13 @@ export function FormHorarios() {
       h.dia === horarioAtualizado.dia ? horarioAtualizado : h
     ));
     setHasChanges(true);
+    
+    // Notificação de alteração
+    info(
+      'Alteração registrada',
+      `Horário de ${horarioAtualizado.dia} foi atualizado. Clique em "Salvar alterações" para confirmar.`,
+      3000
+    );
   };
 
   /**
@@ -120,10 +134,13 @@ export function FormHorarios() {
     console.log('Salvando horários:', horarios);
     setHasChanges(false);
     // TODO: POST /api/horarios-funcionamento
-    // Simula sucesso
-    setTimeout(() => {
-      alert('Horários salvos com sucesso!');
-    }, 500);
+    
+    // Notificação de sucesso
+    success(
+      'Horários salvos com sucesso!',
+      'Os horários de funcionamento foram atualizados e já estão em vigor.',
+      4000
+    );
   };
 
   /**
@@ -132,6 +149,13 @@ export function FormHorarios() {
   const handleReset = () => {
     setHorarios(horariosPadrao);
     setHasChanges(false);
+    
+    // Notificação de reset
+    warning(
+      'Horários resetados',
+      'Os horários foram restaurados para o padrão.',
+      3000
+    );
   };
 
   /**
@@ -142,6 +166,8 @@ export function FormHorarios() {
 
     const diaOrigem = horarios.find(h => h.dia === diaParaCopiar);
     if (!diaOrigem) return;
+
+    const diasAfetados = horarios.filter(h => h.ativo && h.dia !== diaParaCopiar).length;
 
     setHorarios(horarios.map(h => {
       // Não copia para o próprio dia ou dias inativos
@@ -157,6 +183,13 @@ export function FormHorarios() {
     }));
     setHasChanges(true);
     setDiaParaCopiar('');
+    
+    // Notificação de cópia
+    success(
+      'Horários copiados!',
+      `O horário de ${diaOrigem.dia} foi aplicado em ${diasAfetados} dia(s).`,
+      4000
+    );
   };
 
   // ========================================
@@ -361,6 +394,15 @@ export function FormHorarios() {
           <li>• Use "Copiar para todos" para aplicar o mesmo horário em múltiplos dias</li>
         </ul>
       </div>
+
+      {/* ========================================
+          CONTAINER DE NOTIFICAÇÕES
+      ======================================== */}
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={removeToast}
+        position="top-right"
+      />
     </div>
   );
 }
