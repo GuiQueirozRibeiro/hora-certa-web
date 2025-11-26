@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import { ServicoCard, Servico } from '../ServicoCard';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 
 // ========================================
 // DADOS MOCK (Temporário - substituir por API)
@@ -89,6 +90,8 @@ export function FormServicos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todas');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
+  const [modalExcluir, setModalExcluir] = useState(false);
+  const [servicoParaExcluir, setServicoParaExcluir] = useState<string | null>(null);
 
   // ========================================
   // HANDLERS
@@ -113,12 +116,20 @@ export function FormServicos() {
   };
 
   /**
-   * Remove serviço após confirmação
-   * TODO: Adicionar modal de confirmação
+   * Abre modal de confirmação para excluir serviço
    */
   const handleDeleteServico = (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este serviço?')) {
-      setServicos(servicos.filter(s => s.id !== id));
+    setServicoParaExcluir(id);
+    setModalExcluir(true);
+  };
+
+  /**
+   * Confirma exclusão do serviço
+   */
+  const confirmarExclusao = () => {
+    if (servicoParaExcluir) {
+      setServicos(servicos.filter(s => s.id !== servicoParaExcluir));
+      setServicoParaExcluir(null);
       // TODO: Chamar API para deletar
     }
   };
@@ -280,6 +291,35 @@ export function FormServicos() {
           </p>
         </div>
       )}
+
+      {/* ========================================
+          MODAL DE CONFIRMAÇÃO
+      ======================================== */}
+      <Modal
+        isOpen={modalExcluir}
+        onClose={() => {
+          setModalExcluir(false);
+          setServicoParaExcluir(null);
+        }}
+        onConfirm={confirmarExclusao}
+        title="Excluir serviço"
+        description="Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita e afetará os agendamentos futuros."
+        confirmText="Sim, excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      >
+        {servicoParaExcluir && (() => {
+          const servico = servicos.find(s => s.id === servicoParaExcluir);
+          return servico ? (
+            <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700">
+              <p className="text-sm text-zinc-200 font-medium mb-1">{servico.nome}</p>
+              <p className="text-xs text-zinc-500">
+                {servico.categoria} • R$ {servico.preco.toFixed(2)}
+              </p>
+            </div>
+          ) : null;
+        })()}
+      </Modal>
     </div>
   );
 }

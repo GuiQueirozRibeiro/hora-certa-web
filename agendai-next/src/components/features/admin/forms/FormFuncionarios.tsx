@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { FuncionarioCard, Funcionario } from '../FuncionarioCard';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 
 // ========================================
 // DADOS MOCK (Temporário - substituir por API)
@@ -66,6 +67,8 @@ export function FormFuncionarios() {
   // ========================================
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>(funcionariosMock);
   const [searchTerm, setSearchTerm] = useState('');
+  const [modalExcluir, setModalExcluir] = useState(false);
+  const [funcionarioParaExcluir, setFuncionarioParaExcluir] = useState<string | null>(null);
 
   // ========================================
   // HANDLERS
@@ -90,12 +93,20 @@ export function FormFuncionarios() {
   };
 
   /**
-   * Remove funcionário após confirmação
-   * TODO: Adicionar modal de confirmação
+   * Abre modal de confirmação para excluir funcionário
    */
   const handleDeleteFuncionario = (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este funcionário?')) {
-      setFuncionarios(funcionarios.filter(f => f.id !== id));
+    setFuncionarioParaExcluir(id);
+    setModalExcluir(true);
+  };
+
+  /**
+   * Confirma exclusão do funcionário
+   */
+  const confirmarExclusao = () => {
+    if (funcionarioParaExcluir) {
+      setFuncionarios(funcionarios.filter(f => f.id !== funcionarioParaExcluir));
+      setFuncionarioParaExcluir(null);
       // TODO: Chamar API para deletar
     }
   };
@@ -179,6 +190,33 @@ export function FormFuncionarios() {
           </p>
         </div>
       )}
+
+      {/* ========================================
+          MODAL DE CONFIRMAÇÃO
+      ======================================== */}
+      <Modal
+        isOpen={modalExcluir}
+        onClose={() => {
+          setModalExcluir(false);
+          setFuncionarioParaExcluir(null);
+        }}
+        onConfirm={confirmarExclusao}
+        title="Excluir funcionário"
+        description="Tem certeza que deseja excluir este funcionário? Esta ação não pode ser desfeita."
+        confirmText="Sim, excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      >
+        {funcionarioParaExcluir && (() => {
+          const funcionario = funcionarios.find(f => f.id === funcionarioParaExcluir);
+          return funcionario ? (
+            <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700">
+              <p className="text-sm text-zinc-200 font-medium mb-1">{funcionario.nome}</p>
+              <p className="text-xs text-zinc-500">{funcionario.tipo}</p>
+            </div>
+          ) : null;
+        })()}
+      </Modal>
     </div>
   );
 }
