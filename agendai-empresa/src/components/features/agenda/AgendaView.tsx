@@ -91,6 +91,43 @@ const mockAppointments = [
     color: 'bg-purple-600/90',
     date: new Date(),
   },
+  // Exemplos de datas personalizadas:
+  // Para dia 25 de novembro de 2025
+  {
+    id: 8,
+    professionalId: 1,
+    professionalName: 'Rafael Pereira',
+    clientName: 'Lucas Martins',
+    service: 'Corte Masculino',
+    startTime: '09:00',
+    endTime: '09:45',
+    color: 'bg-indigo-600/90',
+    date: new Date(2025, 10, 25), // Ano, Mês (0-11), Dia
+  },
+  // Para dia 28 de novembro de 2025
+  {
+    id: 9,
+    professionalId: 2,
+    professionalName: 'Miguel Silva',
+    clientName: 'Beatriz Costa',
+    service: 'Hidratação',
+    startTime: '10:00',
+    endTime: '11:30',
+    color: 'bg-emerald-600/90',
+    date: new Date(2025, 10, 28), // Novembro = mês 10 (0-indexed)
+  },
+  // Para dia 30 de novembro de 2025
+  {
+    id: 10,
+    professionalId: 3,
+    professionalName: 'João Souza',
+    clientName: 'Patricia Silva',
+    service: 'Corte + Escova',
+    startTime: '15:00',
+    endTime: '16:30',
+    color: 'bg-purple-600/90',
+    date: new Date(2025, 10, 30),
+  },
 ];
 
 export function AgendaView() {
