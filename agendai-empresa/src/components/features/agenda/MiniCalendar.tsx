@@ -16,7 +16,12 @@ import {
 import { ptBR } from 'date-fns/locale'; // Importa o idioma português
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export function MiniCalendar() {
+interface MiniCalendarProps {
+  selectedDate: Date;
+  onDateSelect: (date: Date) => void;
+}
+
+export function MiniCalendar({ selectedDate, onDateSelect }: MiniCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   
   // Lógica Matemática do Calendário:
@@ -71,17 +76,21 @@ export function MiniCalendar() {
         {calendarDays.map((day) => {
           // Estilos condicionais
           const isCurrentMonth = isSameMonth(day, monthStart);
-          const isToday = isSameDay(day, new Date()); 
+          const isToday = isSameDay(day, new Date());
+          const isSelected = isSameDay(day, selectedDate);
 
           return (
             <button
               key={day.toString()}
+              onClick={() => onDateSelect(day)}
               className={`
                 h-8 w-full flex items-center justify-center rounded-md text-sm transition-all
                 
                 ${!isCurrentMonth ? 'text-zinc-700' : 'text-zinc-300 hover:bg-zinc-800'}
                 
-                ${isToday ? 'bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-500/20' : ''}
+                ${isToday && !isSelected ? 'bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-500/20' : ''}
+                
+                ${isSelected ? 'bg-emerald-600 text-white hover:bg-emerald-700 font-bold shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-400' : ''}
               `}
             >
               {format(day, 'd')}

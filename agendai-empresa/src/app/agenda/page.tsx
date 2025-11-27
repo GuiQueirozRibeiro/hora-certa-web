@@ -9,7 +9,7 @@ export default function AgendaPage() {
       <NavBar />
       
       <main className="flex-1 p-6 overflow-auto flex flex-col">
-        <h1 className="text-2xl font-bold text-zinc-100 mb-6">Agenda</h1>
+        <h1 className="text-xl font-bold text-zinc-100 mb-4">Agenda</h1>
         <AgendaView />
       </main>
     </div>
