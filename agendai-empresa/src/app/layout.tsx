@@ -16,7 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} bg-zinc-900 min-h-screen flex flex-col`}>{children}</body>
+      <body className={inter.className}>
+        <div className="bg-zinc-900 min-h-screen flex flex-col">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
