@@ -1,12 +1,18 @@
 // src/app/login/page.tsx
-"use client"; // 👈 Obrigatório porque tem interatividade (LoginModal)
+"use client";
 
+import { useRouter } from 'next/navigation';
 import LoginModal from '@/components/features/auth/LoginModal';
 
-// Se você tiver uma imagem de fundo, coloque em public/ e use assim:
-// const fundoLogin = '/fundo-login.jpg';
-
 export default function LoginPage() {
+  const router = useRouter();
+
+  const handleLoginSuccess = () => {
+    console.log('Login realizado com sucesso!');
+    // Redireciona para a página da agenda
+    router.push('/agenda');
+  };
+
   return (
     <div className="min-h-screen w-full relative flex flex-col">
       {/* Background Image */}
@@ -33,11 +39,7 @@ export default function LoginPage() {
           <LoginModal
             isOpen={true}
             onClose={() => {}}
-            onLoginSuccess={() => {
-              console.log('Login realizado com sucesso!');
-              // Em Next.js, usamos o router para navegar
-              // window.location.href = '/dashboard'; // ou router.push
-            }}
+            onLoginSuccess={handleLoginSuccess}
           />
         </div>
       </div>
