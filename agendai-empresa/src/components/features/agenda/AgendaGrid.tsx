@@ -133,20 +133,22 @@ export function AgendaGrid({ selectedDate, professionals, appointments }: Agenda
                         return (
                           <div
                             key={appointment.id}
-                            className={`absolute ${appointment.color} border-l-4 rounded-md p-2 pointer-events-auto cursor-pointer hover:shadow-lg hover:z-20 transition-all overflow-hidden`}
+                            className="absolute pointer-events-auto cursor-pointer group"
                             style={{
                               ...style,
-                              left: '6px',
-                              right: '6px',
+                              left: '8px',
+                              right: '8px',
                               height: `${height}px`,
-                              minHeight: '40px',
+                              minHeight: '24px',
                             }}
                           >
-                            <div className="text-xs font-semibold text-white mb-0.5 truncate">
-                              {appointment.clientName}
-                            </div>
-                            <div className="text-[10px] text-white/80 truncate">
-                              {appointment.service}
+                            <div className="flex items-center h-full gap-2">
+                              <div 
+                                className={`w-1 h-full rounded-full ${appointment.color}`}
+                              />
+                              <span className="text-xs text-zinc-300 group-hover:text-white transition-colors truncate font-medium">
+                                {appointment.clientName}
+                              </span>
                             </div>
                           </div>
                         );
