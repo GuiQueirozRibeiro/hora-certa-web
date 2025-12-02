@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Edit, Trash2, Clock, DollarSign, Scissors } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Clock, DollarSign, Scissors, Power } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { formatPrice, formatDuration } from '@/lib/mappers/serviceMapper';
 import type { Service } from '@/types/service';
@@ -14,6 +14,7 @@ interface ServicoCardProps {
   servico: Service;
   onEdit: (servico: Service) => void;
   onDelete: (id: string) => void;
+  onToggleStatus: (id: string, currentStatus: boolean) => void;
 }
 
 // ========================================
@@ -26,7 +27,7 @@ interface ServicoCardProps {
  * - Open/Closed: Extensível via props, sem modificar o componente
  * - Dependency Inversion: Recebe callbacks, não conhece a implementação
  */
-export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
+export function ServicoCard({ servico, onEdit, onDelete, onToggleStatus }: ServicoCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // ========================================
@@ -99,6 +100,22 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
               >
                 <Edit className="h-4 w-4" />
                 <span>Editar serviço</span>
+              </button>
+
+              {/* Opção: Alternar Status */}
+              <button
+                onClick={() => {
+                  onToggleStatus(servico.id, servico.is_active);
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                  servico.is_active 
+                    ? 'text-amber-400 hover:bg-amber-500/10 hover:text-amber-300' 
+                    : 'text-green-400 hover:bg-green-500/10 hover:text-green-300'
+                }`}
+              >
+                <Power className="h-4 w-4" />
+                <span>{servico.is_active ? 'Desativar serviço' : 'Ativar serviço'}</span>
               </button>
 
               {/* Opção: Excluir */}

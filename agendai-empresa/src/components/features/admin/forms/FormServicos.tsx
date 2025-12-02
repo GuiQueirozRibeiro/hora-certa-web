@@ -3,10 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
-import { ServicoCard } from '../services/ServicoCard';
+import { ServiceList } from '../servicos/ServiceList';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { ServiceModal } from '../services/ServiceModal';
+import { ServiceModal } from '../servicos/ServiceModal';
 import { serviceService } from '@/services/serviceService';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
@@ -106,6 +106,19 @@ export function FormServicos() {
       setServicoParaExcluir(null);
     } catch (error: any) {
       showError('Erro ao excluir serviço', error.message);
+    }
+  };
+
+  /**
+   * Alterna o status do serviço (Ativo/Inativo)
+   */
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      const updatedService = await serviceService.toggleServiceStatus(id, !currentStatus);
+      setServicos(servicos.map(s => s.id === id ? updatedService : s));
+      success(`Serviço ${!currentStatus ? 'ativado' : 'desativado'} com sucesso!`);
+    } catch (error: any) {
+      showError('Erro ao alterar status', error.message);
     }
   };
 
@@ -260,36 +273,13 @@ export function FormServicos() {
       {/* ========================================
           GRID DE SERVIÇOS
       ======================================== */}
-      {loading ? (
-        <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
-          <p className="text-zinc-500">Carregando serviços...</p>
-        </div>
-      ) : servicosFiltrados.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {servicosFiltrados.map((servico) => (
-            <ServicoCard
-              key={servico.id}
-              servico={servico}
-              onEdit={handleEditServico}
-              onDelete={handleDeleteServico}
-            />
-          ))}
-        </div>
-      ) : (
-        // Mensagem quando não há resultados
-        <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
-          <p className="text-zinc-500 mb-2">
-            {searchTerm || filtroCategoria !== 'todas' || filtroStatus !== 'todos'
-              ? 'Nenhum serviço encontrado com os filtros aplicados'
-              : 'Nenhum serviço cadastrado'}
-          </p>
-          <p className="text-sm text-zinc-600">
-            {searchTerm || filtroCategoria !== 'todas' || filtroStatus !== 'todos'
-              ? 'Tente ajustar os filtros de busca'
-              : 'Clique em "Adicionar Serviço" para começar'}
-          </p>
-        </div>
-      )}
+      <ServiceList
+        services={servicosFiltrados}
+        loading={loading}
+        onEdit={handleEditServico}
+        onDelete={handleDeleteServico}
+        onToggleStatus={handleToggleStatus}
+      />
 
       {/* ========================================
           MODAL DE SERVIÇO (Criar/Editar)
