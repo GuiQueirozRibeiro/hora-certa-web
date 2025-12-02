@@ -1,154 +1,133 @@
-import React from 'react';
+'use client';
 
-interface RegisterFormStep1Props {
-  nomeCompleto: string;
-  nomeEstabelecimento: string;
-  ddd: string;
-  telefone: string;
-  cnpjCpf: string;
-  email: string;
-  senha: string;
-  onNomeCompletoChange: (value: string) => void;
-  onNomeEstabelecimentoChange: (value: string) => void;
-  onDddChange: (value: string) => void;
-  onTelefoneChange: (value: string) => void;
-  onCnpjCpfChange: (value: string) => void;
-  onEmailChange: (value: string) => void;
-  onSenhaChange: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
+import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/useToast';
+
+interface RegisterFormProps {
   onSwitchToLogin: () => void;
 }
 
-const RegisterFormStep1: React.FC<RegisterFormStep1Props> = ({
-  nomeCompleto,
-  nomeEstabelecimento,
-  ddd,
-  telefone,
-  cnpjCpf,
-  email,
-  senha,
-  onNomeCompletoChange,
-  onNomeEstabelecimentoChange,
-  onDddChange,
-  onTelefoneChange,
-  onCnpjCpfChange,
-  onEmailChange,
-  onSenhaChange,
-  onSubmit,
-  onSwitchToLogin,
-}) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
+  const { signUp } = useAuth();
+  const { success: showSuccess, error: showError } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      showError('Erro de validação', 'As senhas não coincidem');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      showError('Erro de validação', 'A senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await signUp(formData.email, formData.password, formData.name);
+      showSuccess('Conta criada com sucesso!');
+      // O useAuth já redireciona para /administracao/setup
+    } catch (err: any) {
+      showError('Erro ao criar conta', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* Nome completo */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
-          Nome completo
+          Nome completo *
         </label>
         <input
           type="text"
-          value={nomeCompleto}
-          onChange={(e) => onNomeCompletoChange(e.target.value)}
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           placeholder="Digite seu nome completo"
           required
-        />
-      </div>
-
-      {/* Nome do estabelecimento */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Nome do estabelecimento
-        </label>
-        <input
-          type="text"
-          value={nomeEstabelecimento}
-          onChange={(e) => onNomeEstabelecimentoChange(e.target.value)}
-          className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-          placeholder="Digite o nome do estabelecimento"
-          required
-        />
-      </div>
-
-      {/* DDD + Telefone */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          DDD + telefone
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={ddd}
-            onChange={(e) => onDddChange(e.target.value.replace(/\D/g, '').slice(0, 2))}
-            className="w-20 bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-            placeholder="DDD"
-            maxLength={2}
-            required
-          />
-          <input
-            type="text"
-            value={telefone}
-            onChange={(e) => onTelefoneChange(e.target.value.replace(/\D/g, '').slice(0, 9))}
-            className="flex-1 bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-            placeholder="Telefone"
-            maxLength={9}
-            required
-          />
-        </div>
-      </div>
-
-      {/* CNPJ/CPF */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          CNPJ/CPF
-        </label>
-        <input
-          type="text"
-          value={cnpjCpf}
-          onChange={(e) => onCnpjCpfChange(e.target.value)}
-          className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-          placeholder="Digite o CNPJ ou CPF"
-          maxLength={18}
-          required
+          disabled={loading}
         />
       </div>
 
       {/* E-mail */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
-          E-mail
+          E-mail *
         </label>
         <input
           type="email"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           placeholder="Digite seu e-mail"
           required
+          disabled={loading}
         />
       </div>
 
       {/* Senha */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
-          Senha
+          Senha *
         </label>
         <input
           type="password"
-          value={senha}
-          onChange={(e) => onSenhaChange(e.target.value)}
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-          placeholder="Crie uma senha"
+          placeholder="Crie uma senha (mínimo 6 caracteres)"
           required
           minLength={6}
+          disabled={loading}
         />
+      </div>
+
+      {/* Confirmar Senha */}
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Confirmar senha *
+        </label>
+        <input
+          type="password"
+          value={formData.confirmPassword}
+          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+          className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+          placeholder="Digite a senha novamente"
+          required
+          minLength={6}
+          disabled={loading}
+        />
+      </div>
+
+      {/* Informação */}
+      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
+        <p className="text-xs text-indigo-300">
+          Após criar sua conta, você será direcionado para configurar sua empresa.
+        </p>
       </div>
 
       {/* Botão de submit */}
       <button
         type="submit"
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6"
+        disabled={loading}
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Confirmar
+        {loading ? 'Criando conta...' : 'Criar Conta'}
       </button>
 
       {/* Link para login */}
@@ -158,6 +137,7 @@ const RegisterFormStep1: React.FC<RegisterFormStep1Props> = ({
           type="button"
           onClick={onSwitchToLogin}
           className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+          disabled={loading}
         >
           Fazer login
         </button>
@@ -166,4 +146,4 @@ const RegisterFormStep1: React.FC<RegisterFormStep1Props> = ({
   );
 };
 
-export default RegisterFormStep1;
+export default RegisterForm;

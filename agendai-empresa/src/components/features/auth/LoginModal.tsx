@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import LoginForm from './LoginForm';
-import RegisterFormStep1 from './RegisterForm';
-import RegisterFormStep2 from './RegisterFormStep2';
+import RegisterForm from './RegisterForm';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -9,83 +8,14 @@ interface LoginModalProps {
   onLoginSuccess?: () => void;
 }
 
-type LoginStep = 'initial' | 'email-login' | 'signup-address';
+type LoginStep = 'initial' | 'email-login';
 type LoginMode = 'login' | 'signup';
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
   const [step, setStep] = useState<LoginStep>('initial');
   const [mode, setMode] = useState<LoginMode>('login');
   
-  // Campos de login
-  const [emailOrPhone, setEmailOrPhone] = useState('');
-  const [password, setPassword] = useState('');
-  
-  // Campos de cadastro - Etapa 1
-  const [nomeCompleto, setNomeCompleto] = useState('');
-  const [nomeEstabelecimento, setNomeEstabelecimento] = useState('');
-  const [ddd, setDdd] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [cnpjCpf, setCnpjCpf] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-
-  // Campos de cadastro - Etapa 2 (Endereço)
-  const [pais, setPais] = useState('');
-  const [cep, setCep] = useState('');
-  const [estado, setEstado] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState('');
-
   if (!isOpen) return null;
-
-  // Função para formatar CPF ou CNPJ
-  const formatCpfCnpj = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    
-    if (numbers.length <= 11) {
-      return numbers
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    } else {
-      return numbers
-        .replace(/(\d{2})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1/$2')
-        .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-    }
-  };
-
-  const handleCnpjCpfChange = (value: string) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 14);
-    const formatted = formatCpfCnpj(numbers);
-    setCnpjCpf(formatted);
-  };
-
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Login:', { emailOrPhone, password });
-    onLoginSuccess?.();
-    onClose();
-  };
-
-  const handleSignupStep1Submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep('signup-address');
-  };
-
-  const handleSignupStep2Submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Cadastro completo:', {
-      nomeCompleto, nomeEstabelecimento, ddd, telefone,
-      cnpjCpf, email, senha, pais, cep, estado, 
-      cidade, bairro, rua, numero
-    });
-    alert('Cadastro realizado com sucesso!');
-    handleCloseModal();
-  };
 
   const handleSocialLogin = (provider: string) => {
     console.log(`Login com ${provider}`);
@@ -96,29 +26,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const handleCloseModal = () => {
     setStep('initial');
     setMode('login');
-    setEmailOrPhone('');
-    setPassword('');
-    setNomeCompleto('');
-    setNomeEstabelecimento('');
-    setDdd('');
-    setTelefone('');
-    setCnpjCpf('');
-    setEmail('');
-    setSenha('');
-    setPais('');
-    setCep('');
-    setEstado('');
-    setCidade('');
-    setBairro('');
-    setRua('');
-    setNumero('');
     onClose();
   };
 
   const getTitle = () => {
     if (step === 'initial') return 'Fazer Login';
-    if (step === 'signup-address') return 'Dados para cadastro';
-    return mode === 'signup' ? 'Dados para cadastro' : 'Fazer Login';
+    return mode === 'signup' ? 'Criar Conta' : 'Fazer Login';
   };
 
   return (
@@ -196,13 +109,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
         {step === 'email-login' && mode === 'login' && (
           <>
-            <LoginForm
-              emailOrPhone={emailOrPhone}
-              password={password}
-              onEmailChange={setEmailOrPhone}
-              onPasswordChange={setPassword}
-              onSubmit={handleLoginSubmit}
-              onForgotPassword={() => console.log('Recuperar senha')}
+            <LoginForm 
               onSwitchToSignup={() => setMode('signup')}
             />
             <button
@@ -217,22 +124,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
         {step === 'email-login' && mode === 'signup' && (
           <>
-            <RegisterFormStep1
-              nomeCompleto={nomeCompleto}
-              nomeEstabelecimento={nomeEstabelecimento}
-              ddd={ddd}
-              telefone={telefone}
-              cnpjCpf={cnpjCpf}
-              email={email}
-              senha={senha}
-              onNomeCompletoChange={setNomeCompleto}
-              onNomeEstabelecimentoChange={setNomeEstabelecimento}
-              onDddChange={setDdd}
-              onTelefoneChange={setTelefone}
-              onCnpjCpfChange={handleCnpjCpfChange}
-              onEmailChange={setEmail}
-              onSenhaChange={setSenha}
-              onSubmit={handleSignupStep1Submit}
+            <RegisterForm 
               onSwitchToLogin={() => setMode('login')}
             />
             <button
@@ -243,27 +135,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               ← Voltar
             </button>
           </>
-        )}
-
-        {step === 'signup-address' && (
-          <RegisterFormStep2
-            pais={pais}
-            cep={cep}
-            estado={estado}
-            cidade={cidade}
-            bairro={bairro}
-            rua={rua}
-            numero={numero}
-            onPaisChange={setPais}
-            onCepChange={setCep}
-            onEstadoChange={setEstado}
-            onCidadeChange={setCidade}
-            onBairroChange={setBairro}
-            onRuaChange={setRua}
-            onNumeroChange={setNumero}
-            onSubmit={handleSignupStep2Submit}
-            onBack={() => setStep('email-login')}
-          />
         )}
     </div>
   );
