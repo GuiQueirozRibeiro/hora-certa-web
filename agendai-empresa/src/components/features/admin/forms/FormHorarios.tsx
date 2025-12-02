@@ -1,13 +1,15 @@
 // src/components/features/admin/forms/FormHorarios.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Copy, Save, RotateCcw } from 'lucide-react';
 import { DiaFuncionamentoCard, HorarioFuncionamento } from '../DiaFuncionamentoCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/hooks/useAuth';
+import { businessService } from '@/services/businessService';
 
 // ========================================
 // DADOS MOCK (Temporário - substituir por API)
@@ -91,7 +93,8 @@ export function FormHorarios() {
   // ========================================
   // HOOKS
   // ========================================
-  const { toasts, removeToast, success, warning, info } = useToast();
+  const { toasts, removeToast, success, warning, info, error: showError } = useToast();
+  const { business, refreshBusiness } = useAuth();
 
   // ========================================
   // ESTADO
@@ -99,11 +102,31 @@ export function FormHorarios() {
   const [horarios, setHorarios] = useState<HorarioFuncionamento[]>(horariosPadrao);
   const [hasChanges, setHasChanges] = useState(false);
   const [diaParaCopiar, setDiaParaCopiar] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Estados dos modais
   const [modalCopiar, setModalCopiar] = useState(false);
   const [modalResetar, setModalResetar] = useState(false);
   const [modalSalvar, setModalSalvar] = useState(false);
+
+  // ========================================
+  // EFEITOS
+  // ========================================
+  useEffect(() => {
+    if (business) {
+      console.log('[FormHorarios] Dados da empresa carregados:', {
+        id: business.id,
+        opening_hours: business.opening_hours
+      });
+
+      if (business.opening_hours && Array.isArray(business.opening_hours) && business.opening_hours.length > 0) {
+        console.log('[FormHorarios] Aplicando horários do banco de dados');
+        setHorarios(business.opening_hours as HorarioFuncionamento[]);
+      } else {
+        console.log('[FormHorarios] Usando horários padrão (sem dados no banco)');
+      }
+    }
+  }, [business]);
 
   // ========================================
   // HANDLERS
@@ -128,19 +151,31 @@ export function FormHorarios() {
 
   /**
    * Salva todas as alterações (chamada da API)
-   * TODO: Integrar com backend
    */
-  const handleSaveAll = () => {
-    console.log('Salvando horários:', horarios);
-    setHasChanges(false);
-    // TODO: POST /api/horarios-funcionamento
-    
-    // Notificação de sucesso
-    success(
-      'Horários salvos com sucesso!',
-      'Os horários de funcionamento foram atualizados e já estão em vigor.',
-      4000
-    );
+  const handleSaveAll = async () => {
+    if (!business) return;
+
+    setIsLoading(true);
+    try {
+      await businessService.updateBusiness(business.id, {
+        opening_hours: horarios
+      });
+      
+      await refreshBusiness();
+      setHasChanges(false);
+      setModalSalvar(false);
+      
+      // Notificação de sucesso
+      success(
+        'Horários salvos com sucesso!',
+        'Os horários de funcionamento foram atualizados e já estão em vigor.',
+        4000
+      );
+    } catch (error: any) {
+      showError('Erro ao salvar horários', error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /**
@@ -304,11 +339,11 @@ export function FormHorarios() {
         </p>
         <Button
           onClick={() => setModalSalvar(true)}
-          disabled={!hasChanges}
+          disabled={!hasChanges || isLoading}
           className="flex items-center gap-2"
         >
           <Save className="h-4 w-4" />
-          <span>Salvar alterações</span>
+          <span>{isLoading ? 'Salvando...' : 'Salvar alterações'}</span>
         </Button>
       </div>
 
@@ -386,12 +421,14 @@ export function FormHorarios() {
           DICAS
       ======================================== */}
       <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-        <h3 className="text-sm font-semibold text-indigo-400 mb-2">💡 Dicas</h3>
+        <h3 className="text-sm font-semibold text-indigo-400 mb-2">💡 Atenção: Configuração Necessária</h3>
+        <p className="text-xs text-zinc-300 mb-3">
+          Os horários exibidos abaixo são <strong>sugestões iniciais</strong>. Você precisa ajustá-los para corresponder ao funcionamento real da sua empresa.
+        </p>
         <ul className="text-xs text-zinc-400 space-y-1">
-          <li>• Clique no ícone de edição para modificar os horários de cada dia</li>
-          <li>• Use o toggle para marcar dias como fechados</li>
-          <li>• O intervalo é opcional (ex: horário de almoço)</li>
-          <li>• Use "Copiar para todos" para aplicar o mesmo horário em múltiplos dias</li>
+          <li>• Clique no ícone de edição (lápis) para definir seus horários reais</li>
+          <li>• Se os horários forem iguais, configure um dia e use "Copiar para todos"</li>
+          <li>• Lembre-se de clicar em <strong>Salvar alterações</strong> para confirmar</li>
         </ul>
       </div>
 
