@@ -1,77 +1,16 @@
 // src/components/features/admin/forms/FormServicos.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
-import { ServicoCard, Servico } from '../ServicoCard';
+import { ServicoCard } from '../services/ServicoCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-
-// ========================================
-// DADOS MOCK (Temporário - substituir por API)
-// ========================================
-const servicosMock: Servico[] = [
-  {
-    id: '1',
-    nome: 'Corte Masculino',
-    descricao: 'Corte de cabelo masculino tradicional com acabamento profissional',
-    duracao: 30,
-    preco: 35.00,
-    categoria: 'Corte',
-    profissionais: ['Rafael Pereira', 'Miguel Silva'],
-    ativo: true
-  },
-  {
-    id: '2',
-    nome: 'Barba Completa',
-    descricao: 'Aparar, modelar e finalizar a barba com toalha quente',
-    duracao: 45,
-    preco: 40.00,
-    categoria: 'Barba',
-    profissionais: ['Rafael Pereira'],
-    ativo: true
-  },
-  {
-    id: '3',
-    nome: 'Corte + Barba',
-    descricao: 'Combo completo de corte de cabelo e barba com desconto especial',
-    duracao: 60,
-    preco: 65.00,
-    categoria: 'Combo',
-    profissionais: ['Rafael Pereira', 'Miguel Silva'],
-    ativo: true
-  },
-  {
-    id: '4',
-    nome: 'Coloração',
-    descricao: 'Coloração profissional de cabelo com produtos de qualidade',
-    duracao: 90,
-    preco: 120.00,
-    categoria: 'Coloração',
-    profissionais: ['Miguel Silva'],
-    ativo: true
-  },
-  {
-    id: '5',
-    nome: 'Tratamento Capilar',
-    descricao: 'Hidratação profunda e tratamento para cabelos danificados',
-    duracao: 45,
-    preco: 80.00,
-    categoria: 'Tratamento',
-    profissionais: ['João Souza'],
-    ativo: false
-  },
-  {
-    id: '6',
-    nome: 'Corte Infantil',
-    descricao: 'Corte de cabelo para crianças até 12 anos',
-    duracao: 25,
-    preco: 25.00,
-    categoria: 'Corte',
-    profissionais: ['Rafael Pereira', 'Miguel Silva', 'João Souza'],
-    ativo: true
-  }
-];
+import { ServiceModal } from '../services/ServiceModal';
+import { serviceService } from '@/services/serviceService';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/useToast';
+import type { Service } from '@/types/service';
 
 // ========================================
 // COMPONENTE: Formulário de Serviços
@@ -86,33 +25,63 @@ export function FormServicos() {
   // ========================================
   // ESTADO
   // ========================================
-  const [servicos, setServicos] = useState<Servico[]>(servicosMock);
+  const [servicos, setServicos] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todas');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [modalExcluir, setModalExcluir] = useState(false);
   const [servicoParaExcluir, setServicoParaExcluir] = useState<string | null>(null);
+  const [modalServico, setModalServico] = useState(false);
+  const [servicoParaEditar, setServicoParaEditar] = useState<Service | null>(null);
+  
+  const { business } = useAuth();
+  const { success, error: showError } = useToast();
+
+  // ========================================
+  // CARREGAMENTO INICIAL
+  // ========================================
+  useEffect(() => {
+    if (business?.id) {
+      loadServicos();
+    }
+  }, [business?.id]);
+
+  /**
+   * Carrega serviços do banco de dados
+   */
+  const loadServicos = async () => {
+    if (!business?.id) return;
+    
+    setLoading(true);
+    try {
+      const data = await serviceService.getServicesByBusinessId(business.id);
+      setServicos(data);
+    } catch (error: any) {
+      showError('Erro ao carregar serviços', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ========================================
   // HANDLERS
   // ========================================
   
   /**
-   * Abre modal/formulário para adicionar novo serviço
-   * TODO: Implementar modal de cadastro
+   * Abre modal para adicionar novo serviço
    */
   const handleAddServico = () => {
-    console.log('Adicionar novo serviço');
-    // TODO: Abrir modal de cadastro
+    setServicoParaEditar(null);
+    setModalServico(true);
   };
 
   /**
-   * Abre modal/formulário para editar serviço existente
-   * TODO: Implementar modal de edição
+   * Abre modal para editar serviço existente
    */
-  const handleEditServico = (servico: Servico) => {
-    console.log('Editar serviço:', servico);
-    // TODO: Abrir modal de edição com dados pré-preenchidos
+  const handleEditServico = (servico: Service) => {
+    setServicoParaEditar(servico);
+    setModalServico(true);
   };
 
   /**
@@ -126,11 +95,28 @@ export function FormServicos() {
   /**
    * Confirma exclusão do serviço
    */
-  const confirmarExclusao = () => {
-    if (servicoParaExcluir) {
+  const confirmarExclusao = async () => {
+    if (!servicoParaExcluir) return;
+    
+    try {
+      await serviceService.deleteService(servicoParaExcluir);
       setServicos(servicos.filter(s => s.id !== servicoParaExcluir));
+      success('Serviço excluído com sucesso!');
+      setModalExcluir(false);
       setServicoParaExcluir(null);
-      // TODO: Chamar API para deletar
+    } catch (error: any) {
+      showError('Erro ao excluir serviço', error.message);
+    }
+  };
+
+  /**
+   * Fecha modal de serviço e recarrega dados se necessário
+   */
+  const handleCloseModalServico = (saved: boolean) => {
+    setModalServico(false);
+    setServicoParaEditar(null);
+    if (saved) {
+      loadServicos();
     }
   };
 
@@ -139,29 +125,38 @@ export function FormServicos() {
   // ========================================
   
   // Obter categorias únicas
-  const categorias = ['todas', ...Array.from(new Set(servicos.map(s => s.categoria)))];
+  const categorias = ['todas', ...Array.from(new Set(servicos.map(s => s.category).filter(Boolean)))];
 
   // Aplicar filtros
   const servicosFiltrados = servicos.filter(servico => {
     // Filtro de busca
-    const matchBusca = servico.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       servico.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchBusca = servico.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       (servico.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     // Filtro de categoria
-    const matchCategoria = filtroCategoria === 'todas' || servico.categoria === filtroCategoria;
+    const matchCategoria = filtroCategoria === 'todas' || servico.category === filtroCategoria;
     
     // Filtro de status
     const matchStatus = filtroStatus === 'todos' || 
-                       (filtroStatus === 'ativos' && servico.ativo) ||
-                       (filtroStatus === 'inativos' && !servico.ativo);
+                       (filtroStatus === 'ativos' && servico.is_active) ||
+                       (filtroStatus === 'inativos' && !servico.is_active);
     
     return matchBusca && matchCategoria && matchStatus;
   });
 
   // Estatísticas
   const totalServicos = servicos.length;
-  const servicosAtivos = servicos.filter(s => s.ativo).length;
-  const servicosInativos = servicos.filter(s => !s.ativo).length;
+  const servicosAtivos = servicos.filter(s => s.is_active).length;
+  const servicosInativos = servicos.filter(s => !s.is_active).length;
+
+  // Se não há empresa, exibir mensagem
+  if (!business) {
+    return (
+      <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
+        <p className="text-zinc-500 mb-2">Carregando informações da empresa...</p>
+      </div>
+    );
+  }
 
   // ========================================
   // RENDER
@@ -226,7 +221,7 @@ export function FormServicos() {
           <select
             value={filtroCategoria}
             onChange={(e) => setFiltroCategoria(e.target.value)}
-            className=" px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+            className="px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
           >
             {categorias.map((cat) => (
               <option key={cat} value={cat}>
@@ -265,7 +260,11 @@ export function FormServicos() {
       {/* ========================================
           GRID DE SERVIÇOS
       ======================================== */}
-      {servicosFiltrados.length > 0 ? (
+      {loading ? (
+        <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
+          <p className="text-zinc-500">Carregando serviços...</p>
+        </div>
+      ) : servicosFiltrados.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {servicosFiltrados.map((servico) => (
             <ServicoCard
@@ -293,7 +292,18 @@ export function FormServicos() {
       )}
 
       {/* ========================================
-          MODAL DE CONFIRMAÇÃO
+          MODAL DE SERVIÇO (Criar/Editar)
+      ======================================== */}
+      {modalServico && business && (
+        <ServiceModal
+          businessId={business.id}
+          service={servicoParaEditar}
+          onClose={handleCloseModalServico}
+        />
+      )}
+
+      {/* ========================================
+          MODAL DE CONFIRMAÇÃO EXCLUSÃO
       ======================================== */}
       <Modal
         isOpen={modalExcluir}
@@ -312,9 +322,9 @@ export function FormServicos() {
           const servico = servicos.find(s => s.id === servicoParaExcluir);
           return servico ? (
             <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700">
-              <p className="text-sm text-zinc-200 font-medium mb-1">{servico.nome}</p>
+              <p className="text-sm text-zinc-200 font-medium mb-1">{servico.name}</p>
               <p className="text-xs text-zinc-500">
-                {servico.categoria} • R$ {servico.preco.toFixed(2)}
+                {servico.category} • R$ {servico.price.toFixed(2)}
               </p>
             </div>
           ) : null;

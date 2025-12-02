@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { LogOut, User as UserIcon } from 'lucide-react';
 
 const Header: React.FC = () => {
-  const { user, business, signOut } = useAuth();
+  const { user, business, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -57,8 +57,9 @@ const Header: React.FC = () => {
     }
   };
 
-  if (!user) {
-    return null; // Não exibe header se não estiver logado
+  // Mostra header mesmo durante loading para evitar que suma
+  if (!user && !loading) {
+    return null; // Só não exibe se tiver terminado de carregar e não houver usuário
   }
 
   return (
@@ -74,24 +75,33 @@ const Header: React.FC = () => {
 
       {/* User Info */}
       <div className="flex items-center gap-4">
-        <div className="flex flex-col items-end">
-          <span className="text-sm font-semibold text-white">
-            {displayName}
-          </span>
-          <span className="text-xs text-gray-400">{formattedDate}</span>
-        </div>
+        {loading ? (
+          // Estado de loading
+          <div className="flex flex-col items-end">
+            <div className="h-4 w-32 bg-zinc-700 rounded animate-pulse"></div>
+            <span className="text-xs text-gray-400">{formattedDate}</span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-semibold text-white">
+              {displayName}
+            </span>
+            <span className="text-xs text-gray-400">{formattedDate}</span>
+          </div>
+        )}
         
         {/* Avatar com Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            onClick={() => !loading && setDropdownOpen(!dropdownOpen)}
+            disabled={loading}
+            className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {getInitials(displayName)}
+            {loading ? '...' : getInitials(displayName)}
           </button>
 
           {/* Dropdown Menu */}
-          {dropdownOpen && (
+          {dropdownOpen && !loading && (
             <div className="absolute right-0 mt-2 w-56 bg-zinc-800 rounded-lg shadow-lg border border-zinc-700 overflow-hidden z-50">
               {/* User Info no Dropdown */}
               <div className="px-4 py-3 border-b border-zinc-700">
@@ -99,7 +109,7 @@ const Header: React.FC = () => {
                   {displayName}
                 </p>
                 <p className="text-xs text-zinc-400 truncate">
-                  {user.email}
+                  {user?.email}
                 </p>
               </div>
 

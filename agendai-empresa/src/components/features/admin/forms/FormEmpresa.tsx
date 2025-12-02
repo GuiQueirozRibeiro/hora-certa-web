@@ -18,7 +18,7 @@ import { ImageUpload } from '@/components/ui/ImageUpload';
  * Responsabilidade: Orquestração entre hooks, services e UI
  */
 export function FormEmpresa() {
-  const { business, refreshBusiness } = useAuth();
+  const { business, refreshBusiness, loading: authLoading } = useAuth();
   const { success, error: showError } = useToast();
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -43,16 +43,16 @@ export function FormEmpresa() {
 
   // Carrega dados da empresa ao montar o componente
   useEffect(() => {
-    console.log('📋 [FormEmpresa] useEffect - business:', business);
+    console.log('📋 [FormEmpresa] useEffect - business:', business, 'authLoading:', authLoading);
     if (business) {
       console.log('✅ [FormEmpresa] Mapeando dados da empresa...');
       const formData = mapBusinessToFormData(business);
       console.log('📝 [FormEmpresa] FormData mapeado:', formData);
       resetForm(formData);
-    } else {
+    } else if (!authLoading) {
       console.warn('⚠️ [FormEmpresa] Business não encontrado');
     }
-  }, [business, resetForm]);
+  }, [business, resetForm, authLoading]);
 
   // Handler: Upload de logo
   const handleLogoUpload = async (file: File) => {
@@ -126,13 +126,31 @@ export function FormEmpresa() {
     }
   };
 
-  if (!business) {
+  // Se ainda está carregando, mostra loading
+  if (authLoading) {
     return (
       <FormLayout
         title="Dados da Empresa"
         description="Carregando informações da empresa..."
       >
-        <div className="text-zinc-400">Carregando...</div>
+        <div className="text-zinc-400 flex items-center gap-2">
+          <div className="animate-spin h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+          Carregando...
+        </div>
+      </FormLayout>
+    );
+  }
+
+  // Se terminou de carregar mas não tem business, mostra erro
+  if (!business) {
+    return (
+      <FormLayout
+        title="Dados da Empresa"
+        description="Empresa não encontrada"
+      >
+        <div className="text-zinc-400">
+          Não foi possível carregar os dados da empresa. Tente recarregar a página.
+        </div>
       </FormLayout>
     );
   }

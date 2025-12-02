@@ -4,24 +4,15 @@
 import { useState } from 'react';
 import { MoreVertical, Edit, Trash2, Clock, DollarSign, Scissors } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
+import { formatPrice, formatDuration } from '@/lib/mappers/serviceMapper';
+import type { Service } from '@/types/service';
 
 // ========================================
 // TIPOS
 // ========================================
-export interface Servico {
-  id: string;
-  nome: string;
-  descricao: string;
-  duracao: number; // Em minutos
-  preco: number;
-  categoria: string; // Ex: "Corte", "Barba", "Coloração"
-  profissionais: string[]; // IDs ou nomes dos profissionais habilitados
-  ativo: boolean; // Se está disponível para agendamento
-}
-
 interface ServicoCardProps {
-  servico: Servico;
-  onEdit: (servico: Servico) => void;
+  servico: Service;
+  onEdit: (servico: Service) => void;
   onDelete: (id: string) => void;
 }
 
@@ -45,26 +36,9 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Formatar preço para exibição
-  const formatarPreco = (preco: number) => {
-    return preco.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-  };
-
-  // Formatar duração
-  const formatarDuracao = (minutos: number) => {
-    if (minutos < 60) {
-      return `${minutos}min`;
-    }
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-    return mins > 0 ? `${horas}h ${mins}min` : `${horas}h`;
-  };
-
   // Cor da categoria
-  const getCategoriaColor = (categoria: string) => {
+  const getCategoriaColor = (categoria?: string) => {
+    if (!categoria) return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
     const cores: Record<string, string> = {
       'Corte': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
       'Barba': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
@@ -83,11 +57,11 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
       ======================================== */}
       <div className="absolute top-4 left-4">
         <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-          servico.ativo 
+          servico.is_active 
             ? 'bg-green-500/20 text-green-400' 
             : 'bg-red-500/20 text-red-400'
         }`}>
-          {servico.ativo ? 'Ativo' : 'Inativo'}
+          {servico.is_active ? 'Ativo' : 'Inativo'}
         </span>
       </div>
 
@@ -156,20 +130,22 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
           {/* Nome e Categoria */}
           <div className="flex-1 pr-8">
             <h3 className="text-lg font-semibold text-zinc-100 mb-2">
-              {servico.nome}
+              {servico.name}
             </h3>
-            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getCategoriaColor(servico.categoria)}`}>
-              {servico.categoria}
-            </span>
+            {servico.category && (
+              <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getCategoriaColor(servico.category)}`}>
+                {servico.category}
+              </span>
+            )}
           </div>
         </div>
 
         {/* ========================================
             DESCRIÇÃO
         ======================================== */}
-        {servico.descricao && (
+        {servico.description && (
           <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
-            {servico.descricao}
+            {servico.description}
           </p>
         )}
 
@@ -183,7 +159,7 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
             <div>
               <p className="text-xs text-zinc-500">Duração</p>
               <p className="text-sm font-semibold text-zinc-200">
-                {formatarDuracao(servico.duracao)}
+                {formatDuration(servico.duration_minutes)}
               </p>
             </div>
           </div>
@@ -194,32 +170,9 @@ export function ServicoCard({ servico, onEdit, onDelete }: ServicoCardProps) {
             <div>
               <p className="text-xs text-zinc-500">Preço</p>
               <p className="text-sm font-semibold text-green-400">
-                {formatarPreco(servico.preco)}
+                {formatPrice(servico.price)}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* ========================================
-            PROFISSIONAIS HABILITADOS
-        ======================================== */}
-        <div className="pt-4 border-t border-zinc-700">
-          <p className="text-xs text-zinc-500 mb-2">Profissionais habilitados</p>
-          <div className="flex flex-wrap gap-2">
-            {servico.profissionais.length > 0 ? (
-              servico.profissionais.map((prof, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-zinc-700 text-zinc-300 text-xs rounded"
-                >
-                  {prof}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-zinc-600 italic">
-                Nenhum profissional vinculado
-              </span>
-            )}
           </div>
         </div>
 
