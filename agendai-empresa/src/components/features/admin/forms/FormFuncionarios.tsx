@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { FuncionarioCard, Funcionario } from '../FuncionarioCard';
+import { FuncionarioCard, Funcionario } from '../professionals/FuncionarioCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ProfessionalModal } from '../professionals/ProfessionalModal';

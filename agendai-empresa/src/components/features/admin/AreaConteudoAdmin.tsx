@@ -1,6 +1,7 @@
 // src/components/features/admin/AreaConteudoAdmin.tsx
 import { AbaAdminAtiva } from '@/app/administracao/page';
 import { FormEmpresa } from './forms/FormEmpresa';
+import { FormEndereco } from './forms/FormEndereco';
 import { FormFuncionarios } from './forms/FormFuncionarios';
 import { FormServicos } from './forms/FormServicos';
 import { FormHorarios } from './forms/FormHorarios';
@@ -31,6 +32,12 @@ export function AreaConteudoAdmin({ abaAtiva }: AreaConteudoAdminProps) {
     // ========================================
     case 'empresa':
       return <FormEmpresa />;
+    
+    // ========================================
+    // ABA: Endereço
+    // ========================================
+    case 'endereco':
+      return <FormEndereco />;
     
     // ========================================
     // ABA: Funcionários

@@ -1,5 +1,5 @@
 import type { ProfessionalWithUser, WorkingHours } from '@/types/professional';
-import type { Funcionario } from '@/components/features/admin/FuncionarioCard';
+import type { Funcionario } from '@/components/features/admin/professionals/FuncionarioCard';
 
 const DAYS_MAP: Record<string, string> = {
   monday: 'Seg',

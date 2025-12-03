@@ -10,7 +10,7 @@ import { AreaConteudoAdmin } from '@/components/features/admin/AreaConteudoAdmin
 // ========================================
 // TIPOS
 // ========================================
-export type AbaAdminAtiva = 'empresa' | 'funcionarios' | 'servicos' | 'horarios' | 'configuracoes';
+export type AbaAdminAtiva = 'empresa' | 'endereco' | 'funcionarios' | 'servicos' | 'horarios' | 'configuracoes';
 
 // ========================================
 // PÁGINA PRINCIPAL DE ADMINISTRAÇÃO

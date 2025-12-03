@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Calendar, Copy, Save, RotateCcw } from 'lucide-react';
-import { DiaFuncionamentoCard, HorarioFuncionamento } from '../DiaFuncionamentoCard';
+import { DiaFuncionamentoCard, HorarioFuncionamento } from '../horarios/DiaFuncionamentoCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ToastContainer } from '@/components/ui/Toast';

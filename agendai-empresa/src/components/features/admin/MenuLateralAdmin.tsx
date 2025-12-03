@@ -5,7 +5,8 @@ import {
   UsersIcon, 
   ScissorsIcon, 
   ClockIcon, 
-  SettingsIcon 
+  SettingsIcon,
+  MapPin
 } from 'lucide-react';
 import { AbaAdminAtiva } from '@/app/administracao/page';
 
@@ -41,6 +42,20 @@ export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProp
         </li>
 
         {/* ========================================
+            ITEM: Endereço
+        ======================================== */}
+        <li 
+          onClick={() => setAbaAtiva('endereco')}
+          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
+            ${abaAtiva === 'endereco' 
+              ? 'bg-zinc-700 text-white font-semibold' 
+              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+        >
+          <MapPin className="h-5 w-5" />
+          <span>Endereço</span>
+        </li>
+
+        {/* ========================================
             ITEM: Funcionários
         ======================================== */}
         <li 
@@ -67,7 +82,6 @@ export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProp
           <ScissorsIcon className="h-5 w-5" />
           <span>Serviços</span>
         </li>
-
         {/* ========================================
             ITEM: Horários
         ======================================== */}
@@ -93,10 +107,10 @@ export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProp
               : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
         >
           <SettingsIcon className="h-5 w-5" />
-          <span>Configurações Gerais</span>
+          <span>Configurações</span>
         </li>
-
       </ul>
     </nav>
   );
 }
+
