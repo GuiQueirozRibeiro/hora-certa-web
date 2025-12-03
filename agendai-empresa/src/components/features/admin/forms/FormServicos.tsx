@@ -10,6 +10,7 @@ import { ServiceModal } from '../servicos/ServiceModal';
 import { serviceService } from '@/services/serviceService';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
 import type { Service } from '@/types/service';
 
 // ========================================
@@ -36,7 +37,7 @@ export function FormServicos() {
   const [servicoParaEditar, setServicoParaEditar] = useState<Service | null>(null);
   
   const { business } = useAuth();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, toasts, removeToast } = useToast();
 
   // ========================================
   // CARREGAMENTO INICIAL
@@ -125,11 +126,14 @@ export function FormServicos() {
   /**
    * Fecha modal de serviço e recarrega dados se necessário
    */
-  const handleCloseModalServico = (saved: boolean) => {
+  const handleCloseModalServico = (saved: boolean, message?: string) => {
     setModalServico(false);
     setServicoParaEditar(null);
     if (saved) {
       loadServicos();
+      if (message) {
+        success(message);
+      }
     }
   };
 
@@ -176,6 +180,11 @@ export function FormServicos() {
   // ========================================
   return (
     <div>
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={removeToast}
+        position="top-right"
+      />
       {/* ========================================
           CABEÇALHO COM ESTATÍSTICAS
       ======================================== */}

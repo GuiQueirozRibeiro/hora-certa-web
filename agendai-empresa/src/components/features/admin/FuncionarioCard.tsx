@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Edit, Trash2, Clock, Calendar } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Clock, Calendar, Power } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 
 // ========================================
@@ -20,12 +20,14 @@ export interface Funcionario {
   };
   avatar?: string; // Iniciais ou URL da foto
   corAvatar?: string; // Cor de fundo do avatar
+  isActive?: boolean; // Status ativo/inativo
 }
 
 interface FuncionarioCardProps {
   funcionario: Funcionario;
   onEdit: (funcionario: Funcionario) => void;
   onDelete: (id: string) => void;
+  onToggleStatus?: (id: string, currentStatus: boolean) => void;
 }
 
 // ========================================
@@ -38,7 +40,7 @@ interface FuncionarioCardProps {
  * - Open/Closed: Aceita props para customização sem modificar o componente
  * - Dependency Inversion: Recebe callbacks para ações, não conhece a implementação
  */
-export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCardProps) {
+export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus }: FuncionarioCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Fecha o menu quando clicar fora
@@ -48,6 +50,7 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
 
   // Função para obter as iniciais do nome
   const getInitials = (nome: string) => {
+    if (!nome) return '??';
     const names = nome.split(' ');
     if (names.length >= 2) {
       return `${names[0][0]}${names[1][0]}`.toUpperCase();
@@ -55,9 +58,25 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
     return nome.substring(0, 2).toUpperCase();
   };
 
+  // Status do funcionário (padrão: ativo se não especificado)
+  const isActive = funcionario.isActive !== undefined ? funcionario.isActive : true;
+
   return (
     <Card className="relative hover:border-zinc-600 transition-all">
       
+      {/* ========================================
+          BADGE DE STATUS (Ativo/Inativo)
+      ======================================== */}
+      <div className="absolute top-4 left-4 z-10">
+        <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${
+          isActive 
+            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+        }`}>
+          {isActive ? 'Ativo' : 'Inativo'}
+        </span>
+      </div>
+
       {/* ========================================
           MENU KEBAB (Três pontinhos)
       ======================================== */}
@@ -94,6 +113,24 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
                 <span>Editar funcionário</span>
               </button>
 
+              {/* Opção: Ativar/Desativar */}
+              {onToggleStatus && (
+                <button
+                  onClick={() => {
+                    onToggleStatus(funcionario.id, isActive);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                    isActive 
+                      ? 'text-amber-400 hover:bg-amber-500/10 hover:text-amber-300' 
+                      : 'text-green-400 hover:bg-green-500/10 hover:text-green-300'
+                  }`}
+                >
+                  <Power className="h-4 w-4" />
+                  <span>{isActive ? 'Desativar' : 'Ativar'}</span>
+                </button>
+              )}
+
               {/* Opção: Excluir */}
               <button
                 onClick={() => {
@@ -114,23 +151,25 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
         {/* ========================================
             CABEÇALHO: Avatar e Nome
         ======================================== */}
-        <div className="flex items-start gap-4 mb-4">
+        <div className="flex items-start gap-4 mb-4 mt-8">
           {/* Avatar com iniciais */}
           <div
             className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg ${
               funcionario.corAvatar || 'bg-indigo-500'
-            }`}
+            } ${!isActive ? 'opacity-50' : ''}`}
           >
             {funcionario.avatar || getInitials(funcionario.nome)}
           </div>
 
           {/* Nome e Tipo */}
           <div className="flex-1 pr-8">
-            <h3 className="text-lg font-semibold text-zinc-100 mb-1">
-              {funcionario.nome}
+            <h3 className={`text-lg font-semibold mb-1 ${
+              isActive ? 'text-zinc-100' : 'text-zinc-400'
+            }`}>
+              {funcionario.nome || 'Sem nome'}
             </h3>
             <span className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-medium rounded-full border border-indigo-500/30">
-              {funcionario.tipo}
+              {funcionario.tipo || 'Sem especialidade'}
             </span>
           </div>
         </div>
@@ -138,19 +177,25 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
         {/* ========================================
             INFORMAÇÕES: Idade e Tempo de Empresa
         ======================================== */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Idade */}
-          <div>
-            <p className="text-xs text-zinc-500 mb-1">Idade</p>
-            <p className="text-sm font-medium text-zinc-200">{funcionario.idade} anos</p>
-          </div>
+        {(funcionario.idade > 0 || funcionario.tempoEmpresa) && (
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* Idade */}
+            {funcionario.idade > 0 && (
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">Idade</p>
+                <p className="text-sm font-medium text-zinc-200">{funcionario.idade} anos</p>
+              </div>
+            )}
 
-          {/* Tempo na empresa */}
-          <div>
-            <p className="text-xs text-zinc-500 mb-1">Na empresa há</p>
-            <p className="text-sm font-medium text-zinc-200">{funcionario.tempoEmpresa}</p>
+            {/* Tempo na empresa */}
+            {funcionario.tempoEmpresa && (
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">Na empresa há</p>
+                <p className="text-sm font-medium text-zinc-200">{funcionario.tempoEmpresa}</p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* ========================================
             HORÁRIOS DE TRABALHO
@@ -158,33 +203,37 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete }: FuncionarioCa
         <div className="space-y-3 pt-4 border-t border-zinc-700">
           
           {/* Dias de trabalho */}
-          <div className="flex items-start gap-2">
-            <Calendar className="h-4 w-4 text-zinc-500 mt-0.5" />
-            <div>
-              <p className="text-xs text-zinc-500 mb-1">Dias de trabalho</p>
-              <div className="flex flex-wrap gap-1">
-                {funcionario.horarioTrabalho.dias.map((dia) => (
-                  <span
-                    key={dia}
-                    className="px-2 py-1 bg-zinc-700 text-zinc-300 text-xs rounded"
-                  >
-                    {dia}
-                  </span>
-                ))}
+          {funcionario.horarioTrabalho?.dias && funcionario.horarioTrabalho.dias.length > 0 && (
+            <div className="flex items-start gap-2">
+              <Calendar className="h-4 w-4 text-zinc-500 mt-0.5" />
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">Dias de trabalho</p>
+                <div className="flex flex-wrap gap-1">
+                  {funcionario.horarioTrabalho.dias.map((dia) => (
+                    <span
+                      key={dia}
+                      className="px-2 py-1 bg-zinc-700 text-zinc-300 text-xs rounded"
+                    >
+                      {dia}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Horário */}
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-zinc-500" />
-            <div>
-              <p className="text-xs text-zinc-500 mb-1">Horário</p>
-              <p className="text-sm font-medium text-zinc-200">
-                {funcionario.horarioTrabalho.horario}
-              </p>
+          {funcionario.horarioTrabalho?.horario && (
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-zinc-500" />
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">Horário</p>
+                <p className="text-sm font-medium text-zinc-200">
+                  {funcionario.horarioTrabalho.horario}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
       </CardContent>

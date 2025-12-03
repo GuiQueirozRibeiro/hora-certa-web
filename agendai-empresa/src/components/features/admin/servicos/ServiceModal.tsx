@@ -4,6 +4,7 @@ import { useServiceForm } from '@/hooks/useServiceForm';
 import { serviceService } from '@/services/serviceService';
 import { validateServiceForm } from '@/lib/validations/serviceValidations';
 import { mapServiceToFormData, sanitizeServiceFormData } from '@/lib/mappers/serviceMapper';
+import { ToastContainer } from '@/components/ui/Toast';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -14,11 +15,11 @@ import type { Service } from '@/types/service';
 interface ServiceModalProps {
   businessId: string;
   service: Service | null;
-  onClose: (saved: boolean) => void;
+  onClose: (saved: boolean, message?: string) => void;
 }
 
 export function ServiceModal({ businessId, service, onClose }: ServiceModalProps) {
-  const { success, error: showError } = useToast();
+  const { toasts, removeToast, error: showError } = useToast();
   const isEditing = !!service;
 
   const {
@@ -65,13 +66,11 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
 
       if (isEditing) {
         await serviceService.updateService(service.id, sanitizedData);
-        success('Serviço atualizado com sucesso!');
+        onClose(true, 'Serviço atualizado com sucesso!');
       } else {
         await serviceService.createService(businessId, sanitizedData);
-        success('Serviço criado com sucesso!');
+        onClose(true, 'Serviço criado com sucesso!');
       }
-
-      onClose(true);
     } catch (err: any) {
       showError('Erro ao salvar', err.message);
     } finally {
@@ -81,6 +80,11 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={removeToast}
+        position="top-right"
+      />
       <div className="bg-zinc-800 rounded-xl border border-zinc-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-zinc-700">

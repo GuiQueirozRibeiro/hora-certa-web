@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
 import { useBusinessForm } from '@/hooks/useBusinessForm';
 import { businessService } from '@/services/businessService';
 import { validateBusinessForm } from '@/lib/validations/businessValidations';
@@ -19,7 +20,7 @@ import { ImageUpload } from '@/components/ui/ImageUpload';
  */
 export function FormEmpresa() {
   const { business, refreshBusiness, loading: authLoading } = useAuth();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, toasts, removeToast } = useToast();
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Inicializa o formulário com dados vazios
@@ -160,6 +161,11 @@ export function FormEmpresa() {
       title="Dados da Empresa"
       description="Essas informações serão exibidas na página de agendamento do seu cliente."
     >
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={removeToast}
+        position="top-right"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {/* Upload de Logo */}
         <ImageUpload

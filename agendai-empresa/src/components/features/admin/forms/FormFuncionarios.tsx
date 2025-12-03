@@ -1,123 +1,260 @@
 // src/components/features/admin/forms/FormFuncionarios.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { FuncionarioCard, Funcionario } from '../FuncionarioCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { ProfessionalModal } from '../professionals/ProfessionalModal';
+import { professionalService } from '@/services/professionalService';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/useToast';
+import type { ProfessionalWithUser, WorkingHours } from '@/types/professional';
 
 // ========================================
-// DADOS MOCK (Temporário - substituir por API)
+// HELPERS
 // ========================================
-const funcionariosMock: Funcionario[] = [
-  {
-    id: '1',
-    nome: 'Rafael Pereira',
-    idade: 28,
-    tempoEmpresa: '2 anos e 3 meses',
-    tipo: 'Barbeiro',
-    horarioTrabalho: {
-      dias: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
-      horario: '09:00 - 18:00'
-    },
-    avatar: 'RP',
-    corAvatar: 'bg-indigo-500'
-  },
-  {
-    id: '2',
-    nome: 'Miguel Silva',
-    idade: 32,
-    tempoEmpresa: '4 anos',
-    tipo: 'Cabeleireiro',
-    horarioTrabalho: {
-      dias: ['Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-      horario: '10:00 - 19:00'
-    },
-    avatar: 'MS',
-    corAvatar: 'bg-emerald-500'
-  },
-  {
-    id: '3',
-    nome: 'João Souza',
-    idade: 25,
-    tempoEmpresa: '1 ano e 6 meses',
-    tipo: 'Esteticista',
-    horarioTrabalho: {
-      dias: ['Seg', 'Qua', 'Sex'],
-      horario: '08:00 - 17:00'
-    },
-    avatar: 'JS',
-    corAvatar: 'bg-purple-500'
+
+/**
+ * Calcula o tempo na empresa com base na data de criação
+ */
+function calcularTempoEmpresa(createdAt: string): string {
+  const now = new Date();
+  const created = new Date(createdAt);
+  
+  // Calcula diferença em meses
+  const diffTime = Math.abs(now.getTime() - created.getTime());
+  const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44));
+  
+  const years = Math.floor(diffMonths / 12);
+  const months = diffMonths % 12;
+  
+  if (years === 0 && months === 0) {
+    return 'Menos de 1 mês';
   }
-];
+  
+  if (years === 0) {
+    return `${months} ${months === 1 ? 'mês' : 'meses'}`;
+  }
+  
+  if (months === 0) {
+    return `${years} ${years === 1 ? 'ano' : 'anos'}`;
+  }
+  
+  return `${years} ${years === 1 ? 'ano' : 'anos'} e ${months} ${months === 1 ? 'mês' : 'meses'}`;
+}
+
+/**
+ * Extrai dias de trabalho do working_hours JSON
+ */
+function extrairDiasSemana(workingHours?: WorkingHours): string[] {
+  if (!workingHours) return [];
+  
+  const diasMap: Record<string, string> = {
+    monday: 'Seg',
+    tuesday: 'Ter',
+    wednesday: 'Qua',
+    thursday: 'Qui',
+    friday: 'Sex',
+    saturday: 'Sáb',
+    sunday: 'Dom',
+  };
+  
+  return Object.entries(workingHours)
+    .filter(([_, config]) => config.enabled)
+    .map(([day, _]) => diasMap[day] || day);
+}
+
+/**
+ * Extrai horário de trabalho representativo
+ */
+function extrairHorarioTrabalho(workingHours?: WorkingHours): string {
+  if (!workingHours) return 'A definir';
+  
+  // Pega o primeiro dia habilitado para mostrar o horário
+  const firstEnabled = Object.values(workingHours).find(config => config.enabled);
+  
+  if (!firstEnabled) return 'A definir';
+  
+  return `${firstEnabled.start} - ${firstEnabled.end}`;
+}
+
+/**
+ * Converte ProfessionalWithUser para Funcionario (compatível com FuncionarioCard)
+ */
+function professionalToFuncionario(professional: ProfessionalWithUser): Funcionario {
+  // Garante que temos um nome válido
+  const nome = professional.user?.name || professional.user?.email?.split('@')[0] || 'Sem nome';
+  
+  // Calcula idade (se não tiver, usa 0)
+  const idade = 0; // Não temos campo de idade no schema
+  
+  // Calcula tempo na empresa
+  const tempoEmpresa = calcularTempoEmpresa(professional.created_at);
+  
+  // Pega primeira especialidade como "tipo"
+  const tipo = professional.specialties?.[0] || 'Profissional';
+  
+  // Extrai horários de trabalho
+  const dias = extrairDiasSemana(professional.working_hours);
+  const horario = extrairHorarioTrabalho(professional.working_hours);
+  
+  return {
+    id: professional.id,
+    nome,
+    idade,
+    tempoEmpresa,
+    tipo,
+    horarioTrabalho: {
+      dias,
+      horario,
+    },
+    avatar: '', // Será calculado pelas iniciais
+    corAvatar: 'bg-indigo-500',
+    isActive: professional.is_active,
+  };
+}
 
 // ========================================
 // COMPONENTE: Formulário de Funcionários
 // ========================================
-/**
- * Componente para gerenciar funcionários.
- * Segue Clean Code e SOLID:
- * - Single Responsibility: Gerencia apenas a lista de funcionários
- * - Separation of Concerns: Card de funcionário é um componente separado
- */
 export function FormFuncionarios() {
+  // ========================================
+  // HOOKS
+  // ========================================
+  const { business } = useAuth();
+  const { success, error: showError } = useToast();
+
   // ========================================
   // ESTADO
   // ========================================
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>(funcionariosMock);
+  const [professionals, setProfessionals] = useState<ProfessionalWithUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalExcluir, setModalExcluir] = useState(false);
-  const [funcionarioParaExcluir, setFuncionarioParaExcluir] = useState<string | null>(null);
+  const [professionalParaExcluir, setProfessionalParaExcluir] = useState<string | null>(null);
+  const [modalProfessional, setModalProfessional] = useState(false);
+  const [professionalParaEditar, setProfessionalParaEditar] = useState<ProfessionalWithUser | null>(null);
+
+  // ========================================
+  // CARREGAMENTO INICIAL
+  // ========================================
+  useEffect(() => {
+    if (business?.id) {
+      loadProfessionals();
+    }
+  }, [business?.id]);
+
+  /**
+   * Carrega profissionais do banco de dados
+   */
+  const loadProfessionals = async () => {
+    if (!business?.id) return;
+    
+    setLoading(true);
+    try {
+      const data = await professionalService.getProfessionalsByBusinessId(business.id);
+      console.log('Profissionais carregados:', data);
+      setProfessionals(data);
+    } catch (error: any) {
+      console.error('Erro ao carregar profissionais:', error);
+      showError('Erro ao carregar profissionais', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ========================================
   // HANDLERS
   // ========================================
   
   /**
-   * Abre modal/formulário para adicionar novo funcionário
-   * TODO: Implementar modal de cadastro
+   * Abre modal para adicionar novo profissional
    */
-  const handleAddFuncionario = () => {
-    console.log('Adicionar novo funcionário');
-    // TODO: Abrir modal de cadastro
+  const handleAddProfessional = () => {
+    setProfessionalParaEditar(null);
+    setModalProfessional(true);
   };
 
   /**
-   * Abre modal/formulário para editar funcionário existente
-   * TODO: Implementar modal de edição
+   * Abre modal para editar profissional existente
    */
-  const handleEditFuncionario = (funcionario: Funcionario) => {
-    console.log('Editar funcionário:', funcionario);
-    // TODO: Abrir modal de edição com dados pré-preenchidos
+  const handleEditProfessional = (funcionario: Funcionario) => {
+    const professional = professionals.find(p => p.id === funcionario.id);
+    if (professional) {
+      setProfessionalParaEditar(professional);
+      setModalProfessional(true);
+    }
   };
 
   /**
-   * Abre modal de confirmação para excluir funcionário
+   * Abre modal de confirmação para excluir profissional
    */
-  const handleDeleteFuncionario = (id: string) => {
-    setFuncionarioParaExcluir(id);
+  const handleDeleteProfessional = (id: string) => {
+    setProfessionalParaExcluir(id);
     setModalExcluir(true);
   };
 
   /**
-   * Confirma exclusão do funcionário
+   * Confirma exclusão do profissional
    */
-  const confirmarExclusao = () => {
-    if (funcionarioParaExcluir) {
-      setFuncionarios(funcionarios.filter(f => f.id !== funcionarioParaExcluir));
-      setFuncionarioParaExcluir(null);
-      // TODO: Chamar API para deletar
+  const confirmarExclusao = async () => {
+    if (!professionalParaExcluir) return;
+    
+    try {
+      await professionalService.deleteProfessional(professionalParaExcluir);
+      setProfessionals(professionals.filter(p => p.id !== professionalParaExcluir));
+      success('Profissional excluído com sucesso!');
+      setModalExcluir(false);
+      setProfessionalParaExcluir(null);
+    } catch (error: any) {
+      showError('Erro ao excluir profissional', error.message);
+    }
+  };
+
+  /**
+   * Alterna o status do profissional (Ativo/Inativo)
+   */
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      const updatedProfessional = await professionalService.toggleProfessionalStatus(id, !currentStatus);
+      setProfessionals(professionals.map(p => p.id === id ? updatedProfessional : p));
+      success(`Profissional ${!currentStatus ? 'ativado' : 'desativado'} com sucesso!`);
+    } catch (error: any) {
+      showError('Erro ao alterar status', error.message);
+    }
+  };
+
+  /**
+   * Fecha modal de profissional e recarrega dados se necessário
+   */
+  const handleCloseModalProfessional = (saved: boolean) => {
+    setModalProfessional(false);
+    setProfessionalParaEditar(null);
+    if (saved) {
+      loadProfessionals();
     }
   };
 
   // ========================================
   // FILTRO DE BUSCA
   // ========================================
-  const funcionariosFiltrados = funcionarios.filter(funcionario =>
-    funcionario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    funcionario.tipo.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const funcionariosFiltrados = professionals
+    .map(professionalToFuncionario)
+    .filter(funcionario =>
+      funcionario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      funcionario.tipo.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  // Se não há empresa, exibir mensagem
+  if (!business) {
+    return (
+      <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
+        <p className="text-zinc-500 mb-2">Carregando informações da empresa...</p>
+      </div>
+    );
+  }
 
   // ========================================
   // RENDER
@@ -133,13 +270,13 @@ export function FormFuncionarios() {
             Gerenciar Funcionários
           </h2>
           <p className="text-sm text-zinc-400">
-            {funcionarios.length} profissiona{funcionarios.length === 1 ? 'l' : 'is'} cadastrado{funcionarios.length === 1 ? '' : 's'}
+            {professionals.length} profissiona{professionals.length === 1 ? 'l' : 'is'} cadastrado{professionals.length === 1 ? '' : 's'}
           </p>
         </div>
 
         {/* Botão Adicionar */}
         <Button
-          onClick={handleAddFuncionario}
+          onClick={handleAddProfessional}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -155,7 +292,7 @@ export function FormFuncionarios() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
           <input
             type="text"
-            placeholder="Buscar por nome ou tipo..."
+            placeholder="Buscar por nome ou especialidade..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -166,14 +303,32 @@ export function FormFuncionarios() {
       {/* ========================================
           GRID DE FUNCIONÁRIOS
       ======================================== */}
-      {funcionariosFiltrados.length > 0 ? (
+      {loading ? (
+        // Estado de loading
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-zinc-900 rounded-lg border border-zinc-700 p-6 animate-pulse">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-zinc-800 rounded-full"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-zinc-800 rounded mb-2"></div>
+                  <div className="h-3 bg-zinc-800 rounded w-2/3"></div>
+                </div>
+              </div>
+              <div className="h-3 bg-zinc-800 rounded mb-2"></div>
+              <div className="h-3 bg-zinc-800 rounded w-3/4"></div>
+            </div>
+          ))}
+        </div>
+      ) : funcionariosFiltrados.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {funcionariosFiltrados.map((funcionario) => (
             <FuncionarioCard
               key={funcionario.id}
               funcionario={funcionario}
-              onEdit={handleEditFuncionario}
-              onDelete={handleDeleteFuncionario}
+              onEdit={handleEditProfessional}
+              onDelete={handleDeleteProfessional}
+              onToggleStatus={handleToggleStatus}
             />
           ))}
         </div>
@@ -192,13 +347,24 @@ export function FormFuncionarios() {
       )}
 
       {/* ========================================
-          MODAL DE CONFIRMAÇÃO
+          MODAL DE PROFISSIONAL (Criar/Editar)
+      ======================================== */}
+      {modalProfessional && business && (
+        <ProfessionalModal
+          businessId={business.id}
+          professional={professionalParaEditar}
+          onClose={handleCloseModalProfessional}
+        />
+      )}
+
+      {/* ========================================
+          MODAL DE CONFIRMAÇÃO EXCLUSÃO
       ======================================== */}
       <Modal
         isOpen={modalExcluir}
         onClose={() => {
           setModalExcluir(false);
-          setFuncionarioParaExcluir(null);
+          setProfessionalParaExcluir(null);
         }}
         onConfirm={confirmarExclusao}
         title="Excluir funcionário"
@@ -207,8 +373,9 @@ export function FormFuncionarios() {
         cancelText="Cancelar"
         variant="danger"
       >
-        {funcionarioParaExcluir && (() => {
-          const funcionario = funcionarios.find(f => f.id === funcionarioParaExcluir);
+        {professionalParaExcluir && (() => {
+          const professional = professionals.find(p => p.id === professionalParaExcluir);
+          const funcionario = professional ? professionalToFuncionario(professional) : null;
           return funcionario ? (
             <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700">
               <p className="text-sm text-zinc-200 font-medium mb-1">{funcionario.nome}</p>

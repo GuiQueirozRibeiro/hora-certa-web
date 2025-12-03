@@ -3,10 +3,11 @@ import { ComponentProps, forwardRef } from "react";
 interface InputProps extends ComponentProps<"input"> {
   label?: string; // titulo em cima do campo
   error?: string; // mensagem de erro
+  helperText?: string; // texto de ajuda
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = "", ...props }, ref) => {
+  ({ label, error, helperText, className = "", ...props }, ref) => {
     return (
       <div className="flex flex-col gap-2 w-full">
         {label && (
@@ -23,14 +24,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   ${
                     error
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : ""
+                      : "border border-zinc-800"
                   }
                   ${className}`}
           {...props}
-        >
-          {/* mensagem de erro */}
-          {error && <span className="text-xs text-red-400">{error}</span>}
-        </input>
+        />
+        
+        {/* mensagem de erro ou helper text */}
+        {error && <span className="text-xs text-red-400">{error}</span>}
+        {!error && helperText && <span className="text-xs text-zinc-500">{helperText}</span>}
       </div>
     );
   }
