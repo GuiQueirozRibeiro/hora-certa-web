@@ -1,120 +1,17 @@
 // src/components/features/admin/forms/FormFuncionarios.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { FuncionarioCard, Funcionario } from '../FuncionarioCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ProfessionalModal } from '../professionals/ProfessionalModal';
 import { professionalService } from '@/services/professionalService';
+import { ProfessionalMapper } from '@/lib/utils/professionalMappers';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
-import type { ProfessionalWithUser, WorkingHours } from '@/types/professional';
-
-// ========================================
-// HELPERS
-// ========================================
-
-/**
- * Calcula o tempo na empresa com base na data de criação
- */
-function calcularTempoEmpresa(createdAt: string): string {
-  const now = new Date();
-  const created = new Date(createdAt);
-  
-  // Calcula diferença em meses
-  const diffTime = Math.abs(now.getTime() - created.getTime());
-  const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44));
-  
-  const years = Math.floor(diffMonths / 12);
-  const months = diffMonths % 12;
-  
-  if (years === 0 && months === 0) {
-    return 'Menos de 1 mês';
-  }
-  
-  if (years === 0) {
-    return `${months} ${months === 1 ? 'mês' : 'meses'}`;
-  }
-  
-  if (months === 0) {
-    return `${years} ${years === 1 ? 'ano' : 'anos'}`;
-  }
-  
-  return `${years} ${years === 1 ? 'ano' : 'anos'} e ${months} ${months === 1 ? 'mês' : 'meses'}`;
-}
-
-/**
- * Extrai dias de trabalho do working_hours JSON
- */
-function extrairDiasSemana(workingHours?: WorkingHours): string[] {
-  if (!workingHours) return [];
-  
-  const diasMap: Record<string, string> = {
-    monday: 'Seg',
-    tuesday: 'Ter',
-    wednesday: 'Qua',
-    thursday: 'Qui',
-    friday: 'Sex',
-    saturday: 'Sáb',
-    sunday: 'Dom',
-  };
-  
-  return Object.entries(workingHours)
-    .filter(([_, config]) => config.enabled)
-    .map(([day, _]) => diasMap[day] || day);
-}
-
-/**
- * Extrai horário de trabalho representativo
- */
-function extrairHorarioTrabalho(workingHours?: WorkingHours): string {
-  if (!workingHours) return 'A definir';
-  
-  // Pega o primeiro dia habilitado para mostrar o horário
-  const firstEnabled = Object.values(workingHours).find(config => config.enabled);
-  
-  if (!firstEnabled) return 'A definir';
-  
-  return `${firstEnabled.start} - ${firstEnabled.end}`;
-}
-
-/**
- * Converte ProfessionalWithUser para Funcionario (compatível com FuncionarioCard)
- */
-function professionalToFuncionario(professional: ProfessionalWithUser): Funcionario {
-  // Garante que temos um nome válido
-  const nome = professional.user?.name || professional.user?.email?.split('@')[0] || 'Sem nome';
-  
-  // Calcula idade (se não tiver, usa 0)
-  const idade = 0; // Não temos campo de idade no schema
-  
-  // Calcula tempo na empresa
-  const tempoEmpresa = calcularTempoEmpresa(professional.created_at);
-  
-  // Pega primeira especialidade como "tipo"
-  const tipo = professional.specialties?.[0] || 'Profissional';
-  
-  // Extrai horários de trabalho
-  const dias = extrairDiasSemana(professional.working_hours);
-  const horario = extrairHorarioTrabalho(professional.working_hours);
-  
-  return {
-    id: professional.id,
-    nome,
-    idade,
-    tempoEmpresa,
-    tipo,
-    horarioTrabalho: {
-      dias,
-      horario,
-    },
-    avatar: '', // Será calculado pelas iniciais
-    corAvatar: 'bg-indigo-500',
-    isActive: professional.is_active,
-  };
-}
+import type { ProfessionalWithUser } from '@/types/professional';
 
 // ========================================
 // COMPONENTE: Formulário de Funcionários
@@ -155,10 +52,8 @@ export function FormFuncionarios() {
     setLoading(true);
     try {
       const data = await professionalService.getProfessionalsByBusinessId(business.id);
-      console.log('Profissionais carregados:', data);
       setProfessionals(data);
     } catch (error: any) {
-      console.error('Erro ao carregar profissionais:', error);
       showError('Erro ao carregar profissionais', error.message);
     } finally {
       setLoading(false);
@@ -238,14 +133,19 @@ export function FormFuncionarios() {
   };
 
   // ========================================
-  // FILTRO DE BUSCA
+  // FILTRO DE BUSCA (Memoizado para performance)
   // ========================================
-  const funcionariosFiltrados = professionals
-    .map(professionalToFuncionario)
-    .filter(funcionario =>
-      funcionario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      funcionario.tipo.toLowerCase().includes(searchTerm.toLowerCase())
+  const funcionariosFiltrados = useMemo(() => {
+    const funcionarios = ProfessionalMapper.toFuncionarioList(professionals);
+    
+    if (!searchTerm) return funcionarios;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return funcionarios.filter(funcionario =>
+      funcionario.nome.toLowerCase().includes(searchLower) ||
+      funcionario.tipo.toLowerCase().includes(searchLower)
     );
+  }, [professionals, searchTerm]);
 
   // Se não há empresa, exibir mensagem
   if (!business) {
@@ -375,7 +275,7 @@ export function FormFuncionarios() {
       >
         {professionalParaExcluir && (() => {
           const professional = professionals.find(p => p.id === professionalParaExcluir);
-          const funcionario = professional ? professionalToFuncionario(professional) : null;
+          const funcionario = professional ? ProfessionalMapper.toFuncionario(professional) : null;
           return funcionario ? (
             <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700">
               <p className="text-sm text-zinc-200 font-medium mb-1">{funcionario.nome}</p>

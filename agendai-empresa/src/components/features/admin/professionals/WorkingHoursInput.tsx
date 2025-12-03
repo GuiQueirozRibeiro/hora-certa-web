@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Check } from 'lucide-react';
 import type { WorkingHours } from '@/types/professional';
 
 interface WorkingHoursInputProps {
@@ -24,6 +24,9 @@ const DEFAULT_HOURS = {
 };
 
 export function WorkingHoursInput({ value, onChange }: WorkingHoursInputProps) {
+  const [globalStart, setGlobalStart] = useState('09:00');
+  const [globalEnd, setGlobalEnd] = useState('18:00');
+
   // Inicializa com valores padrão se não existir
   const workingHours: WorkingHours = value || DAYS.reduce((acc, day) => ({
     ...acc,
@@ -36,8 +39,24 @@ export function WorkingHoursInput({ value, onChange }: WorkingHoursInputProps) {
       [dayKey]: {
         ...workingHours[dayKey],
         enabled: !workingHours[dayKey]?.enabled,
+        start: workingHours[dayKey]?.start || globalStart,
+        end: workingHours[dayKey]?.end || globalEnd,
       },
     };
+    onChange(updated);
+  };
+
+  const handleApplyGlobalTime = () => {
+    const updated = { ...workingHours };
+    DAYS.forEach(day => {
+      if (updated[day.key]?.enabled) {
+        updated[day.key] = {
+          ...updated[day.key],
+          start: globalStart,
+          end: globalEnd,
+        };
+      }
+    });
     onChange(updated);
   };
 
@@ -52,42 +71,45 @@ export function WorkingHoursInput({ value, onChange }: WorkingHoursInputProps) {
     onChange(updated);
   };
 
-  const handleCopyToAll = () => {
-    // Pega o primeiro dia habilitado como referência
-    const referenceDay = DAYS.find(day => workingHours[day.key]?.enabled);
-    if (!referenceDay) return;
-
-    const reference = workingHours[referenceDay.key];
-    const updated = DAYS.reduce((acc, day) => ({
-      ...acc,
-      [day.key]: {
-        enabled: workingHours[day.key]?.enabled || false,
-        start: reference.start,
-        end: reference.end,
-      }
-    }), {});
-    
-    onChange(updated);
-  };
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-zinc-400" />
-          <label className="text-sm font-medium text-zinc-200">
-            Horários de Trabalho
-          </label>
-        </div>
-        <button
-          type="button"
-          onClick={handleCopyToAll}
-          className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          Copiar para todos os dias
-        </button>
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Clock className="h-4 w-4 text-zinc-400" />
+        <label className="text-sm font-medium text-zinc-200">
+          Horários de Trabalho
+        </label>
       </div>
 
+      {/* Horário Global para Aplicar em Todos */}
+      <div className="bg-indigo-500/10 rounded-lg p-4 border border-indigo-500/30">
+        <p className="text-xs text-indigo-400 mb-3 font-medium">🕒 Aplicar Mesmo Horário aos Dias Selecionados</p>
+        <div className="flex items-center gap-2">
+          <input
+            type="time"
+            value={globalStart}
+            onChange={(e) => setGlobalStart(e.target.value)}
+            className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
+          />
+          <span className="text-zinc-500 text-sm">até</span>
+          <input
+            type="time"
+            value={globalEnd}
+            onChange={(e) => setGlobalEnd(e.target.value)}
+            className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
+          />
+          <button
+            type="button"
+            onClick={handleApplyGlobalTime}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            <Check size={16} />
+            Aplicar
+          </button>
+        </div>
+      </div>
+
+      {/* Lista de Dias */}
       <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
         {DAYS.map((day) => {
           const dayData = workingHours[day.key] || DEFAULT_HOURS;
@@ -115,9 +137,9 @@ export function WorkingHoursInput({ value, onChange }: WorkingHoursInputProps) {
               {/* Day Label */}
               <label
                 htmlFor={`day-${day.key}`}
-                className="w-32 text-sm font-medium text-zinc-300 cursor-pointer"
+                className="w-28 text-sm font-medium text-zinc-300 cursor-pointer"
               >
-                {day.label}
+                {day.short}
               </label>
 
               {/* Time Inputs */}
@@ -127,27 +149,34 @@ export function WorkingHoursInput({ value, onChange }: WorkingHoursInputProps) {
                     type="time"
                     value={dayData.start}
                     onChange={(e) => handleTimeChange(day.key, 'start', e.target.value)}
-                    className="px-2 py-1 bg-zinc-900 border border-zinc-700 rounded text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
+                    className="flex-1 px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
                   />
-                  <span className="text-zinc-500 text-sm">até</span>
+                  <span className="text-zinc-500 text-sm">-</span>
                   <input
                     type="time"
                     value={dayData.end}
                     onChange={(e) => handleTimeChange(day.key, 'end', e.target.value)}
-                    className="px-2 py-1 bg-zinc-900 border border-zinc-700 rounded text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
+                    className="flex-1 px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               ) : (
-                <span className="text-xs text-zinc-600 italic flex-1">Não trabalha neste dia</span>
+                <span className="text-xs text-zinc-600 italic flex-1">Não trabalha</span>
               )}
             </div>
           );
         })}
       </div>
 
-      <p className="text-xs text-zinc-500">
-        💡 Marque os dias em que o profissional trabalha e defina os horários
-      </p>
+      <div className="flex items-start gap-2 text-xs text-zinc-500 bg-zinc-900 rounded-lg p-3 border border-zinc-800">
+        <span>💡</span>
+        <div>
+          <p className="font-medium text-zinc-400 mb-1">Dica:</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Defina um horário global e aplique aos dias marcados</li>
+            <li>Ou configure cada dia individualmente marcando a caixa</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

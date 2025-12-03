@@ -178,8 +178,6 @@ export const professionalService = {
       updateData.working_hours = workingHoursToArray(data.working_hours);
     }
 
-    console.log('[professionalService] Enviando dados para Supabase:', JSON.stringify(updateData, null, 2));
-
     const { data: updatedProfessional, error } = await supabase
       .from('professionals')
       .update(updateData)
@@ -195,7 +193,6 @@ export const professionalService = {
       .single();
 
     if (error) {
-      console.error('[professionalService] Erro do Supabase:', error);
       throw new Error(`Erro ao atualizar profissional: ${error.message}`);
     }
 

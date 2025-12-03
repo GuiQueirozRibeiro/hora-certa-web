@@ -1,13 +1,11 @@
 // src/app/administracao/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/layout/Header';
 import { NavBar } from '@/components/layout/NavBar';
 import { MenuLateralAdmin } from '@/components/features/admin/MenuLateralAdmin';
 import { AreaConteudoAdmin } from '@/components/features/admin/AreaConteudoAdmin';
-import { DebugConsole } from '@/components/debug/DebugConsole';
-import { useDebug } from '@/hooks/useDebug';
 
 // ========================================
 // TIPOS
@@ -21,21 +19,8 @@ export default function AdministracaoPage() {
   // Estado para controlar qual aba está ativa
   const [abaAtiva, setAbaAtiva] = useState<AbaAdminAtiva>('empresa');
   
-  // Hook de debug visual
-  const debug = useDebug();
-  
-  // Log inicial quando a página carrega
-  useEffect(() => {
-    debug.success('Página de administração carregada', { timestamp: new Date().toISOString() });
-  }, []);
-  
-  // Função para trocar de aba com log
+  // Função para trocar de aba
   const handleAbaChange = (novaAba: AbaAdminAtiva) => {
-    debug.info(`Navegando para aba: ${novaAba}`, { 
-      abaAnterior: abaAtiva, 
-      novaAba,
-      timestamp: new Date().toISOString() 
-    });
     setAbaAtiva(novaAba);
   };
 
@@ -81,18 +66,6 @@ export default function AdministracaoPage() {
 
         </div>
       </main>
-      
-      {/* ========================================
-          DEBUG CONSOLE - Disponível em todas as abas
-      ======================================== */}
-      <DebugConsole 
-        logs={debug.logs}
-        isEnabled={debug.isEnabled}
-        onClear={debug.clear}
-        onToggle={debug.toggle}
-        position="right"
-        defaultMinimized={false}
-      />
     </div>
   );
 }
