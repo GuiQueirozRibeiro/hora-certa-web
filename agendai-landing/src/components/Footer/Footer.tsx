@@ -31,7 +31,7 @@ export function Footer() {
               <span className="text-white font-bold text-sm">H</span>
             </div>
             <span className="text-base font-bold">
-              Hora<span className="text-indigo-300">Certa</span>
+              Agend<span className="text-indigo-300">ai</span>
             </span>
           </div>
 
@@ -55,7 +55,7 @@ export function Footer() {
         {/* Copyright e Links Legais */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs">
           <p className="text-white/60">
-            © 2025 HoraCerta. Todos os direitos reservados.
+            © 2025 Agendai. Todos os direitos reservados.
           </p>
           
           <div className="flex items-center gap-4">

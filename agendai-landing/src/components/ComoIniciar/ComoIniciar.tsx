@@ -5,7 +5,7 @@ export function ComoIniciar() {
     {
       numero: "1",
       titulo: "Faça o Cadastro",
-      descricao: "Faça o cadastro no HoraCerta, informando os dados básicos do seu estabelecimento."
+      descricao: "Faça o cadastro no Agendai, informando os dados básicos do seu estabelecimento."
     },
     {
       numero: "2",

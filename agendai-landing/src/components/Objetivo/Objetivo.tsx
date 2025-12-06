@@ -4,18 +4,18 @@ export function Objetivo() {
   const objetivos = [
     {
       icon: Calendar,
-      title: "Otimizar seu Tempo",
-      description: "Organize sua agenda e estimule mais agendamentos através do aplicativo.",
+      title: "Otimizar seu tempo",
+      description: "Organize sua agenda em segundos, evite confusões e incentive mais agendamentos com o app trabalhando por você. Assim, você foca no que realmente importa no seu negócio.",
     },
     {
       icon: Smile,
-      title: "Fidelizar seu Cliente",
-      description: "Fidelize através do Agendamento On-line, Programa de Fidelidade, Envio de Promoções e Mensagens de Retorno automáticas.",
+      title: "Fidelizar seus clientes",
+      description: "Crie clientes recorrentes com agendamento online, programa de fidelidade, promoções automáticas e mensagens que mantêm sua barbearia sempre na mente do público.",
     },
     {
       icon: TrendingUp,
-      title: "Aumentar seu Faturamento",
-      description: "Aumente seu movimento em até 40% e tenha um maior faturamento em sua barbearia.",
+      title: "Aumentar seu faturamento",
+      description: "Atraia mais movimento, preencha horários ociosos e aumente seu faturamento em até 40% com uma gestão inteligente que transforma talento em lucro.",
     },
   ];
 
@@ -29,7 +29,7 @@ export function Objetivo() {
             Nosso Objetivo
           </h2>
           <p className="text-zinc-400 text-xs md:text-sm max-w-2xl mx-auto">
-            Ajudamos sua barbearia a crescer com ferramentas simples e eficientes
+            Fazemos sua barbearia crescer com ferramentas simples, automáticas e feitas para atrair mais clientes todos os dias.
           </p>
         </div>
 

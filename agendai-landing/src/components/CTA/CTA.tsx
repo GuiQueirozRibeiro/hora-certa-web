@@ -10,7 +10,7 @@ export function CTA() {
 
         {/* Subtítulo */}
         <p className="text-sm md:text-base text-zinc-400 mb-8">
-          Junte-se a milhares de barbearias que já estão crescendo com o HoraCerta.
+          Junte-se a milhares de barbearias que já estão crescendo com o Agendai.
         </p>
 
         {/* Botões */}

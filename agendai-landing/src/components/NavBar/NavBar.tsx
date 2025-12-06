@@ -26,7 +26,7 @@ export function NavBar() {
 
         {/* --- ESQUERDA: LOGO --- */}
         <div className="text-lg md:text-xl font-bold text-white">
-          Hora<span className="text-indigo-500">Certa</span>
+          Agend<span className="text-indigo-500">ai</span>
         </div>
 
         {/* --- MENU DESKTOP (escondido no mobile) --- */}

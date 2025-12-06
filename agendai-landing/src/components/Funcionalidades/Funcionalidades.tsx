@@ -25,79 +25,78 @@ export function Funcionalidades() {
   const funcionalidades = [
     {
       icon: Clock,
-      title: "Lembrete de Horários",
-      description:
-        "Notificações automáticas para clientes sobre seus agendamentos.",
+      title: "Lembrete de horários",
+      description: "Evita furos e reduz atrasos automaticamente.",
     },
     {
       icon: Handshake,
-      title: "Programa de Fidelidade",
-      description: "Fidelize clientes com sistemas de pontos e recompensas.",
+      title: "Programas de fidelidade",
+      description: "Transforma clientes ocasionais em clientes recorrentes.",
     },
     {
       icon: Mail,
-      title: "Envio de Notícias e Promoções",
-      description: "Comunique-se diretamente com seus clientes sobre ofertas.",
-    },
-    {
-      icon: CreditCard,
-      title: "Pagamento On-line",
-      description: "Aceite pagamentos digitais de forma segura e prática.",
+      title: "Notificações e promoções",
+      description: "Divulgue ofertas e comunique sua base com um clique.",
     },
     {
       icon: FileText,
-      title: "Relatórios Gerenciais",
-      description: "Análises completas do seu negócio em tempo real.",
+      title: "Relatórios gerenciais",
+      description: "Veja onde está ganhando, perdendo e como crescer.",
     },
     {
       icon: Gift,
-      title: "Pacotes de Serviços e Produtos",
-      description: "Crie combos e ofertas especiais para seus clientes.",
+      title: "Pacotes de serviços e produtos",
+      description: "Venda combos e aumente o ticket médio sem esforço.",
+    },
+    {
+      icon: CreditCard,
+      title: "Pagamentos online",
+      description: "Mais praticidade para o cliente e menos falhas na cobrança.",
     },
     {
       icon: Truck,
-      title: "Gestão de Estoque",
-      description: "Controle produtos e materiais com facilidade.",
+      title: "Gestão de estoque",
+      description: "Controle entradas, saídas e evite prejuízos invisíveis.",
     },
     {
       icon: ClipboardList,
-      title: "Comandas e Controle de Consumo",
-      description: "Gerencie o consumo de produtos durante o atendimento.",
+      title: "Comandas e consumo",
+      description: "Organização total dos serviços realizados no atendimento.",
     },
     {
       icon: Cake,
       title: "Aniversariantes",
-      description: "Lembre-se automaticamente dos aniversários dos clientes.",
+      description: "Ação automática para gerar retorno e encantamento.",
     },
     {
       icon: List,
-      title: "Lista de Espera",
-      description: "Organize filas e otimize o tempo de atendimento.",
+      title: "Lista de espera",
+      description: "Preencha horários vagos de forma instantânea.",
     },
     {
       icon: MessageCircle,
-      title: "Mensagens de Retorno Automáticas",
-      description: "Reconquiste clientes inativos automaticamente.",
+      title: "Mensagens automáticas",
+      description: "Retorno rápido e comunicação constante com o cliente.",
     },
     {
       icon: Star,
-      title: "Pesquisa de Satisfação",
-      description: "Colete feedback e melhore continuamente seu serviço.",
+      title: "Pesquisa de satisfação",
+      description: "Entenda a experiência e melhore seu atendimento.",
     },
     {
       icon: Users,
-      title: "Clube de Clientes",
-      description: "Crie uma comunidade engajada em torno do seu negócio.",
+      title: "Clube de clientes",
+      description: "Uma comunidade que engaja e mantém sua barbearia em evidência.",
     },
     {
       icon: Monitor,
-      title: "Site do Estabelecimento",
-      description: "Tenha sua própria página web profissional.",
+      title: "Site do estabelecimento",
+      description: "Presença profissional e mais visibilidade na região.",
     },
     {
       icon: User,
-      title: "Comissões e Vales",
-      description: "Gerencie pagamentos de profissionais com transparência.",
+      title: "Comissões e vales",
+      description: "Transparência total para sua equipe e controle para você.",
     },
   ];
 
@@ -107,10 +106,10 @@ export function Funcionalidades() {
         {/* Título da Seção */}
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3">
-            Funcionalidades do HoraCerta
+            Funcionalidades do Agendai
           </h2>
           <p className="text-zinc-400 text-xs md:text-sm max-w-2xl mx-auto">
-            Tudo que você precisa para gerenciar sua barbearia em um único lugar
+            Tudo o que sua barbearia precisa para atrair, organizar e faturar. Em um único sistema.
           </p>
         </div>
 

@@ -15,13 +15,9 @@ export function Hero() {
       {/* 3. O CONTEÚDO (TEXTO E BOTÕES) */}
       {/* z-10: Para ficar EM CIMA da máscara escura */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto py-12">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6 tracking-tight">
-          Hora<span className="text-indigo-500">Certa</span>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6 tracking-tight leading-tight">
+          Você acabou de encontrar o sistema que enche sua agenda.
         </h1>
-
-        <p className="text-base sm:text-lg md:text-xl text-zinc-200 mb-8 md:mb-10 font-light px-4">
-          Uma nova experiência para uma antiga tradição.
-        </p>
 
         <button className="bg-indigo-600 text-white font-bold px-6 py-3 md:px-8 md:py-4 rounded-lg text-sm md:text-base hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/20 mb-8 md:mb-12 uppercase tracking-wider w-full sm:w-auto max-w-xs sm:max-w-none cursor-pointer">
           Inicie essa experiência

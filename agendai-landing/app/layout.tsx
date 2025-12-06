@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HoraCerta - Sistema de Agendamento para Barbearias",
+  title: "Agendai - Sistema de Agendamento para Barbearias",
   description: "Uma nova experiência para uma antiga tradição. Sistema completo de gestão e agendamento para barbearias.",
 };
 

@@ -25,15 +25,25 @@ export function About() {
             </div>
             
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-100 mb-4 md:mb-6">
-              Sobre o Hora Certa
+              Sobre o Agendai
             </h2>
 
-            <p className="text-sm md:text-base text-zinc-200 mb-4 md:mb-6 leading-relaxed">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla magni dolor laudantium obcaecati velit odit necessitatibus inventore est enim architecto omnis iste a, optio, laboriosam.
+            <p className="text-sm md:text-base text-zinc-200 mb-4 leading-relaxed">
+              O Agendai nasceu com uma visão clara: ajudar barbearias a lotarem a agenda, aumentarem sua visibilidade na região e faturarem de forma previsível.
+            </p>
+
+            <p className="text-sm md:text-base text-zinc-200 mb-4 leading-relaxed">
+              Enquanto muitos sistemas complicam, a gente simplifica. Enquanto outros só organizam horários, o Agendai cria crescimento real: ele conecta sua barbearia aos clientes próximos, facilita o agendamento, automatiza a fidelização e entrega a gestão que faltava para sua empresa dar o próximo passo.
             </p>
             
-            <p className="text-sm md:text-base text-zinc-200 leading-relaxed">
-              Nosso objetivo é simplificar a gestão do seu negócio, conectando profissionais e clientes de forma eficiente e moderna.
+            <p className="text-sm md:text-base text-zinc-200 mb-4 leading-relaxed">
+              Hoje, o Agendai é a escolha de quem quer profissionalizar o negócio, reduzir furos de horário, atrair mais clientes e transformar talento em faturamento.
+            </p>
+
+            <p className="text-sm md:text-base text-zinc-200 font-semibold leading-relaxed">
+              Simples para usar.<br/>
+              Poderoso para escalar.<br/>
+              Feito para quem quer crescer.
             </p>
           </div>
 
@@ -51,9 +61,9 @@ export function About() {
               
               {/* Texto do Card */}
               <div>
-                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Módulo WebAdmin</h3>
+                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Gestão que dá ritmo ao seu negócio</h3>
                 <p className="text-xs md:text-sm text-zinc-200 leading-relaxed">
-                  Gestão completa do estabelecimento: controle de profissionais, histórico de clientes, estoque e relatórios financeiros. Tudo na nuvem, seguro e acessível de qualquer lugar.
+                  Controle de profissionais, histórico de clientes, estoque e relatórios financeiros. Tudo integrado, seguro e 100% na nuvem. A estrutura que sua barbearia precisa para crescer com organização e previsibilidade.
                 </p>
               </div>
             </div>
@@ -69,9 +79,9 @@ export function About() {
               
               {/* Texto do Card */}
               <div>
-                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Módulo Aplicativo</h3>
+                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-2">Experiência completa para equipe e clientes</h3>
                 <p className="text-xs md:text-sm text-zinc-200 leading-relaxed">
-                  Para profissionais (agenda e comissões) e para clientes (agendamentos, promoções e lembretes). Aproximando a barbearia do seu público.
+                  Profissionais com agenda e comissões organizadas. Clientes com agendamentos fáceis, promoções e lembretes automáticos. O Agendai aproxima sua barbearia do público e mantém sua agenda sempre em movimento.
                 </p>
               </div>
             </div>
