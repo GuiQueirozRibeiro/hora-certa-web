@@ -1,9 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../hooks/useAuth';
 import { useAppointments } from '../../../hooks/Useappointments';
 
 export default function NextAppointments() {
+  const router = useRouter();
   const { user } = useAuth();
   const { appointments, loading } = useAppointments({
     status: 'scheduled',
@@ -127,7 +129,10 @@ export default function NextAppointments() {
       </div>
 
       {/* Botão Ver Todos */}
-      <button className="w-full mt-4 py-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors font-semibold">
+      <button 
+        onClick={() => router.push('/agendamentos')}
+        className="w-full mt-4 py-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
+      >
         Ver todos os agendamentos →
       </button>
     </div>
