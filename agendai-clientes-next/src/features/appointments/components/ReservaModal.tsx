@@ -24,8 +24,14 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
   const { user } = useAuth();
   const { createAppointment } = useAppointments();
   const { professionals, loading: loadingProfessionals } = useProfessionals(barbeariaId);
-  const { schedules, getScheduleForDay } = useProfessionalSchedules();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null);
+  
+  // Buscar horários do profissional selecionado
+  const { schedules, loading: loadingSchedules } = useProfessionalSchedules({
+    professionalId: selectedProfessionalId || undefined,
+    isActive: true
+  });
   
   // Inicializa com o domingo da semana atual
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
@@ -40,12 +46,11 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
   
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<{ hora: string; disponivel: boolean }[]>([]);
 
-  // Gerar horários disponíveis baseado na agenda do profissional e dia selecionado
+  // Atualizar horários disponíveis quando profissional ou data mudarem
   useEffect(() => {
     if (!selectedProfessionalId || !selectedDate) {
       setAvailableTimeSlots([]);
@@ -53,118 +58,108 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
     }
 
     const dayOfWeek = selectedDate.getDay();
-    const schedule = getScheduleForDay(selectedProfessionalId, dayOfWeek);
+    
+    // Buscar schedule do profissional para o dia
+    const schedule = schedules.find(s => 
+      s.professional_id === selectedProfessionalId && 
+      s.day_of_week === dayOfWeek && 
+      s.is_active
+    );
 
-    if (!schedule) {
+    // Se não há schedule para este dia específico E há schedules cadastrados para o profissional
+    if (!schedule && schedules.length > 0) {
       setAvailableTimeSlots([]);
       setError('O profissional não trabalha neste dia');
       return;
     }
 
-    // Gerar slots de horário a cada 30 minutos
+    // Definir horário padrão se não houver schedule cadastrado
+    const startTime = schedule ? schedule.start_time : '09:00:00';
+    const endTime = schedule ? schedule.end_time : '18:00:00';
+
+    // Gerar slots de horário
     const slots: { hora: string; disponivel: boolean }[] = [];
-    const startTime = schedule.start_time.substring(0, 5); // "HH:MM"
-    const endTime = schedule.end_time.substring(0, 5);
-    
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
+    const [startHour, startMinute] = startTime.substring(0, 5).split(':').map(Number);
+    const [endHour, endMinute] = endTime.substring(0, 5).split(':').map(Number);
     
     let currentHour = startHour;
     let currentMinute = startMinute;
     
-    while (
-      currentHour < endHour || 
-      (currentHour === endHour && currentMinute < endMinute)
-    ) {
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-      slots.push({
-        hora: timeString,
-        disponivel: true // TODO: Verificar agendamentos existentes
-      });
+      slots.push({ hora: timeString, disponivel: true });
       
-      // Incrementar 30 minutos
       currentMinute += 30;
       if (currentMinute >= 60) {
         currentMinute -= 60;
         currentHour += 1;
       }
     }
-    
+
     setAvailableTimeSlots(slots);
     setError(null);
-  }, [selectedProfessionalId, selectedDate, getScheduleForDay]);
+  }, [selectedProfessionalId, selectedDate, schedules]);
 
-  if (!isOpen || !service) return null;
-
-  // Função para obter os 7 dias da semana atual
+  // Helper: Gerar 7 dias da semana
   const getWeekDays = (weekStart: Date) => {
-    const days = [];
-    for (let i = 0; i < 7; i++) {
+    return Array.from({ length: 7 }, (_, i) => {
       const day = new Date(weekStart);
       day.setDate(weekStart.getDate() + i);
-      days.push(day);
-    }
-    return days;
+      return day;
+    });
   };
 
-  const weekDays = getWeekDays(currentWeekStart);
-
-  // Navegação de semana
-  const handlePreviousWeek = () => {
-    const newWeekStart = new Date(currentWeekStart);
-    newWeekStart.setDate(currentWeekStart.getDate() - 7);
-    setCurrentWeekStart(newWeekStart);
-    setSelectedDate(null);
-    setSelectedTime(null);
-  };
-
-  const handleNextWeek = () => {
-    const newWeekStart = new Date(currentWeekStart);
-    newWeekStart.setDate(currentWeekStart.getDate() + 7);
-    setCurrentWeekStart(newWeekStart);
-    setSelectedDate(null);
-    setSelectedTime(null);
-  };
-
-  // Verificar se a data é hoje ou futura E se o profissional trabalha neste dia
+  // Helper: Verificar se data é disponível
   const isDateAvailable = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     if (date < today) return false;
     
-    // Se nenhum profissional selecionado, permitir selecionar qualquer data
+    // Se não há profissional selecionado, permitir qualquer data futura
     if (!selectedProfessionalId) return true;
     
-    // Verificar se o profissional trabalha neste dia
-    const dayOfWeek = date.getDay();
-    const schedule = getScheduleForDay(selectedProfessionalId, dayOfWeek);
+    // Se está carregando os horários, permitir seleção (será validado depois)
+    if (loadingSchedules) return true;
     
-    return schedule !== null;
+    // Se não há schedules cadastrados, permitir todos os dias (profissional sem horário definido)
+    if (schedules.length === 0) return true;
+    
+    // Verificar se o profissional trabalha neste dia
+    const schedule = schedules.find(s => 
+      s.professional_id === selectedProfessionalId && 
+      s.day_of_week === date.getDay() && 
+      s.is_active
+    );
+    return schedule !== undefined;
   };
 
-  // Verificar se a data está selecionada
+  // Helper: Verificar se data está selecionada
   const isDateSelected = (date: Date) => {
-    if (!selectedDate) return false;
-    return date.toDateString() === selectedDate.toDateString();
+    return selectedDate?.toDateString() === date.toDateString();
   };
 
-  // Formatar mês/ano
-  const monthNames = [
-    'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-    'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
-  ];
-
-  // Pega o mês da primeira data da semana
-  const formattedMonth = monthNames[currentWeekStart.getMonth()];
-
-  // Formatar data para exibição
+  // Helper: Formatar data para exibição
   const formatDate = (date: Date | null) => {
     if (!date) return '--/--';
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    return `${day}/${month}`;
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
   };
+
+  // Helper: Navegar entre semanas
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const offset = direction === 'prev' ? -7 : 7;
+    const newWeekStart = new Date(currentWeekStart);
+    newWeekStart.setDate(currentWeekStart.getDate() + offset);
+    setCurrentWeekStart(newWeekStart);
+    setSelectedDate(null);
+    setSelectedTime(null);
+  };
+
+  if (!isOpen || !service) return null;
+
+  const weekDays = getWeekDays(currentWeekStart);
+  const monthNames = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
+  const formattedMonth = monthNames[currentWeekStart.getMonth()];
 
   const handleConfirm = async () => {
     // Verificar login
@@ -260,7 +255,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           {!user && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 mt-0.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5">
                   <path 
                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" 
                     fill="#f59e0b"
@@ -304,7 +299,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                       }`}
                     >
                       {/* Avatar */}
-                      <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center shrink-0 overflow-hidden">
                         {professional.user_avatar_url ? (
                           <img 
                             src={professional.user_avatar_url} 
@@ -378,9 +373,19 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
 
           {/* Calendário Semanal */}
           <div className="mb-6">
+            <h3 className="text-sm font-semibold mb-3">Selecione a Data</h3>
+            
+            {!selectedProfessionalId && professionals.length > 0 && (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                <p className="text-blue-400 text-sm">
+                  Selecione um profissional primeiro para ver os dias disponíveis
+                </p>
+              </div>
+            )}
+
             <div className="flex justify-between items-center mb-4">
               <button
-                onClick={handlePreviousWeek}
+                onClick={() => navigateWeek('prev')}
                 className="text-gray-400 hover:text-white transition-colors p-2"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -389,7 +394,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
               </button>
               <span className="font-semibold text-sm">{formattedMonth}</span>
               <button
-                onClick={handleNextWeek}
+                onClick={() => navigateWeek('next')}
                 className="text-gray-400 hover:text-white transition-colors p-2"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -414,6 +419,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
               {weekDays.map((date, index) => {
                 const available = isDateAvailable(date);
                 const selected = isDateSelected(date);
+                const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
 
                 return (
                   <button
@@ -426,13 +432,20 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                       }
                     }}
                     disabled={!available}
-                    className={`py-2 rounded-full transition-colors ${
+                    className={`py-2 rounded-full transition-colors relative ${
                       selected
-                        ? 'bg-indigo-500 text-white'
+                        ? 'bg-indigo-500 text-white font-semibold'
                         : available
                         ? 'hover:bg-gray-700 text-white'
-                        : 'text-gray-600 cursor-not-allowed'
+                        : isPast
+                        ? 'text-gray-700 cursor-not-allowed line-through'
+                        : 'text-gray-600 cursor-not-allowed opacity-40'
                     }`}
+                    title={
+                      !available && !isPast && selectedProfessionalId
+                        ? 'Profissional não trabalha neste dia'
+                        : ''
+                    }
                   >
                     {date.getDate()}
                   </button>
@@ -445,7 +458,11 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           {selectedDate && selectedProfessionalId && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold mb-3">Horários disponíveis</h3>
-              {availableTimeSlots.length === 0 ? (
+              {loadingSchedules ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
+                </div>
+              ) : availableTimeSlots.length === 0 ? (
                 <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                   <p className="text-amber-500 text-sm">
                     O profissional não trabalha neste dia. Selecione outra data.

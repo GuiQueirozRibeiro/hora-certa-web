@@ -29,3 +29,13 @@ body {
 html {
   overflow-x: hidden;
 }
+
+/* Esconde scrollbar mas mantém funcionalidade */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

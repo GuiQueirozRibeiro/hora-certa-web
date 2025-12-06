@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useBusinesses } from '../../../../hooks/Usebusinesses';
 import { useFavorites } from '../../../../hooks/useFavorites';
-import BarbeariaModal from '../../../business/components/BarbeariaModal';
 
 interface Barbearia {
   id: string;
@@ -165,16 +164,6 @@ export function FormFavoritos() {
           );
         })}
       </div>
-
-      {/* Modal de Reserva */}
-      {selectedBarbearia && (
-        <BarbeariaModal
-          barbearia={selectedBarbearia}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onReservationSuccess={() => {}}
-        />
-      )}
     </div>
   );
 }
