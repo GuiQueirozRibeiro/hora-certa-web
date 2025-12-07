@@ -1,10 +1,14 @@
-export type OpeningHours = {
-  [key: string]: {
-    open: string;
-    close: string;
-    isClosed?: boolean;
-  };
+export type DaySchedule = {
+  dia: string;
+  ativo: boolean;
+  diaAbreviado: string;
+  intervaloFim: string;
+  horarioAbertura: string;
+  intervaloInicio: string;
+  horarioFechamento: string;
 };
+
+export type OpeningHours = DaySchedule[];
 
 export type Business = {
   id: string;

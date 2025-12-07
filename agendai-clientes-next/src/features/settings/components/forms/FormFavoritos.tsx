@@ -37,11 +37,22 @@ export function FormFavoritos() {
   const convertBusinessToBarbearia = (business: typeof businesses[0]): Barbearia => {
     const addressString = 'Endereço não disponível'; // Simplificado, já que não temos address aqui
     
-    const horariosFuncionamento = business.opening_hours
-      ? Object.entries(business.opening_hours).map(([dia, horario]: [string, any]) => ({
-          dia: dia,
-          horario: horario.isClosed ? 'Fechado' : `${horario.open} - ${horario.close}`,
-        }))
+    const horariosFuncionamento = business.opening_hours && Array.isArray(business.opening_hours)
+      ? business.opening_hours.map((schedule) => {
+          const hasInterval = schedule.intervaloInicio && schedule.intervaloFim;
+          let horario = 'Fechado';
+          if (schedule.ativo) {
+            if (hasInterval) {
+              horario = `${schedule.horarioAbertura} - ${schedule.intervaloInicio} | ${schedule.intervaloFim} - ${schedule.horarioFechamento}`;
+            } else {
+              horario = `${schedule.horarioAbertura} - ${schedule.horarioFechamento}`;
+            }
+          }
+          return {
+            dia: schedule.dia,
+            horario: horario,
+          };
+        })
       : [
           { dia: "Segunda-feira", horario: "09:00 - 21:00" },
           { dia: "Terça-feira", horario: "09:00 - 21:00" },

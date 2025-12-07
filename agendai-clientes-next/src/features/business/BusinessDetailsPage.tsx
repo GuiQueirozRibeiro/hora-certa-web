@@ -80,18 +80,65 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
     return phone;
   };
 
+  const isCurrentlyOpen = (schedule: any): boolean => {
+    if (!schedule.ativo) return false;
+    
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // minutos desde meia-noite
+    
+    const parseTime = (timeStr: string): number => {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      return hours * 60 + minutes;
+    };
+    
+    const openTime = parseTime(schedule.horarioAbertura);
+    const closeTime = parseTime(schedule.horarioFechamento);
+    
+    // Se tem intervalo, verificar se está no horário de funcionamento (manhã ou tarde)
+    if (schedule.intervaloInicio && schedule.intervaloFim) {
+      const intervalStart = parseTime(schedule.intervaloInicio);
+      const intervalEnd = parseTime(schedule.intervaloFim);
+      
+      // Está aberto se está entre abertura-intervaloInicio OU intervalFim-fechamento
+      return (currentTime >= openTime && currentTime < intervalStart) || 
+             (currentTime >= intervalEnd && currentTime < closeTime);
+    }
+    
+    // Sem intervalo, só verificar se está entre abertura e fechamento
+    return currentTime >= openTime && currentTime < closeTime;
+  };
+
   const getOpeningHours = () => {
-    if (!business?.opening_hours) return [];
+    if (!business?.opening_hours || !Array.isArray(business.opening_hours)) return [];
     
-    const days = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
-    const dayKeys = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+    const currentDay = getDayOfWeek();
     
-    return days.map((day, index) => {
-      const dayData = business.opening_hours?.[dayKeys[index]];
+    return business.opening_hours.map((schedule) => {
+      const hasInterval = schedule.intervaloInicio && schedule.intervaloFim;
+      let hours = 'Fechado';
+      
+      if (schedule.ativo) {
+        if (hasInterval) {
+          hours = `${schedule.horarioAbertura} - ${schedule.intervaloInicio} | ${schedule.intervaloFim} - ${schedule.horarioFechamento}`;
+        } else {
+          hours = `${schedule.horarioAbertura} - ${schedule.horarioFechamento}`;
+        }
+      }
+      
+      // Normalizar strings para comparação (remover acentos e converter para minúsculas)
+      const normalizeString = (str: string) => {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      };
+      
+      const isToday = normalizeString(schedule.dia) === normalizeString(currentDay);
+      
       return {
-        day,
-        hours: dayData?.isClosed ? 'Fechado' : `${dayData?.open || '09:00'} - ${dayData?.close || '18:00'}`,
-        isToday: day === getDayOfWeek(),
+        day: schedule.dia,
+        hours,
+        isOpen: schedule.ativo,
+        isToday,
+        hasInterval,
+        schedule, // Manter o schedule original para verificação de horário
       };
     });
   };
@@ -448,9 +495,30 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
               <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-white font-semibold text-lg">Horário de atendimento</h3>
-                  <span className="bg-indigo-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Aberto
-                  </span>
+                  {(() => {
+                    const schedules = getOpeningHours();
+                    const todaySchedule = schedules.find(s => s.isToday);
+                    
+                    // Verificar se está aberto agora (dia ativo E dentro do horário)
+                    const isOpenNow = todaySchedule?.schedule && isCurrentlyOpen(todaySchedule.schedule);
+                    
+                    // Debug: remover após verificar
+                    console.log('Current Day:', getDayOfWeek());
+                    console.log('Current Time:', new Date().toLocaleTimeString('pt-BR'));
+                    console.log('All Schedules:', schedules);
+                    console.log('Today Schedule:', todaySchedule);
+                    console.log('Is Open Now:', isOpenNow);
+                    
+                    return isOpenNow ? (
+                      <span className="bg-indigo-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        Aberto
+                      </span>
+                    ) : (
+                      <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        Fechado
+                      </span>
+                    );
+                  })()}
                 </div>
                 
                 <div className="space-y-3">
@@ -471,7 +539,10 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                           </span>
                         )}
                       </div>
-                      <span className={`text-sm ${schedule.isToday ? 'text-white font-semibold' : 'text-zinc-400'}`}>
+                      <span className={`text-sm ${
+                        schedule.isToday ? 'text-white font-semibold' : 
+                        schedule.isOpen ? 'text-zinc-400' : 'text-red-400'
+                      }`}>
                         {schedule.hours}
                       </span>
                     </div>
