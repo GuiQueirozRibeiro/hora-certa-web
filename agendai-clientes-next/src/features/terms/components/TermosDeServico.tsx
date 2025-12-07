@@ -223,7 +223,7 @@ export const TermosDeServico: React.FC = () => {
         <h2 className="text-xl font-bold text-indigo-400">15. CONTATO</h2>
         <p className="text-gray-300">Para questões sobre estes Termos de Serviço:</p>
         <div className="bg-[#26272B] rounded-lg p-4 space-y-2">
-          <p className="text-gray-300"><strong>E-mail:</strong> legal@horacerta.com.br</p>
+          <p className="text-gray-300"><strong>E-mail:</strong> legal@agendai.app</p>
           <p className="text-gray-300"><strong>Endereço:</strong> [ENDEREÇO COMPLETO DA EMPRESA]</p>
           <p className="text-gray-300"><strong>Telefone:</strong> [TELEFONE DE CONTATO]</p>
         </div>

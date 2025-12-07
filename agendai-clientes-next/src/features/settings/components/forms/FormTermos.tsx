@@ -49,7 +49,7 @@ export function FormTermos({ onNavigateToTermos }: FormTermosProps) {
                             Termos de Serviço
                         </h2>
                         <p className="text-gray-400">
-                            Conheça nossos termos de uso e políticas da plataforma Hora Certa
+                            Conheça nossos termos de uso e políticas da plataforma Agendai
                         </p>
                     </div>
                 </div>

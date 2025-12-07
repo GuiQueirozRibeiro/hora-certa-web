@@ -152,7 +152,7 @@ export const PoliticaPrivacidade: React.FC = () => {
         <h3 className="font-semibold text-gray-200 mt-3">9.8. Como Exercer Seus Direitos</h3>
         <p className="text-gray-300">Para exercer qualquer destes direitos:</p>
         <ul className="list-disc list-inside space-y-1 text-gray-300 ml-4">
-          <li>Entre em contato através de <strong>privacidade@horacerta.com.br</strong></li>
+          <li>Entre em contato através de <strong>privacidade@agendai.app</strong></li>
           <li>Acesse as configurações de privacidade no aplicativo</li>
           <li>Responderemos em até 15 dias</li>
         </ul>
@@ -199,7 +199,7 @@ export const PoliticaPrivacidade: React.FC = () => {
         <h2 className="text-xl font-bold text-green-400">13. ENCARREGADO DE PROTEÇÃO DE DADOS (DPO)</h2>
         <div className="bg-[#26272B] rounded-lg p-4 space-y-2">
           <p className="text-gray-300"><strong>Nome:</strong> [Nome do DPO]</p>
-          <p className="text-gray-300"><strong>E-mail:</strong> dpo@horacerta.com.br</p>
+          <p className="text-gray-300"><strong>E-mail:</strong> dpo@agendai.app</p>
           <p className="text-gray-300"><strong>Endereço:</strong> [Endereço completo]</p>
         </div>
       </section>
@@ -228,8 +228,8 @@ export const PoliticaPrivacidade: React.FC = () => {
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-green-400">16. CONTATO E DÚVIDAS</h2>
         <div className="bg-[#26272B] rounded-lg p-4 space-y-2">
-          <p className="text-gray-300"><strong>E-mail Geral de Privacidade:</strong> privacidade@horacerta.com.br</p>
-          <p className="text-gray-300"><strong>E-mail do DPO:</strong> dpo@horacerta.com.br</p>
+          <p className="text-gray-300"><strong>E-mail Geral de Privacidade:</strong> privacidade@agendai.app</p>
+          <p className="text-gray-300"><strong>E-mail do DPO:</strong> dpo@agendai.app</p>
           <p className="text-gray-300"><strong>Telefone:</strong> [TELEFONE]</p>
           <p className="text-gray-300"><strong>Endereço:</strong> [ENDEREÇO COMPLETO]</p>
           <p className="text-gray-300"><strong>Horário:</strong> Segunda a Sexta, 9h às 18h</p>

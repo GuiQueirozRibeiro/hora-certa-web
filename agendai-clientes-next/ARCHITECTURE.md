@@ -1,4 +1,4 @@
-# 🏗️ Arquitetura do Projeto - Hora Certa
+# 🏗️ Arquitetura do Projeto - Agendai
 
 ## 📋 Índice
 1. [Visão Geral](#visão-geral)

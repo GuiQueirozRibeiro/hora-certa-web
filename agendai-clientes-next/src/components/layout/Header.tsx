@@ -25,7 +25,7 @@ const Header: React.FC = () => {
             <Layers size={24} className="text-white" />
           </div>
           <span className="text-[28px] font-bold tracking-tight">
-            <span className="text-indigo-500">Hora</span> <span className="text-white">Certa</span>
+            <span className="text-white">Agend</span><span className="text-indigo-500">ai</span>
           </span>
         </div>
         

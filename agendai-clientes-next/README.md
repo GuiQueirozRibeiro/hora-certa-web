@@ -1,4 +1,4 @@
-# 🏗️ Arquitetura do Projeto - Hora Certa
+# 🏗️ Arquitetura do Projeto - Agendai
 
 > Documentação técnica da arquitetura, estrutura de pastas e princípios de design aplicados
 
@@ -1270,7 +1270,7 @@ export function SettingsPage() {
 
 <div align="center">
 
-**📖 Documentação de Arquitetura - Hora Certa**
+**📖 Documentação de Arquitetura - Agendai**
 
 Developed with ❤️ by [gui-ccr](https://github.com/gui-ccr)
 
