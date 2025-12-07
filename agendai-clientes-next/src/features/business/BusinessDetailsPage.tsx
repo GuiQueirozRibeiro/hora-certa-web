@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { gsap } from 'gsap';
 import { ArrowLeft, Star, Clock, MapPin, Phone, Store, Wifi, Lock, User, Users, Scissors, ZoomIn, Image as ImageIcon, Check } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
@@ -283,22 +284,129 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                   
                   {/* Grid de Comodidades */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-                    <button className="bg-zinc-800 hover:bg-zinc-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+                    <button 
+                      className="bg-zinc-800 hover:bg-zinc-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors"
+                      onMouseEnter={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        const text = e.currentTarget.querySelector('span');
+                        gsap.to(e.currentTarget, {
+                          backgroundColor: '#4f46e5',
+                          scale: 1.05,
+                          duration: 0.4,
+                          ease: 'elastic.out(1, 0.5)'
+                        });
+                        gsap.to(icon, {
+                          rotation: 360,
+                          duration: 0.6,
+                          ease: 'back.out(1.7)'
+                        });
+                        gsap.to(text, {
+                          y: -2,
+                          duration: 0.3
+                        });
+                      }}
+                      onMouseLeave={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        const text = e.currentTarget.querySelector('span');
+                        gsap.to(e.currentTarget, {
+                          backgroundColor: '#27272a',
+                          scale: 1,
+                          duration: 0.3
+                        });
+                        gsap.to(icon, {
+                          rotation: 0,
+                          duration: 0.3
+                        });
+                        gsap.to(text, {
+                          y: 0,
+                          duration: 0.3
+                        });
+                      }}
+                    >
                       <Wifi size={24} className="text-white" />
                       <span className="text-white text-sm">Wi-fi</span>
                     </button>
                     
-                    <button className="bg-zinc-800 hover:bg-indigo-900/50 border-2 border-indigo-500 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+                    <button 
+                      className="bg-zinc-800 hover:bg-indigo-900/50 border-2 border-indigo-500 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors"
+                      onMouseEnter={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        gsap.to(e.currentTarget, {
+                          scale: 1.05,
+                          borderColor: '#a78bfa',
+                          duration: 0.3,
+                          ease: 'power2.out'
+                        });
+                        gsap.to(icon, {
+                          scale: 1.3,
+                          y: -5,
+                          duration: 0.4,
+                          ease: 'back.out(2)'
+                        });
+                      }}
+                      onMouseLeave={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        gsap.to(e.currentTarget, {
+                          scale: 1,
+                          borderColor: '#6366f1',
+                          duration: 0.3
+                        });
+                        gsap.to(icon, {
+                          scale: 1,
+                          y: 0,
+                          duration: 0.3
+                        });
+                      }}
+                    >
                       <Lock size={24} className="text-white" />
                       <span className="text-white text-sm">Estacionamento</span>
                     </button>
                     
-                    <button className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500">
+                    <button 
+                      className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500"
+                      onMouseEnter={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        const tl = gsap.timeline();
+                        tl.to(icon, { x: -3, duration: 0.1 })
+                          .to(icon, { x: 3, duration: 0.1 })
+                          .to(icon, { x: -2, duration: 0.1 })
+                          .to(icon, { x: 2, duration: 0.1 })
+                          .to(icon, { x: 0, duration: 0.1 });
+                      }}
+                    >
                       <User size={24} />
                       <span className="text-sm line-through">Acessibilidade</span>
                     </button>
                     
-                    <button className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500">
+                    <button 
+                      className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500"
+                      onMouseEnter={(e) => {
+                        const icon = e.currentTarget.querySelector('svg');
+                        const tl = gsap.timeline();
+                        tl.to(icon, { 
+                          rotation: -15,
+                          y: -3,
+                          duration: 0.15,
+                          ease: 'power2.out'
+                        })
+                        .to(icon, { 
+                          rotation: 15,
+                          y: -5,
+                          duration: 0.15 
+                        })
+                        .to(icon, { 
+                          rotation: -10,
+                          y: -3,
+                          duration: 0.15 
+                        })
+                        .to(icon, { 
+                          rotation: 0,
+                          y: 0,
+                          duration: 0.2,
+                          ease: 'elastic.out(1, 0.3)'
+                        });
+                      }}
+                    >
                       <Users size={24} />
                       <span className="text-sm line-through">Atende crianças</span>
                     </button>
@@ -556,7 +664,30 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
               <h3 className="text-white font-semibold text-lg mb-4">Formas de pagamento</h3>
               <div className="flex flex-wrap gap-2">
                 {['Dinheiro', 'Cartão de Crédito', 'Cartão de Débito', 'Pix'].map((payment, index) => (
-                  <span key={index} className="bg-zinc-800 text-zinc-300 text-sm px-4 py-2 rounded-lg">
+                  <span 
+                    key={index} 
+                    className="payment-badge bg-zinc-800 text-zinc-300 text-sm px-4 py-2 rounded-lg cursor-pointer transition-colors"
+                    onMouseEnter={(e) => {
+                      gsap.to(e.currentTarget, {
+                        scale: 1.1,
+                        y: -4,
+                        backgroundColor: '#4f46e5',
+                        color: '#ffffff',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      gsap.to(e.currentTarget, {
+                        scale: 1,
+                        y: 0,
+                        backgroundColor: '#27272a',
+                        color: '#d4d4d8',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                      });
+                    }}
+                  >
                     {payment}
                   </span>
                 ))}
