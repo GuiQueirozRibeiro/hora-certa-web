@@ -17,7 +17,7 @@ interface BusinessDetailsPageProps {
 
 export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ businessId }) => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"servicos" | "profissionais" | "imagens" | "localizacao" | "avaliacoes">("servicos");
+  const [activeTab, setActiveTab] = useState<"servicos" | "profissionais" | "imagens" | "avaliacoes">("servicos");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [showNotification, setShowNotification] = useState(false);
@@ -216,16 +216,6 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                     Imagens
                   </button>
                   <button 
-                    onClick={() => setActiveTab("localizacao")}
-                    className={`flex-1 px-6 py-4 font-semibold whitespace-nowrap transition-colors ${
-                      activeTab === "localizacao" 
-                        ? "text-white border-b-2 border-indigo-500 bg-zinc-800/30" 
-                        : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
-                    Localização
-                  </button>
-                  <button 
                     onClick={() => setActiveTab("avaliacoes")}
                     className={`flex-1 px-6 py-4 font-semibold whitespace-nowrap transition-colors ${
                       activeTab === "avaliacoes" 
@@ -399,45 +389,6 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-
-              {/* Conteúdo - Localização */}
-              {activeTab === "localizacao" && (
-                <div className="p-6">
-                  <h3 className="text-white font-semibold text-lg mb-4">Localização</h3>
-                  {address ? (
-                    <>
-                      <div className="mb-4">
-                        <p className="text-zinc-400 mb-2">
-                          {address.street_address}, {address.number}
-                          {address.complement && ` - ${address.complement}`}
-                        </p>
-                        <p className="text-zinc-400">
-                          {address.neighborhood} - {address.city}/{address.state}
-                        </p>
-                        <p className="text-zinc-400">CEP: {address.zipcode}</p>
-                      </div>
-                      <div className="rounded-xl overflow-hidden border border-zinc-800">
-                        <iframe
-                          width="100%"
-                          height="400"
-                          style={{ border: 0 }}
-                          loading="lazy"
-                          allowFullScreen
-                          referrerPolicy="no-referrer-when-downgrade"
-                          src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodeURIComponent(
-                            `${address.street_address}, ${address.number}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.zipcode}`
-                          )}`}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-12">
-                      <MapPin size={48} className="text-zinc-600 mx-auto mb-4" />
-                      <p className="text-zinc-400">Endereço não disponível</p>
-                    </div>
-                  )}
                 </div>
               )}
 

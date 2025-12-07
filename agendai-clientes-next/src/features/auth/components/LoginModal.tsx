@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { X, Mail } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { useAuth } from '../../../hooks/useAuth';
 
 interface LoginModalProps {

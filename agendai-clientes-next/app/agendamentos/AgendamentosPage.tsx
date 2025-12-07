@@ -100,7 +100,7 @@ const AgendamentosPage: React.FC = () => {
   // Estado de não autenticado
   if (!user) {
     return (
-      <>
+      <div className="min-h-screen bg-zinc-900">
         <EmptyStates.NotAuthenticated onLogin={() => setShowLoginModal(true)} />
         
         <LoginModal
@@ -108,13 +108,17 @@ const AgendamentosPage: React.FC = () => {
           onClose={() => setShowLoginModal(false)}
           onLoginSuccess={() => setShowLoginModal(false)}
         />
-      </>
+      </div>
     );
   }
 
   // Estado de carregamento
   if (loading) {
-    return <EmptyStates.Loading />;
+    return (
+      <div className="min-h-screen bg-zinc-900">
+        <EmptyStates.Loading />
+      </div>
+    );
   }
 
   return (

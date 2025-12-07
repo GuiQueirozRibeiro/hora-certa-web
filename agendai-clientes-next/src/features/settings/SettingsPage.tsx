@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { MenuLateral } from './components/MenuLateral';
 import { AreaConteudo } from './components/AreaConteudo';
+import { EmptyStates } from '../appointments/components/EmptyStates';
+import LoginModal from '../auth/components/LoginModal';
 
 type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
 
@@ -12,6 +15,23 @@ interface SettingsPageProps {
 
 export function SettingsPage({ onNavigateToTermos }: SettingsPageProps) {
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('meus-dados');
+  const { user } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Estado de não autenticado
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-zinc-900">
+        <EmptyStates.NotAuthenticated onLogin={() => setShowLoginModal(true)} />
+        
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={() => setShowLoginModal(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex bg-zinc-900 text-black">

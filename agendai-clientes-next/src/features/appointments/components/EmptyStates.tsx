@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { Calendar, UserCircle } from 'lucide-react';
+import { Calendar, UserCircle, AlertCircle } from 'lucide-react';
 
 const NoSelection: React.FC = () => {
   return (
@@ -36,10 +36,10 @@ const Loading: React.FC = () => {
 
 const NotAuthenticated: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   return (
-    <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] bg-zinc-900">
       <div className="text-center">
         <div className="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <UserCircle size={40} className="text-indigo-500" fill="#6366f1" />
+          <AlertCircle size={40} className="text-indigo-500" />
         </div>
         <h3 className="text-2xl font-bold text-white mb-3">
           Faça login para ver seus agendamentos
