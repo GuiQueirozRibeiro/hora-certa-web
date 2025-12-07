@@ -7,7 +7,7 @@ import { AreaConteudo } from './components/AreaConteudo';
 import { EmptyStates } from '../appointments/components/EmptyStates';
 import LoginModal from '../auth/components/LoginModal';
 
-type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+type AbaAtiva = 'meus-dados' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
 
 interface SettingsPageProps {
   onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;

@@ -1,8 +1,8 @@
 'use client';
 
-import { InfoIcon, MapPinHouseIcon, ReceiptIcon, ShieldIcon, StarIcon } from "lucide-react";
+import { InfoIcon, ReceiptIcon, ShieldIcon, StarIcon } from "lucide-react";
 
-type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+type AbaAtiva = 'meus-dados' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
 
 interface MenuLateralProps {
   abaAtiva: AbaAtiva;
@@ -20,15 +20,6 @@ export function MenuLateral({ abaAtiva, setAbaAtiva }: MenuLateralProps) {
         >
           <InfoIcon className="h-5 w-5"/>
           <span>Meus dados</span>
-        </li>
-
-        <li 
-          onClick={() => setAbaAtiva('endereco')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 
-            ${abaAtiva === 'endereco' ? 'bg-zinc-600 text-white font-bold' : 'text-zinc-200 hover:text-white hover:font-bold'}`}
-        >
-          <MapPinHouseIcon className="h-5 w-5"/>
-          <span>Endereço</span>
         </li>
 
         <li 
