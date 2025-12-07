@@ -58,9 +58,34 @@ const NotAuthenticated: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   );
 };
 
+const NotAuthenticatedSettings: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+  return (
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] bg-zinc-900">
+      <div className="text-center">
+        <div className="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertCircle size={40} className="text-indigo-500" />
+        </div>
+        <h3 className="text-2xl font-bold text-white mb-3">
+          Faça login para acessar suas configurações
+        </h3>
+        <p className="text-gray-400 mb-8 max-w-md">
+          Entre com sua conta para visualizar e gerenciar as configurações do seu perfil
+        </p>
+        <button
+          onClick={onLogin}
+          className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+        >
+          Fazer Login
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Exportar como namespace para uso: EmptyStates.NoSelection, EmptyStates.Loading, etc.
 export const EmptyStates = {
   NoSelection,
   Loading,
   NotAuthenticated,
+  NotAuthenticatedSettings,
 };

@@ -22,7 +22,7 @@ export function SettingsPage({ onNavigateToTermos }: SettingsPageProps) {
   if (!user) {
     return (
       <div className="min-h-screen bg-zinc-900">
-        <EmptyStates.NotAuthenticated onLogin={() => setShowLoginModal(true)} />
+        <EmptyStates.NotAuthenticatedSettings onLogin={() => setShowLoginModal(true)} />
         
         <LoginModal
           isOpen={showLoginModal}
