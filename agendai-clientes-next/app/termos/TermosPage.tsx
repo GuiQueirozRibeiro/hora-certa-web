@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { TermosDeServico } from '../../src/features/terms/components/TermosDeServico';
 import { PoliticaPrivacidade } from '../../src/features/terms/components/PoliticaPrivacidade';
 
@@ -18,9 +19,7 @@ const TermosPage: React.FC<TermosPageProps> = ({ tipo, onClose }) => {
           onClick={onClose}
           className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <ArrowLeft size={20} />
           Voltar
         </button>
         <h1 className="text-xl font-bold">

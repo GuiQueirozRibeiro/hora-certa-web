@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Calendar } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useAppointments } from '../../../hooks/Useappointments';
 
@@ -26,15 +27,7 @@ export default function NextAppointments() {
       <div className="bg-[#0000009a] border border-[#3a3a3a] rounded-lg p-6 mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                stroke="#6366f1"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Calendar size={20} className="text-indigo-500" />
           </div>
           <h2 className="text-xl font-bold text-white">Próximos Agendamentos</h2>
         </div>
@@ -52,15 +45,7 @@ export default function NextAppointments() {
       {/* Cabeçalho */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              stroke="#6366f1"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Calendar size={20} className="text-indigo-500" />
         </div>
         <h2 className="text-xl font-bold text-white">Próximos Agendamentos</h2>
       </div>

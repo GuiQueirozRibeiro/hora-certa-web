@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Search } from 'lucide-react';
 
 interface SearchBarProps {
   searchTerm: string;
@@ -30,10 +31,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         )}
       </div>
       <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
-          <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" />
-        </svg>
+        <Search size={20} className="text-white" />
       </button>
     </div>
   );

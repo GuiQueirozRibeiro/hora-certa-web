@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Layers } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import LoginModal from '../../features/auth/components/LoginModal';
@@ -21,11 +22,7 @@ const Header: React.FC = () => {
       <header className="flex justify-between items-center px-16 py-3 bg-zinc-900 border-b border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white"/>
-              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
-              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
-            </svg>
+            <Layers size={24} className="text-white" />
           </div>
           <span className="text-[28px] font-bold tracking-tight">
             <span className="text-indigo-500">Hora</span> <span className="text-white">Certa</span>

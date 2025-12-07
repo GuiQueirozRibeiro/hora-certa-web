@@ -238,16 +238,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
               onClick={onClose}
               className="text-gray-500 hover:text-white transition-colors"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <X size={24} />
             </button>
           </div>
 
@@ -255,12 +246,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           {!user && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5">
-                  <path 
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" 
-                    fill="#f59e0b"
-                  />
-                </svg>
+                <AlertCircle size={20} className="text-amber-500 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-amber-500 text-sm font-medium mb-1">
                     Login necessário
@@ -325,9 +311,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                         )}
                         {professional.average_rating > 0 && (
                           <div className="flex items-center gap-1 mt-1">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
+                            <Star size={12} fill="#fbbf24" className="text-amber-400" />
                             <span className="text-xs text-gray-400">
                               {professional.average_rating.toFixed(1)} ({professional.total_reviews} avaliações)
                             </span>
@@ -354,15 +338,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
 
                       {/* Check icon */}
                       {selectedProfessionalId === professional.id && (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                          <path 
-                            d="M5 13l4 4L19 7" 
-                            stroke="white" 
-                            strokeWidth="2.5" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                          />
-                        </svg>
+                        <Check size={20} className="text-white" strokeWidth={2.5} />
                       )}
                     </button>
                   ))}
@@ -388,18 +364,14 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                 onClick={() => navigateWeek('prev')}
                 className="text-gray-400 hover:text-white transition-colors p-2"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2"/>
-                </svg>
+                <ChevronLeft size={20} />
               </button>
               <span className="font-semibold text-sm">{formattedMonth}</span>
               <button
                 onClick={() => navigateWeek('next')}
                 className="text-gray-400 hover:text-white transition-colors p-2"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2"/>
-                </svg>
+                <ChevronRight size={20} />
               </button>
             </div>
 

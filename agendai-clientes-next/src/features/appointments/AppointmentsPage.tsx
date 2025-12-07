@@ -8,7 +8,6 @@ import { useDateFormatter } from './hooks/useDateFormatter';
 import { useAppointmentActions } from './hooks/useAppointmentActions';
 import { usePhoneCopy } from './hooks/usePhoneCopy';
 import { AppointmentCard } from './components/AppointmentCard';
-import { AppointmentDetails } from './components/AppointmentDetails';
 import { CancelModal } from './components/CancelModal';
 import { EmptyStates } from './components/EmptyStates';
 import LoginModal from '../auth/components/LoginModal';
@@ -166,17 +165,9 @@ export const AppointmentsPage: React.FC = () => {
           {/* Right Column - Details */}
           <div className="col-span-8">
             {selectedAppointment ? (
-              <AppointmentDetails
-                appointment={selectedAppointment}
-                copiedPhone={copiedPhone}
-                isProcessing={isProcessing}
-                formatDate={formatDate}
-                formatTime={formatTime}
-                formatPhoneNumber={formatPhoneNumber}
-                onCopyPhone={handleCopyPhone}
-                onCancel={() => handleOpenCancelModal(selectedAppointment.id)}
-                onComplete={() => handleCompleteAppointment(selectedAppointment.id)}
-              />
+              <div className="bg-[#1a1a1a] rounded-lg p-6">
+                <p className="text-gray-400">Detalhes do agendamento removidos</p>
+              </div>
             ) : (
               <EmptyStates.NoSelection />
             )}

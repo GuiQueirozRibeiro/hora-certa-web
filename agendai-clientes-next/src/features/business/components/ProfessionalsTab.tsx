@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { User, Star } from 'lucide-react';
 import { useProfessionals } from '../../../hooks/useProfessionals';
 
 interface ProfessionalsTabProps {
@@ -47,12 +48,7 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
         <h3 className="text-white font-semibold text-base mb-4">Profissionais</h3>
         <div className="flex flex-col items-center justify-center py-12">
           <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-              <path 
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" 
-                fill="#9CA3AF"
-              />
-            </svg>
+            <User size={32} className="text-gray-400" />
           </div>
           <p className="text-gray-400 text-sm">Nenhum profissional cadastrado</p>
         </div>
@@ -95,9 +91,7 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
                   </span>
                   {professional.average_rating > 0 && (
                     <div className="flex items-center gap-1">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
+                      <Star size={12} fill="#fbbf24" className="text-amber-400" />
                       <span className="text-xs text-gray-400">
                         {professional.average_rating.toFixed(1)}
                       </span>

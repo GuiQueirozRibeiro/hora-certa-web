@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { UserCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import LoginModal from '../../features/auth/components/LoginModal';
 
@@ -47,12 +48,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, fallback }) =
           <div className="flex items-center justify-center min-h-screen bg-[#1a1a1a]">
             <div className="text-center">
               <div className="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                  <path 
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" 
-                    fill="#6366f1"
-                  />
-                </svg>
+                <UserCircle size={32} className="text-indigo-500" fill="#6366f1" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">
                 Acesso Restrito
