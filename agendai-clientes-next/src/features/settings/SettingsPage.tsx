@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { MenuLateral } from './components/MenuLateral';
 import { AreaConteudo } from './components/AreaConteudo';
@@ -17,6 +17,20 @@ export function SettingsPage({ onNavigateToTermos }: SettingsPageProps) {
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('meus-dados');
   const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Evita erro de hidratação
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-zinc-900">
+        <EmptyStates.Loading />
+      </div>
+    );
+  }
 
   // Estado de não autenticado
   if (!user) {
