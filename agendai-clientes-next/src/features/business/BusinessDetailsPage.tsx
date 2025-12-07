@@ -171,22 +171,22 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
     <div className="min-h-screen bg-zinc-950">
       {/* Botão Voltar */}
       <div className="bg-zinc-900 border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
           >
-            <ArrowLeft size={20} />
-            <span>Voltar</span>
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            <span className="text-sm sm:text-base">Voltar</span>
           </button>
         </div>
       </div>
 
       {/* Header com Logo e Nome */}
       <div className="bg-zinc-900 border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-800 shrink-0">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-zinc-800 shrink-0">
               {business.image_url || business.cover_image_url ? (
                 <img 
                   src={(business.logo_url || business.image_url || business.cover_image_url) ?? undefined} 
@@ -199,9 +199,9 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                 </div>
               )}
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">{business.name}</h1>
-              <div className="flex items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1 truncate">{business.name}</h1>
+              <div className="flex items-center gap-1 sm:gap-2">
                 <div className="flex items-center">
                   <Star size={16} fill="#FFD700" color="#FFD700" className="mr-1" />
                   <span className="text-white font-semibold">{business.average_rating.toFixed(1)}</span>
@@ -214,28 +214,28 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
       </div>
 
       {/* Container Principal */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Coluna Esquerda - Informações Principais */}
           <div className="lg:col-span-2 space-y-6">
             {/* Imagem de Capa */}
             {(business.cover_image_url || business.image_url) && (
-              <div className="rounded-2xl overflow-hidden">
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden">
                 <img 
                   src={(business.cover_image_url || business.image_url) ?? undefined} 
                   alt={business.name}
-                  className="w-full h-64 object-cover"
+                  className="w-full h-48 sm:h-56 md:h-64 object-cover"
                 />
               </div>
             )}
 
             {/* Tabs de Navegação */}
-            <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
+            <div className="bg-zinc-900 rounded-xl sm:rounded-2xl border border-zinc-800 overflow-hidden">
               <div className="border-b border-zinc-800">
                 <div className="flex overflow-x-auto scrollbar-hide">
                   <button 
                     onClick={() => setActiveTab("servicos")}
-                    className={`flex-1 px-6 py-4 font-semibold whitespace-nowrap transition-colors ${
+                    className={`flex-1 px-4 sm:px-6 py-3 sm:py-4 font-semibold text-sm sm:text-base whitespace-nowrap transition-colors ${
                       activeTab === "servicos" 
                         ? "text-white border-b-2 border-indigo-500 bg-zinc-800/30" 
                         : "text-zinc-400 hover:text-white"
@@ -283,7 +283,7 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                   <p className="text-zinc-400 text-sm mb-6">Clique no item para obter informações</p>
                   
                   {/* Grid de Comodidades */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
                     <button 
                       className="bg-zinc-800 hover:bg-zinc-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors"
                       onMouseEnter={(e) => {
@@ -419,9 +419,9 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
                     </div>
                   ) : services.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {services.map((service) => (
-                        <div key={service.id} className="flex items-center justify-between bg-zinc-800 rounded-xl p-4 hover:bg-zinc-700 transition-colors">
+                        <div key={service.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-zinc-800 rounded-xl p-3 sm:p-4 hover:bg-zinc-700 transition-colors gap-3 sm:gap-0">
                           <div className="flex items-center gap-4 flex-1">
                             <div className="w-16 h-16 rounded-full bg-zinc-900 shrink-0 overflow-hidden">
                               {service.image_url ? (
@@ -448,9 +448,9 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                               </div>
                             </div>
                           </div>
-                          <button 
+                          <button
                             onClick={() => handleOpenModal(service)}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors ml-4"
+                            className="bg-indigo-500 hover:bg-indigo-600 text-white w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors"
                           >
                             Agendar
                           </button>

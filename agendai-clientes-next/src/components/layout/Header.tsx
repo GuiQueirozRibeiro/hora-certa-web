@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layers } from 'lucide-react';
+import { Layers, Menu, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import LoginModal from '../../features/auth/components/LoginModal';
@@ -19,20 +19,20 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center px-16 py-3 bg-zinc-900 border-b border-zinc-800">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 flex items-center justify-center">
-            <Layers size={24} className="text-white" />
+      <header className="flex justify-between items-center px-4 sm:px-8 md:px-16 py-3 bg-zinc-900 border-b border-zinc-800">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+            <Layers size={20} className="text-white sm:w-6 sm:h-6" />
           </div>
-          <span className="text-[28px] font-bold tracking-tight">
+          <span className="text-xl sm:text-2xl md:text-[28px] font-bold tracking-tight">
             <span className="text-white">Agend</span><span className="text-indigo-500">ai</span>
           </span>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <>
-              <div className="flex flex-col items-end">
+              <div className="hidden sm:flex flex-col items-end">
                 <span className="text-sm font-semibold text-white">
                   {profile?.name || user.email?.split('@')[0] || 'Usuário'}
                 </span>
@@ -47,7 +47,7 @@ const Header: React.FC = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors"
                 >
                   {profile?.image_url ? (
                     <img 
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
             </>
           ) : (
             <>
-              <div className="flex flex-col items-end">
+              <div className="hidden sm:flex flex-col items-end">
                 <span className="text-sm font-semibold text-white">Visitante</span>
                 <span className="text-xs text-gray-500 mt-0.5">
                   {new Date().toLocaleDateString('pt-BR', { 
@@ -89,7 +89,7 @@ const Header: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="px-4 py-2 bg-indigo-500 text-white text-sm font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
               >
                 Entrar
               </button>

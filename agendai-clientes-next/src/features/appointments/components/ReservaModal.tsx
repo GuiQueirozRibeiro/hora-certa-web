@@ -5,6 +5,7 @@ import { useProfessionals } from '../../../hooks/useProfessionals';
 import { useProfessionalSchedules } from '../../../hooks/useProfessionalSchedules';
 import LoginModal from '../../auth/components/LoginModal';
 import type { Service } from '../../../types/types';
+import { X, AlertCircle, Star, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ReservaModalProps {
   isOpen: boolean;

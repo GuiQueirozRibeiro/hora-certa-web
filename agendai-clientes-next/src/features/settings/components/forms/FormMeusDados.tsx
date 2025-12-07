@@ -79,10 +79,10 @@ export function FormMeusDados() {
 
   return (
     <div className="w-full max-w-3xl">
-      <h2 className="text-2xl text-zinc-300 font-bold mb-3">
+      <h2 className="text-xl sm:text-2xl text-zinc-300 font-bold mb-2 sm:mb-3">
         Meus Dados
       </h2>
-      <p className="text-zinc-300 mb-6">
+      <p className="text-sm sm:text-base text-zinc-300 mb-4 sm:mb-6">
         Aqui você pode alterar suas informações de perfil.
       </p>
 
@@ -171,7 +171,7 @@ export function FormMeusDados() {
         <button
           type="submit"
           disabled={isSubmitting || loading}
-          className="mt-4 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 w-full sm:w-auto rounded-lg bg-indigo-600 px-6 py-2.5 sm:py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
           {isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
         </button>

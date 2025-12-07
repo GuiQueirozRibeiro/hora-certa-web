@@ -3,10 +3,10 @@
 export function FormEndereco() {
   return (
     <div className="w-full max-w-3xl">
-      <h2 className="text-2xl text-zinc-300 font-bold mb-3">
+      <h2 className="text-xl sm:text-2xl text-zinc-300 font-bold mb-2 sm:mb-3">
         Endereço
       </h2>
-      <p className="text-zinc-300 mb-6">
+      <p className="text-sm sm:text-base text-zinc-300 mb-4 sm:mb-6">
         Aqui você pode alterar seu endereço.
       </p>
 

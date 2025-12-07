@@ -66,9 +66,9 @@ export const HomePage: React.FC = () => {
       <SuccessNotification show={showNotification} />
 
       {/* Search Section */}
-      <div className="max-w-[1400px] mx-auto px-16 pt-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 pt-6 sm:pt-8">
         <NextAppointments />
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -86,8 +86,8 @@ export const HomePage: React.FC = () => {
 
       {/* Business Grid */}
       {!loading && !error && businessList.length > 0 && (
-        <div className="max-w-[1400px] mx-auto px-16 mt-12">
-          <div className="grid grid-cols-4 gap-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 mt-8 sm:mt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {businessList.map((business) => (
               <BusinessCard
                 key={business.id}

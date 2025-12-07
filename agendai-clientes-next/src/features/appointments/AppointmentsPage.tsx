@@ -101,10 +101,10 @@ export const AppointmentsPage: React.FC = () => {
 
   // Render: Main Content
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-6 min-h-screen bg-zinc-800">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 min-h-screen bg-zinc-800">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
       </div>
 
       {/* Loading */}
@@ -112,15 +112,15 @@ export const AppointmentsPage: React.FC = () => {
 
       {/* Main Layout */}
       {!loading && (
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left Column - Appointment List */}
-          <div className="col-span-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+          {/* Left Column - Appointment List - Esconde em mobile quando tem seleção */}
+          <div className={`lg:col-span-4 ${selectedAppointment ? 'hidden lg:block' : 'block'}`}>
             {/* Confirmed Section */}
-            <div className="mb-6">
-              <h2 className="text-white font-semibold text-base mb-3">Confirmados</h2>
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-white font-semibold text-sm sm:text-base mb-2 sm:mb-3">Confirmados</h2>
               {confirmedAppointments.length === 0 ? (
-                <div className="bg-[#1a1a1a] rounded-lg p-6 text-center">
-                  <p className="text-gray-400 text-sm">Nenhum agendamento confirmado</p>
+                <div className="bg-[#1a1a1a] rounded-lg p-4 sm:p-6 text-center">
+                  <p className="text-gray-400 text-xs sm:text-sm">Nenhum agendamento confirmado</p>
                 </div>
               ) : (
                 <div>
@@ -140,10 +140,10 @@ export const AppointmentsPage: React.FC = () => {
 
             {/* Completed Section */}
             <div>
-              <h2 className="text-white font-semibold text-base mb-3">Finalizados</h2>
+              <h2 className="text-white font-semibold text-sm sm:text-base mb-2 sm:mb-3">Finalizados</h2>
               {completedAppointments.length === 0 ? (
-                <div className="bg-[#1a1a1a] rounded-lg p-6 text-center">
-                  <p className="text-gray-400 text-sm">Nenhum agendamento finalizado</p>
+                <div className="bg-[#1a1a1a] rounded-lg p-4 sm:p-6 text-center">
+                  <p className="text-gray-400 text-xs sm:text-sm">Nenhum agendamento finalizado</p>
                 </div>
               ) : (
                 <div>
@@ -162,11 +162,21 @@ export const AppointmentsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column - Details */}
-          <div className="col-span-8">
+          {/* Right Column - Details - Mostra em mobile quando tem seleção */}
+          <div className={`lg:col-span-8 ${selectedAppointment ? 'block' : 'hidden lg:block'}`}>
             {selectedAppointment ? (
-              <div className="bg-[#1a1a1a] rounded-lg p-6">
-                <p className="text-gray-400">Detalhes do agendamento removidos</p>
+              <div className="bg-[#1a1a1a] rounded-lg p-4 sm:p-6">
+                {/* Botão voltar apenas em mobile */}
+                <button
+                  onClick={() => setSelectedAppointment(null)}
+                  className="lg:hidden flex items-center gap-2 text-zinc-400 hover:text-white mb-4 text-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                  </svg>
+                  Voltar
+                </button>
+                <p className="text-gray-400 text-sm sm:text-base">Detalhes do agendamento removidos</p>
               </div>
             ) : (
               <EmptyStates.NoSelection />
