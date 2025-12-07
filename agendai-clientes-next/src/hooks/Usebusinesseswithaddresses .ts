@@ -96,36 +96,31 @@ export const useBusinessesWithAddresses = (filters?: {
       console.log(`📦 [useBusinessesWithAddresses] ${businessesData.length} estabelecimentos encontrados`);
       console.log('🔗 [useBusinessesWithAddresses] Buscando endereços...');
 
-      // Buscar endereços para cada negócio (através do owner_id)
+      // Buscar endereços para cada negócio (através da tabela addresses_businesses)
       const businessesWithAddresses = await Promise.all(
         businessesData.map(async (business, index) => {
           console.log(`  📍 [${index + 1}/${businessesData.length}] Business: ${business.name}`);
-          console.log(`     owner_id:`, business.owner_id);
+          console.log(`     business_id:`, business.id);
           
-          if (business.owner_id) {
-            const { data: addressData, error: addressError } = await supabase
-              .from('addresses')
-              .select('*')
-              .eq('user_id', business.owner_id)
-              .eq('is_primary', true)
-              .maybeSingle(); // Usa maybeSingle em vez de single para evitar erro 406
+          const { data: addressData, error: addressError } = await supabase
+            .from('addresses_businesses')
+            .select('*')
+            .eq('business_id', business.id)
+            .eq('is_primary', true)
+            .maybeSingle(); // Usa maybeSingle em vez de single para evitar erro 406
 
-            if (addressError) {
-              console.warn(`     ⚠️ Erro ao buscar endereço:`, addressError);
-            } else if (addressData) {
-              console.log(`     ✅ Endereço encontrado:`, addressData.street_address);
-            } else {
-              console.log(`     ℹ️ Sem endereço cadastrado`);
-            }
-
-            return {
-              ...business,
-              address: addressData || undefined,
-            };
+          if (addressError) {
+            console.warn(`     ⚠️ Erro ao buscar endereço:`, addressError);
+          } else if (addressData) {
+            console.log(`     ✅ Endereço encontrado:`, addressData.street_address);
           } else {
-            console.log(`     ℹ️ Sem owner_id`);
+            console.log(`     ℹ️ Sem endereço cadastrado`);
           }
-          return business;
+
+          return {
+            ...business,
+            address: addressData || undefined,
+          };
         })
       );
 
