@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from 'gsap';
-import { ArrowLeft, Star, Clock, MapPin, Phone, Store, Wifi, Lock, User, Users, Scissors, ZoomIn, Image as ImageIcon, Check } from "lucide-react";
+import { ArrowLeft, Star, Clock, MapPin, Phone, Store, Scissors, Check } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import ReservaModal from "../appointments/components/ReservaModal";
@@ -213,22 +213,24 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
         </div>
       </div>
 
+      {/* Imagem de Capa - Full Width */}
+      {(business.cover_image_url || business.image_url) && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+          <div className="rounded-xl sm:rounded-2xl overflow-hidden">
+            <img 
+              src={(business.cover_image_url || business.image_url) ?? undefined} 
+              alt={business.name}
+              className="w-full h-48 sm:h-56 md:h-64 object-cover"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Container Principal */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Coluna Esquerda - Informações Principais */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Imagem de Capa */}
-            {(business.cover_image_url || business.image_url) && (
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden">
-                <img 
-                  src={(business.cover_image_url || business.image_url) ?? undefined} 
-                  alt={business.name}
-                  className="w-full h-48 sm:h-56 md:h-64 object-cover"
-                />
-              </div>
-            )}
-
             {/* Tabs de Navegação */}
             <div className="bg-zinc-900 rounded-xl sm:rounded-2xl border border-zinc-800 overflow-hidden">
               <div className="border-b border-zinc-800">
@@ -254,16 +256,6 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                     Profissionais
                   </button>
                   <button 
-                    onClick={() => setActiveTab("imagens")}
-                    className={`flex-1 px-6 py-4 font-semibold whitespace-nowrap transition-colors ${
-                      activeTab === "imagens" 
-                        ? "text-white border-b-2 border-indigo-500 bg-zinc-800/30" 
-                        : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
-                    Imagens
-                  </button>
-                  <button 
                     onClick={() => setActiveTab("avaliacoes")}
                     className={`flex-1 px-6 py-4 font-semibold whitespace-nowrap transition-colors ${
                       activeTab === "avaliacoes" 
@@ -279,139 +271,6 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
               {/* Conteúdo - Serviços */}
               {activeTab === "servicos" && (
                 <div className="p-6">
-                  <h3 className="text-white font-semibold text-lg mb-4">Comodidades</h3>
-                  <p className="text-zinc-400 text-sm mb-6">Clique no item para obter informações</p>
-                  
-                  {/* Grid de Comodidades */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
-                    <button 
-                      className="bg-zinc-800 hover:bg-zinc-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors"
-                      onMouseEnter={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        const text = e.currentTarget.querySelector('span');
-                        gsap.to(e.currentTarget, {
-                          backgroundColor: '#4f46e5',
-                          scale: 1.05,
-                          duration: 0.4,
-                          ease: 'elastic.out(1, 0.5)'
-                        });
-                        gsap.to(icon, {
-                          rotation: 360,
-                          duration: 0.6,
-                          ease: 'back.out(1.7)'
-                        });
-                        gsap.to(text, {
-                          y: -2,
-                          duration: 0.3
-                        });
-                      }}
-                      onMouseLeave={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        const text = e.currentTarget.querySelector('span');
-                        gsap.to(e.currentTarget, {
-                          backgroundColor: '#27272a',
-                          scale: 1,
-                          duration: 0.3
-                        });
-                        gsap.to(icon, {
-                          rotation: 0,
-                          duration: 0.3
-                        });
-                        gsap.to(text, {
-                          y: 0,
-                          duration: 0.3
-                        });
-                      }}
-                    >
-                      <Wifi size={24} className="text-white" />
-                      <span className="text-white text-sm">Wi-fi</span>
-                    </button>
-                    
-                    <button 
-                      className="bg-zinc-800 hover:bg-indigo-900/50 border-2 border-indigo-500 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors"
-                      onMouseEnter={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        gsap.to(e.currentTarget, {
-                          scale: 1.05,
-                          borderColor: '#a78bfa',
-                          duration: 0.3,
-                          ease: 'power2.out'
-                        });
-                        gsap.to(icon, {
-                          scale: 1.3,
-                          y: -5,
-                          duration: 0.4,
-                          ease: 'back.out(2)'
-                        });
-                      }}
-                      onMouseLeave={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        gsap.to(e.currentTarget, {
-                          scale: 1,
-                          borderColor: '#6366f1',
-                          duration: 0.3
-                        });
-                        gsap.to(icon, {
-                          scale: 1,
-                          y: 0,
-                          duration: 0.3
-                        });
-                      }}
-                    >
-                      <Lock size={24} className="text-white" />
-                      <span className="text-white text-sm">Estacionamento</span>
-                    </button>
-                    
-                    <button 
-                      className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500"
-                      onMouseEnter={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        const tl = gsap.timeline();
-                        tl.to(icon, { x: -3, duration: 0.1 })
-                          .to(icon, { x: 3, duration: 0.1 })
-                          .to(icon, { x: -2, duration: 0.1 })
-                          .to(icon, { x: 2, duration: 0.1 })
-                          .to(icon, { x: 0, duration: 0.1 });
-                      }}
-                    >
-                      <User size={24} />
-                      <span className="text-sm line-through">Acessibilidade</span>
-                    </button>
-                    
-                    <button 
-                      className="bg-[#2a2a2a] hover:bg-[#333333] rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors text-gray-500"
-                      onMouseEnter={(e) => {
-                        const icon = e.currentTarget.querySelector('svg');
-                        const tl = gsap.timeline();
-                        tl.to(icon, { 
-                          rotation: -15,
-                          y: -3,
-                          duration: 0.15,
-                          ease: 'power2.out'
-                        })
-                        .to(icon, { 
-                          rotation: 15,
-                          y: -5,
-                          duration: 0.15 
-                        })
-                        .to(icon, { 
-                          rotation: -10,
-                          y: -3,
-                          duration: 0.15 
-                        })
-                        .to(icon, { 
-                          rotation: 0,
-                          y: 0,
-                          duration: 0.2,
-                          ease: 'elastic.out(1, 0.3)'
-                        });
-                      }}
-                    >
-                      <Users size={24} />
-                      <span className="text-sm line-through">Atende crianças</span>
-                    </button>
-                  </div>
-
                   {/* Lista de Serviços */}
                   <h3 className="text-white font-semibold text-lg mb-4">Serviços</h3>
                   {loadingServices ? (
@@ -506,46 +365,7 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                 </div>
               )}
 
-              {/* Conteúdo - Imagens */}
-              {activeTab === "imagens" && (
-                <div className="p-6">
-                  <h3 className="text-white font-semibold text-lg mb-4">Galeria de Fotos</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {business.cover_image_url && (
-                      <div className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer">
-                        <img 
-                          src={business.cover_image_url ?? undefined}
-                          alt="Foto do estabelecimento"
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <ZoomIn size={32} className="text-white" />
-                        </div>
-                      </div>
-                    )}
-                    {business.image_url && business.image_url !== business.cover_image_url && (
-                      <div className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer">
-                        <img 
-                          src={business.image_url ?? undefined}
-                          alt="Foto do estabelecimento"
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <ZoomIn size={32} className="text-white" />
-                        </div>
-                      </div>
-                    )}
-                    {(!business.cover_image_url && !business.image_url) && (
-                      <div className="col-span-2 md:col-span-3 text-center py-12">
-                        <div className="flex flex-col items-center justify-center">
-                          <ImageIcon size={64} className="text-zinc-600 mb-4" />
-                          <p className="text-zinc-400">Nenhuma imagem disponível</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+
 
               {/* Outros tabs (placeholders) */}
               {activeTab === "avaliacoes" && (

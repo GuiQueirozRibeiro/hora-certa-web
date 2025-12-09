@@ -85,10 +85,16 @@ export const useUserProfile = (): UseUserProfileReturn => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, user_type, ...updateData } = data;
 
+      // Converte strings vazias em null para campos opcionais
+      const cleanedData = Object.entries(updateData).reduce((acc, [key, value]) => {
+        acc[key] = value === '' ? null : value;
+        return acc;
+      }, {} as Record<string, unknown>);
+
       const { error: updateError } = await supabase
         .from('users')
         .update({
-          ...updateData,
+          ...cleanedData,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
