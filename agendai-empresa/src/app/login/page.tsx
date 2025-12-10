@@ -147,40 +147,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
-      {/* COLUNA DIREITA - DEBUG */}
-      <div className="w-96 bg-black p-6 overflow-y-auto">
-        <h3 className="text-lg font-bold text-emerald-400 mb-4">🐛 Debug Console</h3>
-        
-        <div className="space-y-2">
-          {debugLogs.length === 0 ? (
-            <p className="text-zinc-500 text-sm italic">Aguardando ação...</p>
-          ) : (
-            debugLogs.map((log, index) => (
-              <div 
-                key={index}
-                className="text-xs font-mono text-zinc-300 bg-zinc-900 p-2 rounded border border-zinc-800"
-              >
-                {log}
-              </div>
-            ))
-          )}
-        </div>
-
-        {loading && (
-          <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-            <p className="text-yellow-400 text-sm font-semibold">⚠️ PROCESSANDO</p>
-            <p className="text-yellow-300 text-xs mt-1">Se demorar mais de 10s, há um problema.</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-            <p className="text-red-400 text-sm font-semibold">❌ ERRO DETECTADO</p>
-            <p className="text-red-300 text-xs mt-1">{error}</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

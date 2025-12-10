@@ -7,7 +7,7 @@ import { useToast } from './useToast'; // Assumindo que você tem um toast
 
 export function useAddress() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { error: showError, success: showSuccess } = useToast();
   
   const [address, setAddress] = useState<AddressInput | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,11 +26,11 @@ export function useAddress() {
       }
     } catch (error) {
       console.error(error);
-      toast({ title: 'Erro', description: 'Falha ao carregar endereço', variant: 'destructive' });
+      showError('Erro', 'Falha ao carregar endereço');
     } finally {
       setLoading(false);
     }
-  }, [user?.id, toast]);
+  }, [user?.id, showError]);
 
   // Carrega ao iniciar
   useEffect(() => {
@@ -44,10 +44,10 @@ export function useAddress() {
       setSaving(true);
       await addressService.saveAddress(user.id, data);
       setAddress(data); // Atualiza estado local otimista
-      toast({ title: 'Sucesso', description: 'Endereço salvo!' });
+      showSuccess('Sucesso', 'Endereço salvo!');
     } catch (error) {
       console.error(error);
-      toast({ title: 'Erro', description: 'Falha ao salvar endereço', variant: 'destructive' });
+      showError('Erro', 'Falha ao salvar endereço');
     } finally {
       setSaving(false);
     }
