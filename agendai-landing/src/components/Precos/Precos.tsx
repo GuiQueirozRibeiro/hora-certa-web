@@ -39,7 +39,7 @@ export function Precos() {
       descontoMensal: 0,
       descontoSemestral: 15,
       descontoAnual: 30,
-      destaque: false,
+      destaque: true,
       recursos: [
         "Todas funcionalidades",
         "Programa de fidelidade",
@@ -56,7 +56,7 @@ export function Precos() {
       descontoMensal: 0,
       descontoSemestral: 15,
       descontoAnual: 30,
-      destaque: true,
+      destaque: false,
       recursos: [
         "Múltiplas unidades",
         "API personalizada",
@@ -288,7 +288,7 @@ export function Precos() {
                 ref={(el) => {
                   cardBadgeRefs.current[index] = el;
                 }}
-                className="absolute -top-3 left-1/2 pointer-events-none"
+                className="absolute -top-3 left-46 pointer-events-none"
                 style={{ opacity: 0, transform: 'translateX(-50%) scale(0)' }}
               >
                 <span className="text-xs bg-green-600 text-white px-3 py-1 rounded-full font-semibold shadow-lg">
