@@ -90,7 +90,7 @@ const Navigation: React.FC = () => {
       <Link
         ref={agendamentosRef}
         href="/agendamentos"
-        className={`relative text-xs sm:text-sm font-medium px-3 sm:px-4 py-1 transition-colors whitespace-nowrap ${
+        className={`relative text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 transition-colors whitespace-nowrap ${
           activeTab === 'agendamentos' ? 'text-indigo-500' : 'text-zinc-200 hover:text-white hover:font-bold'
         }`}
       >
