@@ -1,4 +1,4 @@
-import ConfiguracoesPage from './ConfiguracoesPage';
+import {ConfiguracoesPage} from './ConfiguracoesPage';
 
 export default function Page() {
   return <ConfiguracoesPage />;

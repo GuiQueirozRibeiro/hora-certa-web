@@ -1,8 +1,7 @@
 'use client';
 
 import { InfoIcon, ReceiptIcon, ShieldIcon, StarIcon } from "lucide-react";
-
-type AbaAtiva = 'meus-dados' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+import type { AbaAtiva } from '../types';
 
 interface MenuLateralProps {
   abaAtiva: AbaAtiva;

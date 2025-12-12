@@ -4,8 +4,7 @@ import { FormMeusDados } from "./forms/FormMeusDados";
 import { FormSeguranca } from "./forms/FormSeguranca";
 import { FormTermos } from "./forms/FormTermos";
 import { FormFavoritos } from "./forms/FormFavoritos";
-
-type AbaAtiva = 'meus-dados' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+import type { AbaAtiva } from '../types';
 
 interface AreaConteudoProps {
   abaAtiva: AbaAtiva;

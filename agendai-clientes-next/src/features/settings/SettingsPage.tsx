@@ -7,8 +7,7 @@ import { AreaConteudo } from './components/AreaConteudo';
 import { EmptyStates } from '../appointments/components/EmptyStates';
 import LoginModal from '../auth/components/LoginModal';
 import { Menu, X } from 'lucide-react';
-
-type AbaAtiva = 'meus-dados' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+import type { AbaAtiva } from './types';
 
 interface SettingsPageProps {
   onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;

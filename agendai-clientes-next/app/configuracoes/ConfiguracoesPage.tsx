@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { MenuLateral } from '../../src/features/settings/components/MenuLateral';
 import { AreaConteudo } from '../../src/features/settings/components/AreaConteudo';
-
-type AbaAtiva = 'meus-dados' | 'endereco' | 'seguranca' | 'termos' | 'pagamento' | 'favoritos';
+import type { AbaAtiva } from '../../src/features/settings/types';
 
 interface ConfiguracoesPageProps {
   onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FileText, Shield, CheckCircle, Info, ExternalLink } from 'lucide-react';
-import TermosPage from '../../../../../app/Termos/TermosPage';
+import TermosPage from '../../../terms/TermosPage';
 
 interface FormTermosProps {
     onNavigateToTermos?: (tipo: 'termos' | 'privacidade') => void;
@@ -41,7 +41,7 @@ export function FormTermos({ onNavigateToTermos }: FormTermosProps) {
             {/* Card de Termos de Serviço */}
             <div className="bg-[#1f1f1f] rounded-lg p-8">
                 <div className="flex items-start gap-4 mb-6">
-                    <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center shrink-0">
                         <FileText size={24} className="text-indigo-500" />
                     </div>
                     <div className="flex-1">
@@ -113,7 +113,7 @@ export function FormTermos({ onNavigateToTermos }: FormTermosProps) {
             {/* Card de Política de Privacidade */}
             <div className="bg-[#1f1f1f] rounded-lg p-8">
                 <div className="flex items-start gap-4 mb-6">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center shrink-0">
                         <Shield size={24} className="text-green-500" />
                     </div>
                     <div className="flex-1">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { DaySchedule } from '../../../types/types';
 
 export interface Business {
   id: string;
@@ -27,7 +28,7 @@ export const useBusinessData = (rawBusinesses: any[]) => {
         : 'Endereço não disponível';
 
       const horariosFuncionamento = business.opening_hours && Array.isArray(business.opening_hours)
-        ? business.opening_hours.map((schedule) => {
+        ? business.opening_hours.map((schedule: DaySchedule) => {
             const hasInterval = schedule.intervaloInicio && schedule.intervaloFim;
             let horario = 'Fechado';
             if (schedule.ativo) {

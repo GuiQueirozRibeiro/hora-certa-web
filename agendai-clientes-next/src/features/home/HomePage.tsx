@@ -13,6 +13,7 @@ import { BusinessCard } from "./components/BusinessCard";
 import { LoadingState, ErrorState, EmptyState } from "./components/EmptyStates";
 import { SuccessNotification } from "./components/SuccessNotification";
 import NextAppointments from "../appointments/components/NextAppointments";
+import { createBusinessSlug } from "../../lib/slugify";
 
 export const HomePage: React.FC = () => {
   // State Management
@@ -41,7 +42,8 @@ export const HomePage: React.FC = () => {
 
   // Event Handlers
   const handleOpenBusiness = (business: Business) => {
-    router.push(`/empresa/${business.id}`);
+    const slug = createBusinessSlug(business.nome);
+    router.push(`/empresa/${slug}`);
   };
 
   const handleToggleFavorite = async (businessId: string, e: React.MouseEvent) => {
