@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { gsap } from 'gsap';
@@ -11,43 +11,69 @@ const Navigation: React.FC = () => {
   const inicioRef = useRef<HTMLAnchorElement>(null);
   const agendamentosRef = useRef<HTMLAnchorElement>(null);
   const perfilRef = useRef<HTMLAnchorElement>(null);
-  const isFirstRender = useRef(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const getActiveTab = () => {
-    if (pathname === '/agendamentos') return 'agendamentos';
-    if (pathname === '/perfil') return 'perfil';
+    // Remove trailing slash para comparação consistente
+    const cleanPath = pathname.endsWith('/') && pathname !== '/' 
+      ? pathname.slice(0, -1) 
+      : pathname;
+    
+    console.log('Clean path:', cleanPath);
+    
+    if (cleanPath === '/agendamentos') return 'agendamentos';
+    if (cleanPath === '/perfil') return 'perfil';
+    if (cleanPath.startsWith('/perfil/')) return 'perfil';
+    if (cleanPath.startsWith('/agendamentos/')) return 'agendamentos';
     return 'inicio';
   };
   
   const activeTab = getActiveTab();
 
   useEffect(() => {
-    const activeElement = 
-      activeTab === 'inicio' ? inicioRef.current :
-      activeTab === 'agendamentos' ? agendamentosRef.current :
-      perfilRef.current;
+    console.log('Pathname mudou para:', pathname, 'Active tab:', activeTab);
+    
+    // Pequeno delay para garantir que os elementos estão renderizados
+    const timer = setTimeout(() => {
+      const activeElement = 
+        activeTab === 'inicio' ? inicioRef.current :
+        activeTab === 'agendamentos' ? agendamentosRef.current :
+        perfilRef.current;
 
-    if (activeElement && indicatorRef.current) {
-      const { offsetLeft, offsetWidth } = activeElement;
-      
-      if (isFirstRender.current) {
-        // Primeira renderização - posiciona sem animação
-        gsap.set(indicatorRef.current, {
-          left: offsetLeft,
-          width: offsetWidth
-        });
-        isFirstRender.current = false;
+      if (activeElement && indicatorRef.current) {
+        const { offsetLeft, offsetWidth } = activeElement;
+        
+        console.log('Elemento ativo:', activeTab);
+        console.log('Posição - left:', offsetLeft, 'width:', offsetWidth);
+        
+        if (!isInitialized) {
+          // Primeira renderização - posiciona sem animação
+          console.log('Inicializando indicador sem animação');
+          gsap.set(indicatorRef.current, {
+            left: offsetLeft,
+            width: offsetWidth
+          });
+          setIsInitialized(true);
+        } else {
+          // Animação de transição entre abas
+          console.log('Animando indicador');
+          gsap.to(indicatorRef.current, {
+            left: offsetLeft,
+            width: offsetWidth,
+            duration: 0.4,
+            ease: 'power3.out'
+          });
+        }
       } else {
-        // Animação de transição entre abas
-        gsap.to(indicatorRef.current, {
-          left: offsetLeft,
-          width: offsetWidth,
-          duration: 0.4,
-          ease: 'power3.out'
+        console.error('Elemento não encontrado:', {
+          activeElement: !!activeElement,
+          indicatorRef: !!indicatorRef.current
         });
       }
-    }
-  }, [activeTab]);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [pathname, activeTab, isInitialized]);
 
   return (
     <nav className="relative flex justify-center gap-6 sm:gap-10 py-3 bg-zinc-800 overflow-x-auto">
