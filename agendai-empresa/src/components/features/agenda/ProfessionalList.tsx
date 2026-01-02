@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface Professional {
-  id: number;
+  id: string;
   name: string;
   color: string;
 }
@@ -11,11 +11,16 @@ interface ProfessionalListProps {
 }
 
 // Dados adicionais para os profissionais (mock)
-const professionalDetails = [
-  { id: 1, role: 'Barbeiro', avatar: 'RP' },
-  { id: 2, role: 'Cabelereiro', avatar: 'MS' },
-  { id: 3, role: 'Esteticista', avatar: 'JS' },
-];
+const professionalDetails: { [key: string]: { role: string; avatar: string } } = {};
+
+// Função para gerar iniciais do nome
+function getInitials(name: string): string {
+  const parts = name.split(' ').filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
 
 export function ProfessionalList({ professionals }: ProfessionalListProps) {
   return (
@@ -26,7 +31,7 @@ export function ProfessionalList({ professionals }: ProfessionalListProps) {
       
       <div className="space-y-2">
         {professionals.map((prof) => {
-          const details = professionalDetails.find(d => d.id === prof.id);
+          const avatar = getInitials(prof.name);
           return (
             <div 
               key={prof.id} 
@@ -34,7 +39,7 @@ export function ProfessionalList({ professionals }: ProfessionalListProps) {
             >
               {/* Avatar (Bola colorida com Iniciais) */}
               <div className={`w-10 h-10 rounded-full ${prof.color} flex items-center justify-center text-white font-bold text-xs shadow-sm ring-2 ring-zinc-900 group-hover:ring-zinc-700 transition-all`}>
-                {details?.avatar}
+                {avatar}
               </div>
               
               {/* Informações */}
@@ -43,9 +48,9 @@ export function ProfessionalList({ professionals }: ProfessionalListProps) {
                   {prof.name}
                 </p>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-zinc-500">{details?.role}</p>
+                  <p className="text-xs text-zinc-500">Profissional</p>
                   <span className="text-[10px] bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded border border-green-500/20">
-                    09:00 - 18:00
+                    Ativo
                   </span>
                 </div>
               </div>

@@ -16,6 +16,7 @@ export interface Appointment {
 
 export interface AppointmentWithDetails extends Appointment {
   professional_name?: string;
+  client_name?: string;
   service_name?: string;
   service_price?: number;
 }

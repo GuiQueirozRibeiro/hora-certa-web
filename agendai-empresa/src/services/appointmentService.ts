@@ -3,6 +3,40 @@ import type { Appointment, AppointmentWithDetails } from '@/types/appointment';
 
 export const appointmentService = {
   /**
+   * Busca agendamentos por data específica com detalhes do cliente e profissional
+   */
+  async getAppointmentsByDate(
+    businessId: string,
+    date: string
+  ): Promise<AppointmentWithDetails[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        professionals!inner(id, name),
+        services(name, price),
+        client:users!appointments_client_id_fkey(id, name)
+      `)
+      .eq('business_id', businessId)
+      .eq('appointment_date', date)
+      .order('appointment_time', { ascending: true });
+
+    if (error) {
+      throw new Error(`Erro ao buscar agendamentos: ${error.message}`);
+    }
+
+    return (data || []).map((item: any) => ({
+      ...item,
+      professional_name: item.professionals?.name,
+      client_name: item.client?.name || 'Cliente',
+      service_name: item.services?.name,
+      service_price: item.services?.price,
+    }));
+  },
+
+  /**
    * Busca agendamentos com detalhes de profissional e serviço
    */
   async getAppointmentsWithDetails(
@@ -83,5 +117,105 @@ export const appointmentService = {
       service_name: item.services?.name,
       service_price: item.total_price || item.services?.price,
     }));
+  },
+
+  /**
+   * Busca agendamentos por período de datas
+   */
+  async getAppointmentsByDateRange(
+    businessId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<AppointmentWithDetails[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        professionals!inner(id, name),
+        services(name, price),
+        client:users!appointments_client_id_fkey(id, name)
+      `)
+      .eq('business_id', businessId)
+      .gte('appointment_date', startDate)
+      .lte('appointment_date', endDate)
+      .order('appointment_date', { ascending: true })
+      .order('appointment_time', { ascending: true });
+
+    if (error) {
+      throw new Error(`Erro ao buscar agendamentos: ${error.message}`);
+    }
+
+    return (data || []).map((item: any) => ({
+      ...item,
+      professional_name: item.professionals?.name,
+      client_name: item.client?.name || 'Cliente',
+      service_name: item.services?.name,
+      service_price: item.services?.price,
+    }));
+  },
+
+  /**
+   * Cria um novo agendamento
+   */
+  async createAppointment(
+    appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'> & { client_name?: string }
+  ): Promise<Appointment> {
+    const supabase = createClient();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { client_name, ...appointmentData } = appointment;
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .insert(appointmentData)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Erro ao criar agendamento: ${error.message}`);
+    }
+
+    return data;
+  },
+
+  /**
+   * Atualiza um agendamento existente
+   */
+  async updateAppointment(
+    appointmentId: string,
+    updates: Partial<Appointment>
+  ): Promise<Appointment> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .update(updates)
+      .eq('id', appointmentId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Erro ao atualizar agendamento: ${error.message}`);
+    }
+
+    return data;
+  },
+
+  /**
+   * Deleta um agendamento
+   */
+  async deleteAppointment(appointmentId: string): Promise<void> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', appointmentId);
+
+    if (error) {
+      throw new Error(`Erro ao deletar agendamento: ${error.message}`);
+    }
   },
 };

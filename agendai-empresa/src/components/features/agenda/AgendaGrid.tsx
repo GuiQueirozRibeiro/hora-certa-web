@@ -8,14 +8,14 @@ const HOURS = Array.from({ length: 11 }, (_, i) => i + 8);
 
 // Tipos
 interface Professional {
-  id: number;
+  id: string;
   name: string;
   color: string;
 }
 
 interface Appointment {
-  id: number;
-  professionalId: number;
+  id: string;
+  professionalId: string;
   professionalName: string;
   clientName: string;
   service: string;
@@ -28,9 +28,10 @@ interface AgendaGridProps {
   selectedDate: Date;
   professionals: Professional[];
   appointments: Appointment[];
+  loading?: boolean;
 }
 
-export function AgendaGrid({ selectedDate, professionals, appointments }: AgendaGridProps) {
+export function AgendaGrid({ selectedDate, professionals, appointments, loading }: AgendaGridProps) {
   // Altura de cada hora em pixels (h-16 = 4rem = 64px)
   const HOUR_HEIGHT = 64;
   
@@ -51,7 +52,7 @@ export function AgendaGrid({ selectedDate, professionals, appointments }: Agenda
   };
 
   return (
-    <div className="flex-1 bg-zinc-900 rounded-xl border border-zinc-800 p-4 overflow-hidden flex flex-col">
+    <div className="flex-1 bg-zinc-900 rounded-xl border border-zinc-800 p-4  overflow-hidden flex flex-col">
       {/* Cabeçalho com data selecionada */}
       <div className="mb-4 pb-3 border-b border-zinc-800 shrink-0">
         <h2 className="text-lg font-semibold text-zinc-100 capitalize">
@@ -108,7 +109,7 @@ export function AgendaGrid({ selectedDate, professionals, appointments }: Agenda
                 
                 // Ordena todos os agendamentos por horário e ID
                 const sortedAppointments = [...appointments].sort((a, b) => 
-                  a.startTime.localeCompare(b.startTime) || a.id - b.id
+                  a.startTime.localeCompare(b.startTime) || a.id.localeCompare(b.id)
                 );
                 
                 // Encontra o índice deste agendamento na lista ordenada
