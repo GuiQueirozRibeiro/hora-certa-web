@@ -56,7 +56,7 @@ export function SchedulerView() {
         const profData = await professionalService.getProfessionalsByBusinessId(business.id);
         const mappedProfs = profData.map((prof, index) => ({
           id: prof.id,
-          name: prof.user?.name || prof.specialties?.[0] || 'Profissional',
+          name: prof.user?.name || (prof as any).name || prof.specialties?.[0] || 'Profissional',
           color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length],
         }));
         setProfessionals(mappedProfs);
@@ -66,6 +66,10 @@ export function SchedulerView() {
         const endDate = `${currentYear}-12-31`;
         const apptData = await appointmentService.getAppointmentsByDateRange(business.id, startDate, endDate);
         setAppointments(apptData);
+        
+        // Debug: log para verificar os dados
+        console.log('Profissionais carregados:', mappedProfs);
+        console.log('Agendamentos carregados:', apptData);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {
@@ -134,12 +138,23 @@ export function SchedulerView() {
 
   // Profissionais que atendem hoje
   const todayProfessionals = useMemo(() => {
-    const profIds = new Set(todayEvents.map(e => {
-      const prof = professionals.find(p => p.name === e.professionalName);
-      return prof?.id;
-    }));
-    return professionals.filter(p => profIds.has(p.id));
-  }, [todayEvents, professionals]);
+    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+    
+    // Pega os IDs dos profissionais que têm agendamentos no dia selecionado
+    const appointmentsToday = appointments.filter(apt => apt.appointment_date === dateStr);
+    const profIds = new Set(appointmentsToday.map(apt => apt.professional_id));
+    
+    const result = professionals.filter(p => profIds.has(p.id));
+    
+    // Debug
+    console.log('Data selecionada:', dateStr);
+    console.log('Agendamentos do dia:', appointmentsToday);
+    console.log('IDs dos profissionais com agendamento:', Array.from(profIds));
+    console.log('IDs dos profissionais carregados:', professionals.map(p => p.id));
+    console.log('Profissionais atendendo hoje:', result);
+    
+    return result;
+  }, [appointments, professionals, selectedDate]);
 
   // Horários do dia (8h às 20h)
   const hours = Array.from({ length: 13 }, (_, i) => i + 8);
@@ -183,7 +198,7 @@ export function SchedulerView() {
   }
 
   return (
-    <div className="flex h-full gap-4 p-4 ">
+    <div className="flex min-h-full gap-4 p-4 overflow-y-auto no-scrollbar">
       {/* Coluna Esquerda - Mini Calendário + Profissionais */}
       <div className="w-64 shrink-0 flex flex-col gap-4">
         {/* Mini Calendário */}
@@ -236,21 +251,27 @@ export function SchedulerView() {
         </div>
 
         {/* Lista de Profissionais Atendendo Hoje */}
-        <div className="bg-zinc-900/50 rounded-xl p-4 flex-1">
+        <div className="bg-zinc-900/50 rounded-xl p-4">
           <h3 className="text-white text-sm font-medium mb-4">Atendendo hoje</h3>
           <div className="space-y-2">
-            {(todayProfessionals.length > 0 ? todayProfessionals : professionals).map((prof) => (
-              <div 
-                key={prof.id}
-                className={`flex items-center gap-3 p-2 rounded-lg bg-zinc-800/50 border-l-4 ${prof.color.border}`}
-              >
-                {/* Avatar */}
-                <div className={`w-9 h-9 rounded-full ${prof.color.bg} flex items-center justify-center`}>
-                  <span className="text-white text-xs font-medium">{getInitials(prof.name)}</span>
+            {todayProfessionals.length > 0 ? (
+              todayProfessionals.map((prof) => (
+                <div 
+                  key={prof.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg bg-zinc-800/50 border-l-4 ${prof.color.border}`}
+                >
+                  {/* Avatar */}
+                  <div className={`w-9 h-9 rounded-full ${prof.color.bg} flex items-center justify-center`}>
+                    <span className="text-white text-xs font-medium">{getInitials(prof.name)}</span>
+                  </div>
+                  <span className="text-white text-sm">{prof.name}</span>
                 </div>
-                <span className="text-white text-sm">{prof.name}</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-zinc-500 text-sm text-center py-4">
+                Nenhum profissional com agendamento neste dia
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -286,7 +307,7 @@ export function SchedulerView() {
         </div>
 
         {/* Grid de Agendamentos */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
           {hours.map(hour => {
             const hourEvents = todayEvents.filter(e => e.hour === hour);
             
