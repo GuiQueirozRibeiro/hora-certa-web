@@ -233,9 +233,9 @@ export function FormSeguranca() {
             }`}
           >
             {message.type === 'success' ? (
-              <Check className="h-5 w-5 flex-shrink-0" />
+              <Check className="h-5 w-5 shrink-0" />
             ) : (
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 shrink-0" />
             )}
             <p className="text-sm">{message.text}</p>
           </div>
