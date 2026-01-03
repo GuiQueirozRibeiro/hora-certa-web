@@ -101,7 +101,7 @@ export function FormEndereco() {
 
         <button
           type="submit"
-          className="mt-4 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+          className="mt-4 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 cursor-pointer"
           >
           Salvar Alterações
         </button>

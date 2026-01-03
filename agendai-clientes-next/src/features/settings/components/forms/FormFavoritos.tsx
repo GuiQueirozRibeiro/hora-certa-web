@@ -157,7 +157,7 @@ export function FormFavoritos() {
                 <button
                   onClick={(e) => handleRemoveFavorite(favorite.id, e)}
                   disabled={removingId === favorite.id}
-                  className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm cursor-pointer"
                 >
                   {removingId === favorite.id ? 'Removendo...' : 'Remover'}
                 </button>

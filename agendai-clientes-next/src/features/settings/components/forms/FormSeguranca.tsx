@@ -245,7 +245,7 @@ export function FormSeguranca() {
         <button
           type="submit"
           disabled={saving}
-          className={`mt-4 rounded-lg px-6 py-3 text-sm font-semibold text-white transition-colors ${
+          className={`mt-4 rounded-lg px-6 py-3 text-sm font-semibold text-white transition-colors cursor-pointer ${
             saving
               ? 'bg-gray-600 cursor-not-allowed'
               : 'bg-indigo-600 hover:bg-indigo-700'

@@ -171,7 +171,7 @@ export function FormMeusDados() {
         <button
           type="submit"
           disabled={isSubmitting || loading}
-          className="mt-4 w-full sm:w-auto rounded-lg bg-indigo-600 px-6 py-2.5 sm:py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 w-full sm:w-auto rounded-lg bg-indigo-600 px-6 py-2.5 sm:py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
           {isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
         </button>

@@ -100,7 +100,7 @@ export function FormTermos({ onNavigateToTermos }: FormTermosProps) {
                         <button
                             type="button"
                             onClick={handleOpenTermos}
-                            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+                            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors cursor-pointer"
                         >
                             <FileText size={20} />
                             Ver Termos de Serviço
@@ -172,7 +172,7 @@ export function FormTermos({ onNavigateToTermos }: FormTermosProps) {
                         <button
                             type="button"
                             onClick={handleOpenPrivacidade}
-                            className="flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white hover:bg-green-700 transition-colors"
+                            className="flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white hover:bg-green-700 transition-colors cursor-pointer" 
                         >
                             <Shield size={20} />
                             Ver Política de Privacidade
