@@ -67,7 +67,7 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
           >
             <div className="flex items-center gap-3 flex-1">
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center shrink-0 overflow-hidden">
                 {professional.user_avatar_url ? (
                   <img 
                     src={professional.user_avatar_url} 
@@ -121,7 +121,7 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
             </div>
 
             {/* Botão Ver mais */}
-            <button className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0">
+            <button className="bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors shrink-0">
               Ver perfil
             </button>
           </div>
