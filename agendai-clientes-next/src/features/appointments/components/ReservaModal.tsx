@@ -283,7 +283,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                         setSelectedTime(null);
                         setError(null);
                       }}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
                         selectedProfessionalId === professional.id
                           ? 'bg-indigo-500'
                           : 'bg-[#2a2a2a] hover:bg-[#333]'
@@ -309,19 +309,6 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                         <p className="text-white font-medium text-sm">
                           {professional.user_name || 'Profissional'}
                         </p>
-                        {professional.experience_years && (
-                          <p className="text-gray-400 text-xs">
-                            {professional.experience_years} anos de experiência
-                          </p>
-                        )}
-                        {professional.average_rating > 0 && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star size={12} fill="#fbbf24" className="text-amber-400" />
-                            <span className="text-xs text-gray-400">
-                              {professional.average_rating.toFixed(1)} ({professional.total_reviews} avaliações)
-                            </span>
-                          </div>
-                        )}
                         {/* Dias de trabalho */}
                         {schedules.length > 0 && (
                           <div className="mt-1">
@@ -409,7 +396,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                       }
                     }}
                     disabled={!available}
-                    className={`py-2 rounded-full transition-colors relative ${
+                    className={`py-2 rounded-full transition-colors relative cursor-pointer ${
                       selected
                         ? 'bg-indigo-500 text-white font-semibold'
                         : available
@@ -457,7 +444,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
                       }
                     }}
                     disabled={!horario.disponivel}
-                    className={`w-full flex items-center rounded-md transition-colors ${
+                    className={`w-full flex items-center rounded-md transition-colors cursor-pointer ${
                       selectedTime === horario.hora
                         ? 'bg-indigo-500'
                         : horario.disponivel
@@ -528,7 +515,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({
           <button
             onClick={handleConfirm}
             disabled={loading || (!user && false)}
-            className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors ${
+            className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors cursor-pointer ${
               loading
                 ? 'bg-gray-700 cursor-not-allowed'
                 : 'bg-indigo-500 hover:bg-indigo-600'
