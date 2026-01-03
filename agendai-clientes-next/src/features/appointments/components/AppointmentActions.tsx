@@ -19,7 +19,7 @@ export function AppointmentActions({
       <button
         onClick={onCancel}
         disabled={isProcessing}
-        className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
+        className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors cursor-pointer"
       >
         {isProcessing ? 'Processando...' : 'Cancelar Agendamento'}
       </button>
