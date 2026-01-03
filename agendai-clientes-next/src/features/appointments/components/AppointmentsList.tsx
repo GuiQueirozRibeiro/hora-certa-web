@@ -1,7 +1,5 @@
 /**
- * Componente AppointmentsList
- * Single Responsibility: Renderizar lista de agendamentos por categoria
- * Open/Closed: Extensível via props
+ * Lista de agendamentos por categoria com suporte a estado vazio.
  */
 import React from 'react';
 import type { AppointmentWithDetails } from '../../../types/types';

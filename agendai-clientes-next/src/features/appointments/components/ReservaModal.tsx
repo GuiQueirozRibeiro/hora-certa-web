@@ -1,3 +1,7 @@
+/**
+ * Modal de reserva de agendamento com seleção de profissional, data e horário.
+ * Dependências: useAuth, useAppointments, useProfessionals, useProfessionalSchedules.
+ */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useAppointments } from '../../../hooks/Useappointments';

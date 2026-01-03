@@ -1,6 +1,5 @@
 /**
- * Estados vazios para a página de agendamentos
- * Single Responsibility: Cada componente renderiza um estado específico
+ * Estados vazios da página de agendamentos: sem seleção, loading e não autenticado.
  */
 'use client';
 

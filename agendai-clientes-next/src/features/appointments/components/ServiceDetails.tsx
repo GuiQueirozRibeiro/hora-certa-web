@@ -1,6 +1,6 @@
 /**
- * Componente ServiceDetails
- * Single Responsibility: Renderizar detalhes do serviço agendado
+ * Detalhes do serviço agendado (nome, data, horário, preço).
+ * Dependência: useDateFormatter para formatação.
  */
 import React from 'react';
 import type { AppointmentWithDetails } from '../../../types/types';

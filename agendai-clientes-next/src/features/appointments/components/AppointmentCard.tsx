@@ -1,7 +1,6 @@
 /**
- * Componente AppointmentCard
- * Single Responsibility: Renderizar card de agendamento
- * Open/Closed: Extensível via props
+ * Card de agendamento com status, serviço, profissional e data.
+ * Dependência: useDateFormatter para formatação de data/hora.
  */
 'use client';
 

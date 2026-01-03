@@ -1,3 +1,6 @@
+/**
+ * Modal de confirmação para cancelamento de agendamento.
+ */
 'use client';
 
 import React from 'react';

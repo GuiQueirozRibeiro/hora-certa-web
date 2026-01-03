@@ -1,6 +1,5 @@
 /**
- * Componente AppointmentActions
- * Single Responsibility: Renderizar botões de ação do agendamento
+ * Botões de ação do agendamento (cancelar).
  */
 import React from 'react';
 
@@ -23,14 +22,6 @@ export function AppointmentActions({
         className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
       >
         {isProcessing ? 'Processando...' : 'Cancelar Agendamento'}
-      </button>
-      
-      <button
-        onClick={onComplete}
-        disabled={isProcessing}
-        className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
-      >
-        {isProcessing ? 'Processando...' : 'Marcar como Finalizado'}
       </button>
     </div>
   );

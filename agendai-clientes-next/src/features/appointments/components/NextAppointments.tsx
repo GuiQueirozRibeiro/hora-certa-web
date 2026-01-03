@@ -1,3 +1,7 @@
+/**
+ * Exibe os próximos agendamentos do usuário na home.
+ * Dependências: useAuth, useAppointments.
+ */
 'use client';
 
 import { useRouter } from 'next/navigation';

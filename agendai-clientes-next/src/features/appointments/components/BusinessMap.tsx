@@ -1,6 +1,5 @@
 /**
- * Componente BusinessMap
- * Single Responsibility: Renderizar mapa e informações do estabelecimento
+ * Mapa e informações do estabelecimento (endereço, nome, imagem).
  */
 import React from 'react';
 import type { AppointmentWithDetails } from '../../../types/types';

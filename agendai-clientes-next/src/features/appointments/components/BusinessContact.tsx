@@ -1,6 +1,6 @@
 /**
- * Componente BusinessContact
- * Single Responsibility: Renderizar informações de contato do estabelecimento
+ * Informações de contato do estabelecimento (WhatsApp e telefone).
+ * Dependência: usePhoneCopy para copiar telefone.
  */
 import React from 'react';
 import { Phone } from 'lucide-react';
