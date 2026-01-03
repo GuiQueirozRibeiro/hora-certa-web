@@ -47,7 +47,7 @@ const Header: React.FC = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold hover:bg-indigo-600 transition-colors cursor-pointer"
                 >
                   {profile?.image_url ? (
                     <img 
@@ -89,7 +89,7 @@ const Header: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-indigo-600 transition-color"
               >
                 Entrar
               </button>
