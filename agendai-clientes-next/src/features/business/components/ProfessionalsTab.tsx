@@ -9,10 +9,8 @@ interface ProfessionalsTabProps {
 }
 
 /**
- * Componente para exibir a lista de profissionais na aba "Profissionais" do BarbeariaModal
- * 
- * USO: Substitua a seção {activeTab === "profissionais" && (...)} no BarbeariaModal.tsx
- * por este componente
+ * Lista de profissionais do estabelecimento.
+ * Dependência: useProfessionals hook para buscar dados.
  */
 const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
   const { professionals, loading, error } = useProfessionals(businessId);

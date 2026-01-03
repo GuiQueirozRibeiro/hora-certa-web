@@ -53,7 +53,6 @@ export function BusinessMap({ appointment }: BusinessMapProps) {
         <img
           src={
             business?.image_url ||
-            business?.cover_image_url ||
             'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=80&h=80&fit=crop'
           }
           alt={business?.name || 'Estabelecimento'}
