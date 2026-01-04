@@ -48,7 +48,7 @@ const NotAuthenticated: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
         </p>
         <button
           onClick={onLogin}
-          className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+          className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors cursor-pointer"
         >
           Fazer Login
         </button>
@@ -72,7 +72,7 @@ const NotAuthenticatedSettings: React.FC<{ onLogin: () => void }> = ({ onLogin }
         </p>
         <button
           onClick={onLogin}
-          className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors"
+          className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors cursor-pointer"
         >
           Fazer Login
         </button>
