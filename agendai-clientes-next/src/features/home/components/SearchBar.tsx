@@ -30,7 +30,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </div>
         )}
       </div>
-      <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+      <button className="bg-indigo-500 rounded-lg w-12 h-12 flex items-center justify-center hover:bg-indigo-600 transition-colors cursor-pointer">
         <Search size={20} className="text-white" />
       </button>
     </div>

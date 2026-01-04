@@ -38,7 +38,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         {/* Botão de Favoritar */}
         <button
           onClick={onToggleFavorite}
-          className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+          className="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all cursor-pointer"
         >
           <Heart
             size={20}
