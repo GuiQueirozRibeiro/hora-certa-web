@@ -30,7 +30,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           <h2 className="text-xl font-semibold">{vm.title}</h2>
           <button
             onClick={vm.closeModal}
-            className="text-gray-500 hover:text-white transition-colors"
+            className="text-gray-500 hover:text-white transition-colors cursor-pointer"
           >
             <X size={24} />
           </button>

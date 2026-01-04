@@ -22,17 +22,17 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         type="button"
         onClick={onGoogleLogin}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 rounded-lg py-3 px-4 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 rounded-lg py-3 px-4 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <FontAwesomeIcon icon={faGoogle} className="text-xl" />
-        Entrar com Google
+        Continuar com Google
       </button>
 
       {/* Botão Entrar com Email */}
       <button
         type="button"
         onClick={onEmailLogin}
-        className="w-full flex items-center justify-center gap-3 bg-[#2a2a2a] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors"
+        className="w-full flex items-center justify-center gap-3 bg-[#2a2a2a] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors cursor-pointer"
       >
         <Mail size={20} />
         Entrar com email
@@ -42,7 +42,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
       <button
         type="button"
         onClick={onSignup}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 px-4 text-sm font-medium transition-colors cursor-pointer"
       >
         Novo cadastro
       </button>

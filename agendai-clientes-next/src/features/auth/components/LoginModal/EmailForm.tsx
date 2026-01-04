@@ -85,7 +85,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
           <button
             type="button"
             onClick={() => onModeChange('reset')}
-            className="text-sm text-indigo-500 hover:text-indigo-400 transition-colors"
+            className="text-sm text-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer"
           >
             Esqueceu a senha?
           </button>
@@ -96,7 +96,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
       <button
         type="submit"
         disabled={loading}
-        className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors ${
+        className={`w-full rounded-lg py-3 text-white text-sm font-semibold transition-colors cursor-pointer ${
           loading ? 'bg-gray-700 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'
         }`}
       >
@@ -110,7 +110,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
           <button
             type="button"
             onClick={() => onModeChange('signup')}
-            className="text-indigo-500 hover:text-indigo-400 transition-colors"
+            className="text-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer"
           >
             Criar conta
           </button>
@@ -123,7 +123,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
           <button
             type="button"
             onClick={() => onModeChange('login')}
-            className="text-indigo-500 hover:text-indigo-400 transition-colors"
+            className="text-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer"
           >
             Fazer login
           </button>
@@ -134,7 +134,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
       <button
         type="button"
         onClick={onBack}
-        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors"
+        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
       >
         ← Voltar
       </button>
