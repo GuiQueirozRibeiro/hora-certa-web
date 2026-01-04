@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import ReservaModal from '../appointments/components/ReservaModal';
+import ReservaModal from './components/ReservaModal';
 import { useBusinessDetailsViewModel } from './hooks/useBusinessDetailsViewModel';
 import {
   LoadingSpinner,
