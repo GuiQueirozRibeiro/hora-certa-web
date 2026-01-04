@@ -11,8 +11,6 @@ interface AuthState {
 interface UseAuthReturn extends AuthState {
   signInWithEmail: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
-  signInWithApple: () => Promise<{ error: AuthError | null }>;
-  signInWithPhone: (phone: string, password: string) => Promise<{ error: AuthError | null }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
@@ -77,34 +75,6 @@ export const useAuth = (): UseAuthReturn => {
     }
   };
 
-  // Login com Apple
-  const signInWithApple = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      return { error };
-    } catch (error) {
-      return { error: error as AuthError };
-    }
-  };
-
-  // Login com Telefone
-  const signInWithPhone = async (phone: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        phone,
-        password,
-      });
-      return { error };
-    } catch (error) {
-      return { error: error as AuthError };
-    }
-  };
-
   // Cadastro com Email
   const signUpWithEmail = async (email: string, password: string) => {
     try {
@@ -144,8 +114,6 @@ export const useAuth = (): UseAuthReturn => {
     ...authState,
     signInWithEmail,
     signInWithGoogle,
-    signInWithApple,
-    signInWithPhone,
     signUpWithEmail,
     signOut,
     resetPassword,
