@@ -22,7 +22,14 @@ const Header: React.FC = () => {
       <header className="flex justify-between items-center px-4 sm:px-8 md:px-16 py-3 bg-zinc-900 border-b border-zinc-800">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
-            <Layers size={20} className="text-white sm:w-6 sm:h-6" />
+            <img 
+              src="/Ativo 2.svg" 
+              alt="Logo Agendai" 
+              className="w-full h-full"
+              onError={(e) => {
+                e.currentTarget.src = "/Ativo 2.png";
+              }}
+            />
           </div>
           <span className="text-xl sm:text-2xl md:text-[28px] font-bold tracking-tight">
             <span className="text-white">Agend</span><span className="text-indigo-500">ai</span>
