@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Agendai - Agendamentos",
   description: "Sistema de agendamentos para barbearias",
+  icons: {
+    icon: '/Ativo 2.svg',
+  }
 };
 
 export default function RootLayout({
