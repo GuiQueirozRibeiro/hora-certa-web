@@ -15,18 +15,29 @@ export function NavBar() {
     { name: "Duvidas", href: "#faq" },
   ];
   const actions = [
-    { name: "Teste Gratis", hightlight: true },
-    { name: "Acessar" },
-    { name: "Sou Cliente" },
+    { name: "Teste Gratis", hightlight: true, href: "https://sistema.agendai.tec.br/login/" },
+    { name: "Acessar", href: "https://sites.agendai.tec.br/" },
+    { name: "Sou Cliente", href: "https://sistema.agendai.tec.br/login/" },
   ];
 
   return (
     <>
       <div className="flex bg-zinc-900 w-full h-16 md:h-12 font-sans px-4 md:px-8 items-center justify-between fixed top-0 z-50 border-b border-zinc-800">
-
         {/* --- ESQUERDA: LOGO --- */}
-        <div className="text-lg md:text-xl font-bold text-white">
-          Agend<span className="text-indigo-500">ai</span>
+         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+            <img 
+              src="/Ativo 2.svg" 
+              alt="Logo Agendai" 
+              className="w-full h-full"
+              onError={(e) => {
+                e.currentTarget.src = "/Ativo 2.png";
+              }}
+            />
+          </div>
+          <span className="text-xl sm:text-2xl md:text-[28px] font-bold tracking-tight">
+            <span className="text-white">Agend</span><span className="text-indigo-500">ai</span>
+          </span>
         </div>
 
         {/* --- MENU DESKTOP (escondido no mobile) --- */}
@@ -48,16 +59,19 @@ export function NavBar() {
             {/* botoes de acoes */}
             <div className="flex gap-4">
               {actions.map((item, index) => (
-                <button
+                <a
                   key={index}
-                  className={`text-white text-sm font-medium px-4 rounded-full cursor-pointer  ${
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-white text-sm font-medium px-4 rounded-full cursor-pointer inline-flex items-center ${
                     item.hightlight
                       ? "text-white border border-indigo-700 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all duration-400 hover:scale-[1.2]"
                       : "text-white hover:underline decoration-indigo-500 hover:text-indigo-600 transition-all underline-offset-4"
                   }`}
                 >
                   {item.name}
-                </button>
+                </a>
               ))}
             </div>
           </nav>
@@ -91,9 +105,12 @@ export function NavBar() {
             <div className="h-px bg-zinc-700 my-2"></div>
             
             {actions.map((item, index) => (
-              <button
+              <a
                 key={index}
-                className={`text-white text-base font-medium px-4 py-2 rounded-full cursor-pointer ${
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`text-white text-base font-medium px-4 py-2 rounded-full cursor-pointer inline-flex items-center justify-center ${
                   item.hightlight
                     ? "text-white border border-indigo-700 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all"
                     : "text-white hover:underline decoration-indigo-500 hover:text-indigo-600 transition-all"
@@ -101,7 +118,7 @@ export function NavBar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
-              </button>
+              </a>
             ))}
           </nav>
         </div>
