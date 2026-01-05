@@ -220,7 +220,7 @@ export const TabContent: React.FC<TabContentProps> = ({
 
       {activeTab === 'avaliacoes' && (
         <div className="text-center py-12">
-          <p className="text-zinc-400">Avaliações em breve</p>
+          <p className="text-zinc-400">Avaliações são feitas via aplicativo</p>
         </div>
       )}
     </div>

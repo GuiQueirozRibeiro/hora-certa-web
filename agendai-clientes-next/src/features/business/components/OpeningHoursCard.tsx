@@ -45,7 +45,7 @@ export const OpeningHoursCard: React.FC<OpeningHoursCardProps> = ({ schedules, i
                 {schedule.day}
               </span>
               {schedule.isToday && (
-                <span className="bg-indigo-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                <span className="bg-indigo-500 text-white text-xs font-semibold px-2 py-0.5 rounded mr-1.5">
                   Hoje
                 </span>
               )}
