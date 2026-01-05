@@ -18,7 +18,7 @@ const TermosPage: React.FC<TermosPageProps> = ({ tipo = 'termos', onClose }) => 
         {onClose && (
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft size={20} />
             Voltar
@@ -44,7 +44,7 @@ const TermosPage: React.FC<TermosPageProps> = ({ tipo = 'termos', onClose }) => 
           <div className="mt-8 text-center">
             <button
               onClick={onClose}
-              className={`${
+              className={`cursor-pointer ${
                 tipo === 'termos' ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-green-500 hover:bg-green-600'
               } text-white font-semibold px-8 py-3 rounded-lg transition-colors`}
             >

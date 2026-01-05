@@ -211,7 +211,7 @@ export function FormSeguranca() {
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility('confirm')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
               >
                 {showPasswords.confirm ? (
                   <EyeOff className="h-5 w-5" />
