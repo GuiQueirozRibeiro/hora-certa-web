@@ -66,7 +66,8 @@ export const useAuth = (): UseAuthReturn => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          // Garante que vai para a rota /auth/callback que criamos acima
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       return { error };
