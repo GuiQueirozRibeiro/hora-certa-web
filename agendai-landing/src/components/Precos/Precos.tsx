@@ -273,7 +273,7 @@ export function Precos() {
         </div>
 
         {/* Grid de Planos */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto mb-8">
           {planos.map((plano, index) => (
             <div
               key={index}
@@ -345,6 +345,70 @@ export function Precos() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Card Especial - IA */}
+        <div className="max-w-4xl mx-auto">
+          <div className="relative rounded-2xl p-8 bg-linear-to-br from-purple-600 via-indigo-600 to-blue-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/30">
+            {/* Badge Destaque */}
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <span className="bg-linear-to-r from-yellow-400 to-orange-500 text-zinc-900 px-6 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                RECURSO PREMIUM
+              </span>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 items-center mt-2">
+              {/* Conteúdo */}
+              <div className="space-y-4">
+                <h3 className="text-2xl md:text-3xl font-bold text-white">
+                  Assistente IA
+                </h3>
+                <p className="text-purple-100 text-sm md:text-base">
+                  Atendimento e agendamento automatizado com Inteligência Artificial 24/7
+                </p>
+
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-start gap-3">
+                    <Check size={20} className="text-green-300 shrink-0 mt-0.5" />
+                    <span className="text-white text-sm">Atendimento automático via WhatsApp</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check size={20} className="text-green-300 shrink-0 mt-0.5" />
+                    <span className="text-white text-sm">Agendamento inteligente 24/7</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check size={20} className="text-green-300 shrink-0 mt-0.5" />
+                    <span className="text-white text-sm">Confirmações e lembretes automáticos</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check size={20} className="text-green-300 shrink-0 mt-0.5" />
+                    <span className="text-white text-sm">Respostas personalizadas</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preço e CTA */}
+              <div className="text-center md:text-right space-y-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <p className="text-purple-200 text-sm mb-2">Adicione ao seu plano</p>
+                  <div className="flex items-start justify-center md:justify-end gap-1 mb-1">
+                    <span className="text-2xl text-white font-bold mt-1">R$</span>
+                    <span className="text-5xl md:text-6xl font-bold text-white">99</span>
+                    <span className="text-white text-lg mt-2">,90</span>
+                  </div>
+                  <p className="text-purple-200 text-xs">por mês</p>
+                </div>
+
+                <button className="w-full bg-white text-indigo-600 hover:bg-purple-50 py-3 px-8 rounded-lg font-bold text-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl cursor-pointer">
+                  Contratar Agora
+                </button>
+
+                <p className="text-purple-200 text-xs">
+                  * Serviço adicional, requer plano ativo
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
