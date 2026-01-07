@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
-import { useGeolocation } from '../../hooks/useGeolocation';
+import { useGeolocationContext } from '../../contexts/GeolocationContext';
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -9,21 +9,12 @@ interface LocationModalProps {
 }
 
 const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onLocationGranted }) => {
-  const { requestLocation, loading, error, latitude, longitude } = useGeolocation();
+  const { requestLocation, loading, error, latitude, longitude } = useGeolocationContext();
 
   if (!isOpen) return null;
 
-  const handleRequestLocation = async () => {
+  const handleRequestLocation = () => {
     requestLocation();
-    // Aguarda um pouco para verificar se a localização foi obtida
-    setTimeout(() => {
-      const lat = localStorage.getItem('userLat');
-      const lon = localStorage.getItem('userLon');
-      if (lat && lon) {
-        onLocationGranted?.(parseFloat(lat), parseFloat(lon));
-        onClose();
-      }
-    }, 1000);
   };
 
   const handleSkip = () => {

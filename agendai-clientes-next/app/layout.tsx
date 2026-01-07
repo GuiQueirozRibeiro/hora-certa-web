@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "../src/components/layout/Header";
 import Navigation from "../src/components/layout/Navigation";
 import { DataCacheProvider } from "../src/contexts/DataCacheContext";
+import { GeolocationProvider } from "../src/contexts/GeolocationContext";
+import { LocationManager } from "../src/components/shared/LocationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,11 +35,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#26272B] min-h-screen`}
       >
-        <DataCacheProvider>
-          <Header />
-          <Navigation />
-          {children}
-        </DataCacheProvider>
+        <GeolocationProvider>
+          <DataCacheProvider>
+            <Header />
+            <Navigation />
+            <LocationManager />
+            {children}
+          </DataCacheProvider>
+        </GeolocationProvider>
       </body>
     </html>
   );
