@@ -11,8 +11,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Agendai Empresa",
+  title: "Agendai Empresas",
   description: "Gestão completa para sua barbearia",
+  icons: {
+    icon: "/ativo-2.svg",
+  }
 };
 
 export default function RootLayout({
