@@ -71,9 +71,7 @@ export function ComoIniciar() {
             <div className="relative z-10 animate-float max-w-md w-full">
               {/* Tela */}
               <div className="bg-zinc-950 rounded-lg border-[3px] border-zinc-700 p-2 shadow-2xl">
-                <div className="bg-linear-to-br from-indigo-600 to-indigo-800 rounded aspect-video flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">WebAdmin</span>
-                </div>
+                <img src="/image.png" alt="" />
               </div>
               {/* Base */}
               <div className="h-1.5 bg-zinc-700 rounded-b mx-auto w-3/4"></div>
@@ -83,7 +81,7 @@ export function ComoIniciar() {
             {/* iPhone */}
             <div className="absolute right-4 md:right-8 bottom-8 z-20 animate-float-delay w-28 md:w-32">
               <Iphone 
-                src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400"
+                src="/AGENDAI-NOVAID1-BLACK.png"
                 className="drop-shadow-2xl"
               />
             </div>
