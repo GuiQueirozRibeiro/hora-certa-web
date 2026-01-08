@@ -11,6 +11,8 @@ export interface Address {
   complement?: string;
   zipcode: string;
   isPrimary: boolean; // No banco é is_primary
+  lat?: number; // Latitude do endereço
+  long?: number; // Longitude do endereço
   // created_at não precisa enviar, o banco gera
 }
 

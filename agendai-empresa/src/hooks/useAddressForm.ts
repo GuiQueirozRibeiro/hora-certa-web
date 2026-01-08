@@ -15,6 +15,76 @@ interface AddressData {
   complement: string;
   zipcode: string;
   is_primary?: boolean;
+  lat?: number;
+  long?: number;
+}
+
+// Função para obter coordenadas a partir do endereço usando Google Maps Geocoding API
+async function getCoordinatesFromAddress(address: {
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  country: string;
+}): Promise<{ lat: number; long: number } | null> {
+  
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  if (!apiKey) {
+    console.error('❌ Google Maps API Key não configurada');
+    return null;
+  }
+  
+  // Monta o endereço completo
+  const fullAddress = `${address.street}, ${address.number}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.country}`;
+  const encodedAddress = encodeURIComponent(fullAddress);
+  
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`
+    );
+    
+    const data = await response.json();
+    
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      console.log('✅ Endereço encontrado:', fullAddress);
+      console.log('📍 Coordenadas:', location);
+      return {
+        lat: location.lat,
+        long: location.lng
+      };
+    }
+    
+    // Se não encontrar com endereço completo, tenta sem o número
+    const fallbackAddress = `${address.street}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.country}`;
+    const encodedFallback = encodeURIComponent(fallbackAddress);
+    
+    const fallbackResponse = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedFallback}&key=${apiKey}`
+    );
+    
+    const fallbackData = await fallbackResponse.json();
+    
+    if (fallbackData.status === 'OK' && fallbackData.results && fallbackData.results.length > 0) {
+      const location = fallbackData.results[0].geometry.location;
+      console.log('✅ Endereço encontrado (fallback):', fallbackAddress);
+      console.log('📍 Coordenadas:', location);
+      return {
+        lat: location.lat,
+        long: location.lng
+      };
+    }
+    
+    console.warn('⚠️ Não foi possível encontrar coordenadas para o endereço');
+    console.warn('Status da API:', data.status, data.error_message || '');
+    return null;
+    
+  } catch (error) {
+    console.error('❌ Erro ao buscar coordenadas:', error);
+    return null;
+  }
 }
 
 interface UseAddressFormReturn {
@@ -148,6 +218,16 @@ export function useAddressForm(): UseAddressFormReturn {
     try {
       const supabase = createClient();
       
+      // Buscar coordenadas do endereço
+      const coordinates = await getCoordinatesFromAddress({
+        street: street.trim(),
+        number: number.trim(),
+        neighborhood: neighborhood.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        country: country.trim(),
+      });
+      
       const addressData: Partial<AddressData> = {
         business_id: business.id,
         country: country.trim(),
@@ -159,6 +239,8 @@ export function useAddressForm(): UseAddressFormReturn {
         complement: complement.trim(),
         zipcode: postalCode.trim(),
         is_primary: true,
+        lat: coordinates?.lat,
+        long: coordinates?.long,
       };
 
       // Verifica se já existe um endereço
