@@ -13,6 +13,7 @@ export interface Business {
   formasPagamento: string[];
   horariosFuncionamento: { dia: string; horario: string }[];
   localizacao: { lat: number; lng: number };
+  distancia?: number; // distância em km
 }
 
 export const useBusinessData = (rawBusinesses: any[]) => {
@@ -62,7 +63,11 @@ export const useBusinessData = (rawBusinesses: any[]) => {
         telefones: business.whatsapp_link ? [business.whatsapp_link] : ["Telefone não disponível"],
         formasPagamento: ["Dinheiro", "Cartão de crédito", "Cartão de débito", "Pix"],
         horariosFuncionamento,
-        localizacao: { lat: -15.7942, lng: -47.8822 },
+        localizacao: { 
+          lat: address?.lat ?? -15.7942, 
+          lng: address?.long ?? -47.8822 
+        },
+        distancia: business.distance,
       };
     });
   }, [rawBusinesses]);

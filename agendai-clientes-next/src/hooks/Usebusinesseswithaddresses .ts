@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/SupabaseClient';
-import type { BusinessWithAddress } from '../types/types';
+import type { BusinessWithAddressAndDistance } from '../types/types';
+import { calculateDistance } from '../types/types';
+
+const MAX_DISTANCE_KM = 200; // Raio máximo de 200km
 
 interface UseBusinessesWithAddressesReturn {
-  businesses: BusinessWithAddress[];
+  businesses: BusinessWithAddressAndDistance[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -13,8 +16,10 @@ export const useBusinessesWithAddresses = (filters?: {
   isActive?: boolean;
   businessType?: string;
   searchTerm?: string;
+  userLatitude?: number | null;
+  userLongitude?: number | null;
 }): UseBusinessesWithAddressesReturn => {
-  const [businesses, setBusinesses] = useState<BusinessWithAddress[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessWithAddressAndDistance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const hasFetchedRef = useRef(false);
@@ -113,21 +118,65 @@ export const useBusinessesWithAddresses = (filters?: {
             console.warn(`     ⚠️ Erro ao buscar endereço:`, addressError);
           } else if (addressData) {
             console.log(`     ✅ Endereço encontrado:`, addressData.street_address);
+            console.log(`     📍 Lat/Long:`, addressData.lat, addressData.long);
           } else {
             console.log(`     ℹ️ Sem endereço cadastrado`);
+          }
+
+          // Calcular distância se tivermos as coordenadas do usuário e do estabelecimento
+          let distance: number | undefined = undefined;
+          if (
+            filters?.userLatitude != null &&
+            filters?.userLongitude != null &&
+            addressData?.lat != null &&
+            addressData?.long != null
+          ) {
+            distance = calculateDistance(
+              filters.userLatitude,
+              filters.userLongitude,
+              addressData.lat,
+              addressData.long
+            );
+            console.log(`     📏 Distância: ${distance.toFixed(2)} km`);
           }
 
           return {
             ...business,
             address: addressData || undefined,
+            distance,
           };
         })
       );
 
+      // Filtrar estabelecimentos dentro do raio de 200km e ordenar por distância
+      let filteredBusinesses = businessesWithAddresses;
+
+      if (filters?.userLatitude != null && filters?.userLongitude != null) {
+        // Filtrar apenas estabelecimentos com distância definida e dentro do raio
+        filteredBusinesses = businessesWithAddresses
+          .filter((business) => {
+            // Se não tem distância (sem coordenadas), não exibir
+            if (business.distance === undefined) {
+              console.log(`     ⚠️ ${business.name}: Sem coordenadas, não será exibido`);
+              return false;
+            }
+            // Se está fora do raio de 200km, não exibir
+            if (business.distance > MAX_DISTANCE_KM) {
+              console.log(`     ⚠️ ${business.name}: Fora do raio (${business.distance.toFixed(2)} km), não será exibido`);
+              return false;
+            }
+            return true;
+          })
+          // Ordenar por distância (mais próximos primeiro)
+          .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+
+        console.log(`📊 [useBusinessesWithAddresses] Filtrados: ${filteredBusinesses.length} de ${businessesWithAddresses.length} estabelecimentos dentro do raio de ${MAX_DISTANCE_KM}km`);
+      }
+
       console.log('✅ [useBusinessesWithAddresses] Processamento concluído!');
-      console.log(`📊 [useBusinessesWithAddresses] Total: ${businessesWithAddresses.length} estabelecimentos com endereços processados`);
+      console.log(`📊 [useBusinessesWithAddresses] Total: ${filteredBusinesses.length} estabelecimentos com endereços processados`);
       
-      setBusinesses(businessesWithAddresses);
+      setBusinesses(filteredBusinesses);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar estabelecimentos';
       console.error('💥 [useBusinessesWithAddresses] ERRO FATAL:', err);
@@ -137,7 +186,7 @@ export const useBusinessesWithAddresses = (filters?: {
       console.log('🏁 [useBusinessesWithAddresses] Busca finalizada (loading = false)');
       setLoading(false);
     }
-  }, [filters?.isActive, filters?.businessType, filters?.searchTerm]);
+  }, [filters?.isActive, filters?.businessType, filters?.searchTerm, filters?.userLatitude, filters?.userLongitude]);
 
   useEffect(() => {
     const filtersKey = JSON.stringify(filters);

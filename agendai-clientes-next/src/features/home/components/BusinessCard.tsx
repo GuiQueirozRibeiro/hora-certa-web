@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Heart, MapPin } from 'lucide-react';
+import { Heart, MapPin, Navigation2 } from 'lucide-react';
 
 interface Business {
   id: string;
@@ -9,6 +9,7 @@ interface Business {
   endereco: string;
   horario: string;
   imagem: string;
+  localizacao?: { lat: number; lng: number };
 }
 
 interface BusinessCardProps {
@@ -24,6 +25,19 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   onCardClick,
   onToggleFavorite,
 }) => {
+  // Gerar URL do Google Maps para direções
+  const getDirectionsUrl = () => {
+    if (business.localizacao?.lat && business.localizacao?.lng) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${business.localizacao.lat},${business.localizacao.lng}`;
+    }
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.endereco)}`;
+  };
+
+  const handleDirectionsClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita abrir a página do estabelecimento
+    window.open(getDirectionsUrl(), '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div
       className="bg-zinc-700 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)] transition-all cursor-pointer"
@@ -59,6 +73,13 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         </p>
         <button className="w-full bg-indigo-500 rounded-lg py-3 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors cursor-pointer">
           Reservar horário
+        </button>
+        <button
+          onClick={handleDirectionsClick}
+          className="w-full mt-2 bg-zinc-600 hover:bg-zinc-500 rounded-lg py-2.5 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+        >
+          <Navigation2 size={16} />
+          Como chegar
         </button>
       </div>
     </div>

@@ -87,9 +87,9 @@ export const useGeolocation = () => {
         });
       },
       {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 300000, // 5 minutos
+        enableHighAccuracy: true, // GPS mais preciso
+        timeout: 15000, // 15 segundos para aguardar GPS
+        maximumAge: 60000, // Cache de 1 minuto
       }
     );
   };

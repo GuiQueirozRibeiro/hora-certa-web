@@ -27,7 +27,9 @@ export const HomePage: React.FC = () => {
     hasLocation, 
     hasPermission, 
     requestLocation, 
-    loading: locationLoading 
+    loading: locationLoading,
+    latitude,
+    longitude 
   } = useGeolocationContext();
 
   // Custom Hooks
@@ -36,10 +38,12 @@ export const HomePage: React.FC = () => {
   const { appointments } = useAppointments({});
   const { isFavorited, addFavorite, removeFavorite } = useFavorites();
 
-  // Data Fetching - só busca se tiver localização
+  // Data Fetching - só busca se tiver localização, passando lat/long do usuário
   const { businesses, loading, error } = useBusinessesWithAddresses({
     isActive: true,
     searchTerm: debouncedValue,
+    userLatitude: latitude,
+    userLongitude: longitude,
   });
 
   // Data Transformation
