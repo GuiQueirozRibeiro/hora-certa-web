@@ -66,6 +66,7 @@ const Header: React.FC = () => {
     <header className="flex justify-between items-center px-8 py-2 bg-zinc-900">
       {/* Logo */}
       <div className="flex items-center gap-2">
+        <img src="/ativo-2.svg" alt="" className='h-8 w-8'/>
         <h1 className="text-2xl font-bold">
           <span className="text-white">Agend</span>
           <span className="text-indigo-500">ai</span>{' '}

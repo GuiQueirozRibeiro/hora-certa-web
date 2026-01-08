@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 898.34 769.28">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Gradiente_sem_nome_122-2);
+      }
+
+      .cls-2 {
+        fill: url(#Gradiente_sem_nome_122);
+      }
+
+      .cls-3 {
+        fill: url(#Gradiente_sem_nome_107);
+      }
+
+      .cls-4 {
+        fill: url(#Gradiente_sem_nome_122-3);
+      }
+    </style>
+    <linearGradient id="Gradiente_sem_nome_122" data-name="Gradiente sem nome 122" x1="367.77" y1="72.42" x2="367.77" y2="769.28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#454bcc"/>
+      <stop offset="1" stop-color="#7e84ff"/>
+    </linearGradient>
+    <linearGradient id="Gradiente_sem_nome_107" data-name="Gradiente sem nome 107" x1="691.74" y1="206.6" x2="862.89" y2="35.45" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e0ff5f"/>
+      <stop offset="1" stop-color="#347474"/>
+    </linearGradient>
+    <linearGradient id="Gradiente_sem_nome_122-2" data-name="Gradiente sem nome 122" x1="449.17" y1="0" x2="449.17" y2="769.28" xlink:href="#Gradiente_sem_nome_122"/>
+    <linearGradient id="Gradiente_sem_nome_122-3" data-name="Gradiente sem nome 122" x1="449.17" y1="0" x2="449.17" y2="769.28" xlink:href="#Gradiente_sem_nome_122"/>
+  </defs>
+  <g id="Camada_4" data-name="Camada 4">
+    <g>
+      <g>
+        <path class="cls-2" d="M693.35,370.82c-3.99-26.82-10.82-52.19-20.02-75.98l-170.61,122.93c2.08,90.66-79.73,170.03-175.45,156.1-118.17-17.19-174.3-157.95-98.09-250.22,43.59-52.78,110.37-66.71,167.19-48.2l172.18-124.07c-118.58-95.87-296.08-111.76-432.03-6.94C-103.87,329.8-10.44,711.87,288.98,764.9c85.45,15.13,154.45-13.73,237.79-15.47,32.28-.68,65.96,1.59,97.92,6.04,39.27,5.47,107.3,34.77,110.84-29.77-19.52-63.35-40.63-126.26-43.77-193.05-2.56-54.39,9.67-107.39,1.58-161.83Z"/>
+        <circle class="cls-3" cx="777.32" cy="121.02" r="121.02"/>
+      </g>
+      <g>
+        <path class="cls-1" d="M693.35,370.82c-3.99-26.82-10.82-52.19-20.02-75.98l-170.61,122.93c2.08,90.66-79.73,170.03-175.45,156.1-118.17-17.19-174.3-157.95-98.09-250.22,43.59-52.78,110.37-66.71,167.19-48.2l172.18-124.07c-118.58-95.87-296.08-111.76-432.03-6.94C-103.87,329.8-10.44,711.87,288.98,764.9c85.45,15.13,154.45-13.73,237.79-15.47,32.28-.68,65.96,1.59,97.92,6.04,39.27,5.47,107.3,34.77,110.84-29.77-19.52-63.35-40.63-126.26-43.77-193.05-2.56-54.39,9.67-107.39,1.58-161.83Z"/>
+        <circle class="cls-4" cx="777.32" cy="121.02" r="121.02"/>
+      </g>
+    </g>
+  </g>
+</svg>
