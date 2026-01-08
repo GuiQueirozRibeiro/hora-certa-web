@@ -19,18 +19,13 @@ export function BusinessDetailsPageWrapper({ slug }: BusinessDetailsPageWrapperP
       try {
         setLoading(true);
         
-        console.log('Slug recebido:', slug);
-        
         // Busca todas as empresas ativas
         const { data: businesses, error: supabaseError } = await supabase
           .from('businesses')
           .select('id, name')
           .eq('is_active', true);
         
-        console.log('Empresas encontradas:', businesses?.length);
-        
         if (supabaseError) {
-          console.error('Erro ao buscar empresas:', supabaseError);
           setError(true);
           return;
         }
@@ -38,19 +33,15 @@ export function BusinessDetailsPageWrapper({ slug }: BusinessDetailsPageWrapperP
         // Encontra a empresa cujo nome slugificado corresponde ao slug da URL
         const matchedBusiness = businesses?.find(business => {
           const businessSlug = slugify(business.name);
-          console.log('Comparando:', businessSlug, 'com', slug);
           return businessSlug === slug;
         });
         
         if (matchedBusiness) {
-          console.log('Empresa encontrada:', matchedBusiness.id);
           setBusinessId(matchedBusiness.id);
         } else {
-          console.error('Nenhuma empresa encontrada com slug:', slug);
           setError(true);
         }
       } catch (err) {
-        console.error('Erro:', err);
         setError(true);
       } finally {
         setLoading(false);

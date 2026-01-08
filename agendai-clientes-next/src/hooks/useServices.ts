@@ -20,7 +20,6 @@ export const useServices = (filters?: {
 
   const fetchServices = async () => {
     try {
-      console.log('🔍 [useServices] Buscando serviços...');
       setLoading(true);
       setError(null);
 
@@ -48,11 +47,9 @@ export const useServices = (filters?: {
         throw servicesError;
       }
 
-      console.log(`✅ [useServices] ${data?.length || 0} serviços encontrados`);
       setServices(data || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar serviços';
-      console.error('❌ [useServices] Erro:', err);
       setError(errorMessage);
     } finally {
       setLoading(false);

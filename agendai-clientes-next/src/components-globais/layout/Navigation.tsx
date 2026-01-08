@@ -19,8 +19,6 @@ const Navigation: React.FC = () => {
       ? pathname.slice(0, -1) 
       : pathname;
     
-    console.log('Clean path:', cleanPath);
-    
     if (cleanPath === '/agendamentos') return 'agendamentos';
     if (cleanPath === '/perfil') return 'perfil';
     if (cleanPath.startsWith('/perfil/')) return 'perfil';
@@ -31,7 +29,6 @@ const Navigation: React.FC = () => {
   const activeTab = getActiveTab();
 
   useEffect(() => {
-    console.log('Pathname mudou para:', pathname, 'Active tab:', activeTab);
     
     // Pequeno delay para garantir que os elementos estão renderizados
     const timer = setTimeout(() => {
@@ -42,13 +39,10 @@ const Navigation: React.FC = () => {
 
       if (activeElement && indicatorRef.current) {
         const { offsetLeft, offsetWidth } = activeElement;
-        
-        console.log('Elemento ativo:', activeTab);
-        console.log('Posição - left:', offsetLeft, 'width:', offsetWidth);
-        
+      
         if (!isInitialized) {
           // Primeira renderização - posiciona sem animação
-          console.log('Inicializando indicador sem animação');
+         
           gsap.set(indicatorRef.current, {
             left: offsetLeft,
             width: offsetWidth
@@ -56,7 +50,6 @@ const Navigation: React.FC = () => {
           setIsInitialized(true);
         } else {
           // Animação de transição entre abas
-          console.log('Animando indicador');
           gsap.to(indicatorRef.current, {
             left: offsetLeft,
             width: offsetWidth,
@@ -64,11 +57,6 @@ const Navigation: React.FC = () => {
             ease: 'power3.out'
           });
         }
-      } else {
-        console.error('Elemento não encontrado:', {
-          activeElement: !!activeElement,
-          indicatorRef: !!indicatorRef.current
-        });
       }
     }, 50);
 

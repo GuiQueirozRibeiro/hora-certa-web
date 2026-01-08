@@ -39,7 +39,6 @@ export const useAddresses = (userId?: string): UseAddressesReturn => {
       setAddresses(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao buscar endereços');
-      console.error('Erro ao buscar endereços:', err);
     } finally {
       setLoading(false);
     }

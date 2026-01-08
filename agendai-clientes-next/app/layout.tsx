@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "../src/components/layout/Header";
-import Navigation from "../src/components/layout/Navigation";
+import Header from "../src/components-globais/layout/Header";
+import Navigation from "../src/components-globais/layout/Navigation";
 import { DataCacheProvider } from "../src/contexts/DataCacheContext";
 import { GeolocationProvider } from "../src/contexts/GeolocationContext";
-import { LocationManager } from "../src/components/shared/LocationManager";
+import { LocationManager } from "../src/components-globais/shared/LocationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

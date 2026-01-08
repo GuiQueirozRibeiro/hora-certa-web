@@ -98,7 +98,6 @@ export const SupabaseDiagnostic = () => {
       }
 
       setResults(diagnostics);
-      console.log('🔍 [DIAGNÓSTICO SUPABASE]', diagnostics);
     };
 
     runDiagnostics();

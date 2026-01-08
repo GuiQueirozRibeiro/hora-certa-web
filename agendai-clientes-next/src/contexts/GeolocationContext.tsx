@@ -95,7 +95,7 @@ export const GeolocationProvider: React.FC<{ children: ReactNode }> = ({ childre
             result.removeEventListener('change', handlePermissionChange);
           };
         } catch (error) {
-          console.error('Erro ao verificar permissão de localização:', error);
+          // Erro silencioso ao verificar permissão
         }
       }
     };

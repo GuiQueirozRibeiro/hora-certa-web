@@ -58,7 +58,6 @@ export const useProfessionalSchedules = (options: UseProfessionalSchedulesOption
 
       setSchedules(data || []);
     } catch (err) {
-      console.error('Erro ao buscar horários dos profissionais:', err);
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
     } finally {
       setLoading(false);

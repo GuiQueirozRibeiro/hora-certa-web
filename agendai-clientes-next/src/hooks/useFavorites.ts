@@ -33,7 +33,6 @@ export const useFavorites = () => {
 
       setFavorites(data || []);
     } catch (err) {
-      console.error('Erro ao buscar favoritos:', err);
       setError(err instanceof Error ? err.message : 'Erro ao buscar favoritos');
     } finally {
       setLoading(false);
@@ -76,7 +75,6 @@ export const useFavorites = () => {
 
       return { success: true, data };
     } catch (err) {
-      console.error('Erro ao adicionar favorito:', err);
       return { success: false, error: err instanceof Error ? err.message : 'Erro' };
     } finally {
       setLoading(false);
@@ -106,7 +104,6 @@ export const useFavorites = () => {
 
       return { success: true };
     } catch (err) {
-      console.error('Erro ao remover favorito:', err);
       return { success: false, error: err instanceof Error ? err.message : 'Erro' };
     } finally {
       setLoading(false);

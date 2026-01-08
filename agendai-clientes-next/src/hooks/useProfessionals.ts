@@ -33,7 +33,6 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
 
   const fetchProfessionals = async () => {
     try {
-      console.log('🔍 [useProfessionals] Buscando profissionais...');
       setLoading(true);
       setError(null);
 
@@ -45,7 +44,6 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
 
       // Se businessId for fornecido, filtrar por ele
       if (businessId) {
-        console.log('🔍 [useProfessionals] Filtrando por business_id:', businessId);
         query = query.eq('business_id', businessId);
       }
 
@@ -54,8 +52,6 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
       if (professionalsError) {
         throw professionalsError;
       }
-
-      console.log(`✅ [useProfessionals] ${professionalsData?.length || 0} profissionais encontrados`);
 
       // Buscar dados dos usuários associados
       if (professionalsData && professionalsData.length > 0) {
@@ -93,7 +89,6 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar profissionais';
-      console.error('❌ [useProfessionals] Erro:', err);
       setError(errorMessage);
     } finally {
       setLoading(false);

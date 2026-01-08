@@ -52,7 +52,6 @@ export const useUserProfile = (): UseUserProfileReturn => {
 
       setProfile(data);
     } catch (err) {
-      console.error('Erro ao buscar perfil:', err);
       setError('Não foi possível carregar os dados do perfil.');
     } finally {
       setLoading(false);
@@ -109,7 +108,6 @@ export const useUserProfile = (): UseUserProfileReturn => {
 
       return { success: true };
     } catch (err) {
-      console.error('Erro ao atualizar perfil:', err);
       const errorMessage = err instanceof Error ? err.message : 'Não foi possível atualizar os dados.';
       setError(errorMessage);
       return { success: false, error: errorMessage };

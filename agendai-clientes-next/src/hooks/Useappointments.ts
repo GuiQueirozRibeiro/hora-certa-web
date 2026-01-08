@@ -34,7 +34,6 @@ export const useAppointments = (filters?: {
     }
 
     try {
-      console.log('🔍 [useAppointments] Buscando agendamentos...');
       setLoading(true);
       setError(null);
 
@@ -64,8 +63,6 @@ export const useAppointments = (filters?: {
       if (appointmentsError) {
         throw appointmentsError;
       }
-
-      console.log(`✅ [useAppointments] ${appointmentsData?.length || 0} agendamentos encontrados`);
 
       // Buscar detalhes dos estabelecimentos para cada agendamento
       if (appointmentsData && appointmentsData.length > 0) {
@@ -113,7 +110,6 @@ export const useAppointments = (filters?: {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar agendamentos';
-      console.error('❌ [useAppointments] Erro:', err);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -142,8 +138,6 @@ export const useAppointments = (filters?: {
     }
 
     try {
-      console.log('📝 [useAppointments] Criando agendamento...', appointment);
-
       const { data, error } = await supabase
         .from('appointments')
         .insert([
@@ -159,12 +153,10 @@ export const useAppointments = (filters?: {
         throw error;
       }
 
-      console.log('✅ [useAppointments] Agendamento criado com sucesso!', data);
       await fetchAppointments(); // Recarregar lista
       return { success: true, error: null, data };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao criar agendamento';
-      console.error('❌ [useAppointments] Erro ao criar:', err);
       return { success: false, error: errorMessage };
     }
   };
@@ -174,8 +166,6 @@ export const useAppointments = (filters?: {
     updates: Partial<Appointment>
   ): Promise<{ success: boolean; error: string | null }> => {
     try {
-      console.log('✏️ [useAppointments] Atualizando agendamento:', id, updates);
-
       const { error } = await supabase
         .from('appointments')
         .update(updates)
@@ -186,20 +176,16 @@ export const useAppointments = (filters?: {
         throw error;
       }
 
-      console.log('✅ [useAppointments] Agendamento atualizado!');
       await fetchAppointments(); // Recarregar lista
       return { success: true, error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao atualizar agendamento';
-      console.error('❌ [useAppointments] Erro ao atualizar:', err);
       return { success: false, error: errorMessage };
     }
   };
 
   const cancelAppointment = async (id: string): Promise<{ success: boolean; error: string | null }> => {
     try {
-      console.log('❌ [useAppointments] Cancelando agendamento:', id);
-
       const { error } = await supabase
         .from('appointments')
         .update({ status: 'cancelled' })
@@ -210,20 +196,16 @@ export const useAppointments = (filters?: {
         throw error;
       }
 
-      console.log('✅ [useAppointments] Agendamento cancelado!');
       await fetchAppointments(); // Recarregar lista
       return { success: true, error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao cancelar agendamento';
-      console.error('❌ [useAppointments] Erro ao cancelar:', err);
       return { success: false, error: errorMessage };
     }
   };
 
   const deleteAppointment = async (id: string): Promise<{ success: boolean; error: string | null }> => {
     try {
-      console.log('🗑️ [useAppointments] Excluindo agendamento:', id);
-
       const { error } = await supabase
         .from('appointments')
         .delete()
@@ -234,12 +216,10 @@ export const useAppointments = (filters?: {
         throw error;
       }
 
-      console.log('✅ [useAppointments] Agendamento excluído!');
       await fetchAppointments(); // Recarregar lista
       return { success: true, error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao excluir agendamento';
-      console.error('❌ [useAppointments] Erro ao excluir:', err);
       return { success: false, error: errorMessage };
     }
   };

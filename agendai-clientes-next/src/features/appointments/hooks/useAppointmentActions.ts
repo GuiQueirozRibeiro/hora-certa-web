@@ -17,7 +17,6 @@ export const useAppointmentActions = () => {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Erro ao cancelar agendamento:', error);
       return { success: false, error };
     } finally {
       setIsProcessing(false);
@@ -35,7 +34,6 @@ export const useAppointmentActions = () => {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Erro ao finalizar agendamento:', error);
       return { success: false, error };
     } finally {
       setIsProcessing(false);

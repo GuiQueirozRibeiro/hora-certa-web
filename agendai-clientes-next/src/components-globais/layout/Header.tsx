@@ -136,7 +136,7 @@ const Header: React.FC = () => {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={() => {
-          console.log('Login realizado com sucesso!');
+          // Login realizado com sucesso
         }}
       />
     </>

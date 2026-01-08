@@ -50,7 +50,6 @@ export const useBusinesses = (filters?: {
       setBusinesses(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao buscar estabelecimentos');
-      console.error('Erro ao buscar estabelecimentos:', err);
     } finally {
       setLoading(false);
     }
