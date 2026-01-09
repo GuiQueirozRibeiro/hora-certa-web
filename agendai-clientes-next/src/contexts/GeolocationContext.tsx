@@ -43,110 +43,7 @@ export const GeolocationProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [showLocationToast, setShowLocationToast] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | null>(null);
 
-  // Monitorar mudanças na permissão de localização
-  useEffect(() => {
-    const checkPermissionStatus = async () => {
-      if ('permissions' in navigator) {
-        try {
-          const result = await navigator.permissions.query({ name: 'geolocation' });
-          
-          // Listener para mudanças de permissão
-          const handlePermissionChange = () => {
-            if (result.state === 'denied') {
-              // Permissão foi revogada - limpar tudo
-              localStorage.removeItem(USER_LAT_KEY);
-              localStorage.removeItem(USER_LON_KEY);
-              localStorage.setItem(LOCATION_DENIED_KEY, 'true');
-              
-              setGeolocation({
-                latitude: null,
-                longitude: null,
-                error: 'Localização bloqueada',
-                loading: false,
-                hasPermission: false,
-                locationName: null,
-              });
-
-              // Mostrar toast de aviso
-              setToastType('error');
-              setShowLocationToast(true);
-            } else if (result.state === 'granted') {
-              // Permissão foi concedida novamente
-              const savedLat = localStorage.getItem(USER_LAT_KEY);
-              const savedLon = localStorage.getItem(USER_LON_KEY);
-              
-              if (!savedLat || !savedLon) {
-                // Se não tem coordenadas salvas, solicitar novamente
-                localStorage.removeItem(LOCATION_DENIED_KEY);
-                setGeolocation(prev => ({
-                  ...prev,
-                  hasPermission: true,
-                }));
-              }
-            }
-          };
-
-          result.addEventListener('change', handlePermissionChange);
-
-          // Verificação inicial
-          handlePermissionChange();
-
-          return () => {
-            result.removeEventListener('change', handlePermissionChange);
-          };
-        } catch (error) {
-          // Erro silencioso ao verificar permissão
-        }
-      }
-    };
-
-    checkPermissionStatus();
-  }, []);
-
-  // Verificar se já existe localização salva no Local Storage
-  useEffect(() => {
-    const savedLat = localStorage.getItem(USER_LAT_KEY);
-    const savedLon = localStorage.getItem(USER_LON_KEY);
-    const locationAsked = localStorage.getItem(LOCATION_ASKED_KEY);
-    const locationDenied = localStorage.getItem(LOCATION_DENIED_KEY);
-
-    if (savedLat && savedLon) {
-      setGeolocation({
-        latitude: parseFloat(savedLat),
-        longitude: parseFloat(savedLon),
-        error: null,
-        loading: false,
-        hasPermission: true,
-        locationName: null,
-      });
-    } else if (locationDenied === 'true') {
-      // Usuário já negou anteriormente
-      setGeolocation(prev => ({
-        ...prev,
-        hasPermission: false,
-      }));
-    } else if (!locationAsked) {
-      // Se nunca perguntamos antes, mostrar o modal após um pequeno delay
-      const timer = setTimeout(() => {
-        setShowLocationModal(true);
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  // Auto-hide toast after 4 seconds
-  useEffect(() => {
-    if (showLocationToast) {
-      const timer = setTimeout(() => {
-        setShowLocationToast(false);
-        setToastType(null);
-      }, 4000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showLocationToast]);
-
+  // Função para solicitar localização - declarada antes dos useEffects
   const requestLocation = useCallback(() => {
     if (!('geolocation' in navigator)) {
       setGeolocation((prev) => ({
@@ -218,12 +115,139 @@ export const GeolocationProvider: React.FC<{ children: ReactNode }> = ({ childre
         setToastType('error');
         setShowLocationToast(true);
       },
-      { enableHighAccuracy: true, // GPS mais preciso
-        timeout: 15000, // 15 segundos para aguardar GPS
-        maximumAge: 60000, // Cache de 1 minuto
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 60000,
       }
     );
   }, []);
+
+  // Monitorar mudanças na permissão de localização
+  useEffect(() => {
+    const checkPermissionStatus = async () => {
+      if ('permissions' in navigator) {
+        try {
+          const result = await navigator.permissions.query({ name: 'geolocation' });
+          
+          // Listener para mudanças de permissão
+          const handlePermissionChange = () => {
+            console.log('[Geolocation] Permission state changed:', result.state);
+            
+            if (result.state === 'denied') {
+              // Permissão foi revogada - limpar tudo
+              localStorage.removeItem(USER_LAT_KEY);
+              localStorage.removeItem(USER_LON_KEY);
+              localStorage.setItem(LOCATION_DENIED_KEY, 'true');
+              
+              setGeolocation({
+                latitude: null,
+                longitude: null,
+                error: 'Localização bloqueada',
+                loading: false,
+                hasPermission: false,
+                locationName: null,
+              });
+
+              // Mostrar toast de aviso
+              setToastType('error');
+              setShowLocationToast(true);
+            } else if (result.state === 'granted') {
+              // Permissão foi concedida - verificar se já temos coordenadas
+              const savedLat = localStorage.getItem(USER_LAT_KEY);
+              const savedLon = localStorage.getItem(USER_LON_KEY);
+              
+              // Limpar estado de negado
+              localStorage.removeItem(LOCATION_DENIED_KEY);
+              
+              if (savedLat && savedLon) {
+                // Já temos coordenadas salvas, usar elas
+                setGeolocation({
+                  latitude: parseFloat(savedLat),
+                  longitude: parseFloat(savedLon),
+                  error: null,
+                  loading: false,
+                  hasPermission: true,
+                  locationName: null,
+                });
+              } else {
+                // Não temos coordenadas, solicitar a localização automaticamente
+                console.log('[Geolocation] Permission granted, requesting location...');
+                requestLocation();
+              }
+            } else if (result.state === 'prompt') {
+              // Permissão está em estado "perguntar" - limpar estado negado
+              const locationDenied = localStorage.getItem(LOCATION_DENIED_KEY);
+              if (locationDenied === 'true') {
+                localStorage.removeItem(LOCATION_DENIED_KEY);
+                setGeolocation(prev => ({
+                  ...prev,
+                  hasPermission: null,
+                }));
+              }
+            }
+          };
+
+          result.addEventListener('change', handlePermissionChange);
+
+          // Verificação inicial
+          handlePermissionChange();
+
+          return () => {
+            result.removeEventListener('change', handlePermissionChange);
+          };
+        } catch (error) {
+          console.error('[Geolocation] Error checking permission:', error);
+        }
+      }
+    };
+
+    checkPermissionStatus();
+  }, [requestLocation]);
+
+  // Verificar se já existe localização salva no Local Storage
+  useEffect(() => {
+    const savedLat = localStorage.getItem(USER_LAT_KEY);
+    const savedLon = localStorage.getItem(USER_LON_KEY);
+    const locationAsked = localStorage.getItem(LOCATION_ASKED_KEY);
+    const locationDenied = localStorage.getItem(LOCATION_DENIED_KEY);
+
+    if (savedLat && savedLon) {
+      setGeolocation({
+        latitude: parseFloat(savedLat),
+        longitude: parseFloat(savedLon),
+        error: null,
+        loading: false,
+        hasPermission: true,
+        locationName: null,
+      });
+    } else if (locationDenied === 'true') {
+      // Usuário já negou anteriormente
+      setGeolocation(prev => ({
+        ...prev,
+        hasPermission: false,
+      }));
+    } else if (!locationAsked) {
+      // Se nunca perguntamos antes, mostrar o modal após um pequeno delay
+      const timer = setTimeout(() => {
+        setShowLocationModal(true);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Auto-hide toast after 4 seconds
+  useEffect(() => {
+    if (showLocationToast) {
+      const timer = setTimeout(() => {
+        setShowLocationToast(false);
+        setToastType(null);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showLocationToast]);
 
   const clearLocation = useCallback(() => {
     localStorage.removeItem(USER_LAT_KEY);

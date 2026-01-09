@@ -1,16 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configurações para produção
+  // Configurações para produção na Vercel
   poweredByHeader: false,
   
-  // Desabilitar otimização de imagens
+  // Otimização de imagens habilitada (padrão da Vercel)
   images: {
-    unoptimized: true,
+    // Adicione domínios externos se usar imagens de CDNs externas
+    // remotePatterns: [
+    //   {
+    //     protocol: 'https',
+    //     hostname: 'exemplo.com',
+    //   },
+    // ],
   },
-  
-  // Trailing slash para melhor compatibilidade
-  trailingSlash: true,
 };
 
 export default nextConfig;
