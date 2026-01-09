@@ -39,7 +39,7 @@ export const useAppointments = (filters?: {
 
       let query = supabase
         .from('appointments')
-        .select('*, professional:professionals (*), user:users (name)')
+        .select('*, professional:professionals (*, user:users (name)), service:services (*)')
         .eq('client_id', user.id)
         .order('appointment_date', { ascending: true })
         .order('appointment_time', { ascending: true });
@@ -68,6 +68,10 @@ export const useAppointments = (filters?: {
       if (appointmentsData && appointmentsData.length > 0) {
         const appointmentsWithDetails = await Promise.all(
           appointmentsData.map(async (appointment) => {
+            // Extrair nome do profissional através da relação professional -> user -> name
+            const professionalName = appointment.professional?.user?.name || appointment.professional?.name || 'Profissional não informado';
+            const serviceName = appointment.service?.name || 'Serviço não informado';
+
             if (appointment.business_id) {
               // Buscar dados do estabelecimento
               const { data: businessData } = await supabase
@@ -76,31 +80,30 @@ export const useAppointments = (filters?: {
                 .eq('id', appointment.business_id)
                 .single();
 
-              if (businessData && businessData.owner_id) {
-                // Buscar endereço do estabelecimento
-                const { data: addressData } = await supabase
-                  .from('addresses')
-                  .select('*')
-                  .eq('user_id', businessData.owner_id)
-                  .eq('is_primary', true)
-                  .single();
-
-                return {
-                  ...appointment,
-                  business: {
-                    ...businessData,
-                    address: addressData || undefined,
-                  },
-                };
-              }
+              // Buscar endereço do estabelecimento através da tabela addresses_businesses
+              const { data: addressData } = await supabase
+                .from('addresses_businesses')
+                .select('*')
+                .eq('business_id', appointment.business_id)
+                .eq('is_primary', true)
+                .maybeSingle();
 
               return {
                 ...appointment,
-                business: businessData || undefined,
+                professional_name: professionalName,
+                service_name: serviceName,
+                business: businessData ? {
+                  ...businessData,
+                  address: addressData || undefined,
+                } : undefined,
               };
             }
 
-            return appointment;
+            return {
+              ...appointment,
+              professional_name: professionalName,
+              service_name: serviceName,
+            };
           })
         );
 

@@ -119,7 +119,7 @@ export function FormMeusDados() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full rounded-md border-gray-600 bg-[#3a3b3f] p-3 text-white focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="Fulano Taldo"
+            placeholder="Seu nome"
             required
             />
         </div>
@@ -133,7 +133,7 @@ export function FormMeusDados() {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="w-full rounded-md border-gray-600 bg-[#3a3b3f] p-3 text-white focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="fulano.taldo@gmail.com"
+            placeholder="seu@email.com"
             required
             disabled
             title="O email não pode ser alterado"

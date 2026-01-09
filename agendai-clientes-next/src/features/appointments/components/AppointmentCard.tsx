@@ -25,7 +25,7 @@ export function AppointmentCard({
 }: AppointmentCardProps) {
   const { formatDate, formatTime } = useDateFormatter();
   const date = formatDate(appointment.appointment_date);
-  const profissional = appointment.professional_name || 'Fulano Taldo';
+  const profissional = appointment.professional_name;
 
   return (
     <div
@@ -47,7 +47,7 @@ export function AppointmentCard({
 
         {/* Nome do serviço */}
         <h3 className="text-white font-semibold text-sm sm:text-base mb-0.5 sm:mb-1 truncate">
-          {appointment.service_name || 'Corte de cabelo'}
+          {appointment.service_name || 'Serviço não informado'}
         </h3>
         
         {/* Nome do profissional */}
