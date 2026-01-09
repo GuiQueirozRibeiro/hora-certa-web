@@ -19,9 +19,11 @@ export function Hero() {
           Você acabou de encontrar o sistema que enche sua agenda.
         </h1>
 
-        <button className="bg-indigo-600 text-white font-bold px-6 py-3 md:px-8 md:py-4 rounded-lg text-sm md:text-base hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/20 mb-8 md:mb-12 uppercase tracking-wider w-full sm:w-auto max-w-xs sm:max-w-none cursor-pointer">
+        <a  className="bg-indigo-600 text-white font-bold px-6 py-3 md:px-8 md:py-4 rounded-lg text-sm md:text-base hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/20 mb-8 md:mb-12 uppercase tracking-wider w-full sm:w-auto max-w-xs sm:max-w-none cursor-pointer"
+        href="https://sistema.agendai.tec.br/login/"
+        >
           Inicie essa experiência
-        </button>
+        </a>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 text-white/80">
           <p className="text-sm md:text-base mb-2 sm:mb-0">Baixe o aplicativo nas Stores</p>

@@ -143,9 +143,11 @@ export function FAQ() {
           <p className="text-xs text-zinc-400 mb-3">
             Não encontrou a resposta que procurava? Entre em contato com nossa equipe.
           </p>
-          <button className="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 transition-all duration-200 active:scale-95 cursor-pointer">
+          <a className="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 transition-all duration-200 active:scale-95 cursor-pointer"
+          href="https://wa.me/5533998217341"
+          >
             Entrar em Contato
-          </button>
+          </a>
         </div>
       </div>
     </section>

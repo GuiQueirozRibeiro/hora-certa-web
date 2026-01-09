@@ -15,12 +15,16 @@ export function CTA() {
 
         {/* Botões */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button className="w-full sm:w-auto px-6 py-3 bg-zinc-800 text-white text-sm font-semibold rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-all duration-200 active:scale-95 cursor-pointer">
+          <a className="w-full sm:w-auto px-6 py-3 bg-zinc-800 text-white text-sm font-semibold rounded-lg border border-zinc-700 hover:bg-zinc-700 transition-all duration-200 active:scale-95 cursor-pointer"
+          href="https://site.agendai.tec.br"
+          >
             Sou Cliente
-          </button>
-          <button className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 transition-all duration-200 active:scale-95 shadow-lg hover:shadow-indigo-500/30 cursor-pointer">
+          </a>
+          <a className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 transition-all duration-200 active:scale-95 shadow-lg hover:shadow-indigo-500/30 cursor-pointer"
+          href="https://sistema.agendai.tec.br/login/"
+          >
             Sou Barbearia
-          </button>
+          </a>
         </div>
       </div>
     </section>

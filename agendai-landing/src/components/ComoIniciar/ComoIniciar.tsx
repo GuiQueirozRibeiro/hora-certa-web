@@ -59,9 +59,11 @@ export function ComoIniciar() {
 
             {/* Botão CTA */}
             <div className="pt-2">
-              <button className="bg-orange-500 text-white font-bold px-6 py-2.5 rounded-lg text-xs hover:bg-orange-600 transition-all shadow-lg uppercase tracking-wider w-full sm:w-auto cursor-pointer">
+              <a className="bg-orange-500 text-white font-bold px-6 py-2.5 rounded-lg text-xs hover:bg-orange-600 transition-all shadow-lg uppercase tracking-wider w-full sm:w-auto cursor-pointer"
+              href="https://sistema.agendai.tec.br/login/"
+              >
                 Clique aqui e cadastre-se agora
-              </button>
+              </a>
             </div>
           </div>
 
