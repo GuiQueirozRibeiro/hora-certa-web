@@ -71,6 +71,11 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
 
   // Form submission
   const handleSubmit = useCallback(async () => {
+    // Evitar múltiplos cliques
+    if (isSaving) {
+      return false;
+    }
+
     // Validate form
     const validation = ProfessionalFormValidator.validateForm({
       name,
@@ -128,7 +133,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
     }
   }, [
     name, email, password, specialties, bio, experienceYears, workingHours,
-    isEditing, professional, businessId, success, showError, onSuccess
+    isEditing, professional, businessId, success, showError, onSuccess, isSaving
   ]);
 
   return {

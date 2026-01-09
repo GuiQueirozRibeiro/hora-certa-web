@@ -36,6 +36,44 @@ function workingHoursFromArray(hours?: any[]): WorkingHours {
   return result;
 }
 
+/**
+ * Mapeia erros do Supabase Auth para mensagens amigáveis
+ */
+function mapAuthError(error: any): string {
+  const message = error?.message?.toLowerCase() || '';
+  const code = error?.code || '';
+  
+  // Erro de email já registrado
+  if (message.includes('user already registered') || 
+      message.includes('email already') ||
+      code === 'user_already_exists') {
+    return 'Este email já está cadastrado no sistema. Use outro email.';
+  }
+  
+  // Erro de senha fraca
+  if (message.includes('password') && (message.includes('weak') || message.includes('short'))) {
+    return 'A senha deve ter pelo menos 6 caracteres.';
+  }
+  
+  // Erro de email inválido
+  if (message.includes('invalid') && message.includes('email')) {
+    return 'O formato do email é inválido.';
+  }
+  
+  // Rate limiting
+  if (message.includes('rate') || message.includes('too many') || code === 'over_request_rate_limit') {
+    return 'Muitas tentativas. Aguarde alguns segundos e tente novamente.';
+  }
+  
+  // Signup desabilitado
+  if (message.includes('signups not allowed') || message.includes('signup is disabled')) {
+    return 'O cadastro de novos usuários está desabilitado no sistema.';
+  }
+  
+  // Erro genérico
+  return error?.message || 'Erro desconhecido ao criar conta.';
+}
+
 export const professionalService = {
   /**
    * Cria um novo profissional
@@ -43,20 +81,40 @@ export const professionalService = {
   async createProfessional(data: CreateProfessionalData): Promise<Professional> {
     const supabase = createClient();
 
+    // Validações básicas antes de enviar
+    if (!data.email?.trim()) {
+      throw new Error('Email é obrigatório');
+    }
+    if (!data.password?.trim() || data.password.length < 6) {
+      throw new Error('A senha deve ter pelo menos 6 caracteres');
+    }
+    if (!data.name?.trim()) {
+      throw new Error('Nome é obrigatório');
+    }
+
     // 1. Criar conta de autenticação
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
+      email: data.email.trim(),
       password: data.password,
       options: {
         data: {
           user_type: 'professional',
-          name: data.name,
+          name: data.name.trim(),
         },
       },
     });
 
-    if (authError || !authData.user) {
-      throw new Error(`Erro ao criar conta: ${authError?.message || 'Usuário não criado'}`);
+    if (authError) {
+      throw new Error(mapAuthError(authError));
+    }
+
+    if (!authData.user) {
+      throw new Error('Não foi possível criar o usuário. Verifique se o email já está em uso.');
+    }
+
+    // Verificar se o usuário foi criado com identidades (email não duplicado)
+    if (authData.user.identities && authData.user.identities.length === 0) {
+      throw new Error('Este email já está cadastrado no sistema. Use outro email.');
     }
 
     // 2. Aguardar trigger criar registro na tabela users
