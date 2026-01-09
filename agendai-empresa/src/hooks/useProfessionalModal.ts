@@ -95,6 +95,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
       if (isEditing) {
         // Update existing professional
         await professionalService.updateProfessional(professional.id, {
+          name: name.trim(),
           specialties: Array.isArray(specialties) ? specialties : [],
           bio: bio.trim() || undefined,
           experience_years: experienceYears,

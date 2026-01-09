@@ -45,6 +45,7 @@ export interface CreateProfessionalData {
 }
 
 export interface UpdateProfessionalData {
+  name?: string;
   specialties?: string[];
   bio?: string;
   experience_years?: number;

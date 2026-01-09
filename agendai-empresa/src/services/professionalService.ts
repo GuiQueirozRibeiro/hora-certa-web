@@ -126,6 +126,7 @@ export const professionalService = {
       .insert({
         user_id: authData.user.id,
         business_id: data.business_id,
+        name: data.name.trim(),
         specialties: data.specialties || [],
         bio: data.bio,
         experience_years: data.experience_years,
@@ -231,6 +232,9 @@ export const professionalService = {
     }
     if ('is_active' in data) {
       updateData.is_active = data.is_active;
+    }
+    if ('name' in data) {
+      updateData.name = data.name;
     }
     if ('working_hours' in data) {
       updateData.working_hours = workingHoursToArray(data.working_hours);
