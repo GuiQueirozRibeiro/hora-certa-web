@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
 import { appointmentService } from '@/services/appointmentService';
 import { professionalService } from '@/services/professionalService';
 import type { AppointmentWithDetails } from '@/types/appointment';
@@ -36,15 +38,22 @@ interface ScheduleEvent {
   time: string;
   color: { bg: string; border: string };
   hour: number;
+  status?: string;
 }
 
 export function SchedulerView() {
   const { business } = useAuth();
+  const { toasts, removeToast, info, success, warning } = useToast();
   const [appointments, setAppointments] = useState<AppointmentWithDetails[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [calendarDate, setCalendarDate] = useState(new Date());
+  
+  // Ref para armazenar IDs de agendamentos já conhecidos
+  const knownAppointmentIds = useRef<Set<string>>(new Set());
+  // Ref para armazenar status dos agendamentos conhecidos
+  const knownAppointmentStatus = useRef<Map<string, string>>(new Map());
 
   // Busca dados iniciais
   useEffect(() => {
@@ -67,6 +76,12 @@ export function SchedulerView() {
         const apptData = await appointmentService.getAppointmentsByDateRange(business.id, startDate, endDate);
         setAppointments(apptData);
         
+        // Popula os IDs e status conhecidos no primeiro load
+        apptData.forEach(apt => {
+          knownAppointmentIds.current.add(apt.id);
+          knownAppointmentStatus.current.set(apt.id, apt.status || '');
+        });
+        
         // Debug: log para verificar os dados
         console.log('Profissionais carregados:', mappedProfs);
         console.log('Agendamentos carregados:', apptData);
@@ -79,6 +94,80 @@ export function SchedulerView() {
     
     loadData();
   }, [business?.id]);
+
+  // Função para verificar novos agendamentos
+  const checkNewAppointments = useCallback(async () => {
+    if (!business?.id) return;
+    
+    try {
+      const currentYear = new Date().getFullYear();
+      const startDate = `${currentYear}-01-01`;
+      const endDate = `${currentYear}-12-31`;
+      const apptData = await appointmentService.getAppointmentsByDateRange(business.id, startDate, endDate);
+      
+      // Verifica novos agendamentos
+      const newAppointments = apptData.filter(apt => !knownAppointmentIds.current.has(apt.id));
+      
+      // Função helper para formatar data
+      const formatDate = (dateStr: string) => {
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}`;
+      };
+      
+      if (newAppointments.length > 0 && knownAppointmentIds.current.size > 0) {
+        // Só notifica se já tinhamos agendamentos carregados (não é o primeiro load)
+        newAppointments.forEach(apt => {
+          info(
+            'Novo agendamento!',
+            `${apt.service_name || 'Serviço'} - ${formatDate(apt.appointment_date)} às ${apt.appointment_time?.slice(0, 5) || ''}`,
+            4000
+          );
+        });
+      }
+      
+      // Verifica mudanças de status nos agendamentos existentes
+      if (knownAppointmentStatus.current.size > 0) {
+        apptData.forEach(apt => {
+          const previousStatus = knownAppointmentStatus.current.get(apt.id);
+          
+          if (previousStatus && apt.status && previousStatus !== apt.status) {
+            // Status mudou
+            if (apt.status === 'completed') {
+              success(
+                'Agendamento concluído!',
+                `${apt.service_name || 'Serviço'} - ${formatDate(apt.appointment_date)} às ${apt.appointment_time?.slice(0, 5) || ''}`,
+                4000
+              );
+            } else if (apt.status === 'cancelled') {
+              warning(
+                'Agendamento cancelado',
+                `${apt.service_name || 'Serviço'} - ${formatDate(apt.appointment_date)} às ${apt.appointment_time?.slice(0, 5) || ''}`,
+                4000
+              );
+            }
+          }
+        });
+      }
+      
+      // Atualiza os IDs e status conhecidos
+      apptData.forEach(apt => {
+        knownAppointmentIds.current.add(apt.id);
+        knownAppointmentStatus.current.set(apt.id, apt.status || '');
+      });
+      setAppointments(apptData);
+    } catch (error) {
+      console.error('Erro ao verificar novos agendamentos:', error);
+    }
+  }, [business?.id, info, success, warning]);
+
+  // Polling para verificar novos agendamentos a cada 30 segundos
+  useEffect(() => {
+    if (!business?.id || loading) return;
+    
+    const interval = setInterval(checkNewAppointments, 30000);
+    
+    return () => clearInterval(interval);
+  }, [business?.id, loading, checkNewAppointments]);
 
   // Gera dias do calendário
   const calendarDays = useMemo(() => {
@@ -131,6 +220,7 @@ export function SchedulerView() {
           time: apt.appointment_time.slice(0, 5),
           color: prof?.color || PROFESSIONAL_COLORS[0],
           hour,
+          status: apt.status,
         };
       })
       .sort((a, b) => a.hour - b.hour);
@@ -198,7 +288,11 @@ export function SchedulerView() {
   }
 
   return (
-    <div className="flex min-h-full gap-4 p-4 overflow-y-auto no-scrollbar">
+    <>
+      {/* Container de Toasts */}
+      <ToastContainer toasts={toasts} onClose={removeToast} position="top-right" />
+      
+      <div className="flex min-h-full gap-4 p-4 overflow-y-auto no-scrollbar">
       {/* Coluna Esquerda - Mini Calendário + Profissionais */}
       <div className="w-64 shrink-0 flex flex-col gap-4">
         {/* Mini Calendário */}
@@ -320,15 +414,45 @@ export function SchedulerView() {
                 
                 {/* Área de eventos */}
                 <div className="flex-1 py-2 px-2 min-h-14 bg-zinc-800/20 flex gap-2">
-                  {hourEvents.map(event => (
-                    <div 
-                      key={event.id}
-                      className={`${event.color.bg} rounded-lg px-3 py-2 min-w-[120px]`}
-                    >
-                      <p className="text-white text-xs font-medium">{event.professionalName}</p>
-                      <p className="text-white/70 text-[10px]">{event.serviceName}</p>
-                    </div>
-                  ))}
+                  {hourEvents.map(event => {
+                    // Define estilos baseados no status
+                    const isCompleted = event.status === 'completed';
+                    const isCancelled = event.status === 'cancelled';
+                    
+                    // Extrai a cor da borda do profissional (ex: 'border-l-emerald-500')
+                    const profBorderColor = event.color.border;
+                    
+                    const cardClasses = isCancelled
+                      ? 'bg-zinc-700 opacity-60 border-2 border-dashed border-red-500/50'
+                      : isCompleted
+                        ? 'bg-zinc-700 opacity-75 border-l-4 border-green-500'
+                        : `bg-zinc-800 border-l-4 ${profBorderColor}`;
+                    
+                    return (
+                      <div 
+                        key={event.id}
+                        className={`${cardClasses} rounded-lg px-3 py-2 min-w-[120px] relative`}
+                      >
+                        {/* Badge de status */}
+                        {isCompleted && (
+                          <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-medium">
+                            ✓ Concluído
+                          </span>
+                        )}
+                        {isCancelled && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-medium">
+                            ✕ Cancelado
+                          </span>
+                        )}
+                        <p className={`text-xs font-medium ${isCancelled ? 'text-zinc-400 line-through' : 'text-white'}`}>
+                          {event.professionalName}
+                        </p>
+                        <p className={`text-[10px] ${isCancelled ? 'text-zinc-500 line-through' : 'text-white/70'}`}>
+                          {event.serviceName}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -336,6 +460,7 @@ export function SchedulerView() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
