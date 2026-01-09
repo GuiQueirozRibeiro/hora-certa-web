@@ -29,11 +29,6 @@ export function Funcionalidades() {
       description: "Evita furos e reduz atrasos automaticamente.",
     },
     {
-      icon: Handshake,
-      title: "Programas de fidelidade",
-      description: "Transforma clientes ocasionais em clientes recorrentes.",
-    },
-    {
       icon: Mail,
       title: "Notificações e promoções",
       description: "Divulgue ofertas e comunique sua base com um clique.",
@@ -51,12 +46,7 @@ export function Funcionalidades() {
     {
       icon: CreditCard,
       title: "Pagamentos online",
-      description: "Mais praticidade para o cliente e menos falhas na cobrança.",
-    },
-    {
-      icon: Truck,
-      title: "Gestão de estoque",
-      description: "Controle entradas, saídas e evite prejuízos invisíveis.",
+      description: "Mais praticidade para o cliente e menos falhas na cobrança",
     },
     {
       icon: ClipboardList,
@@ -76,17 +66,12 @@ export function Funcionalidades() {
     {
       icon: MessageCircle,
       title: "Mensagens automáticas",
-      description: "Retorno rápido e comunicação constante com o cliente.",
+      description: "Retorno rápido e comunicação constante com o cliente. (incluso com o adicional de IA)",
     },
     {
       icon: Star,
       title: "Pesquisa de satisfação",
       description: "Entenda a experiência e melhore seu atendimento.",
-    },
-    {
-      icon: Users,
-      title: "Clube de clientes",
-      description: "Uma comunidade que engaja e mantém sua barbearia em evidência.",
     },
     {
       icon: Monitor,
