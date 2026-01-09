@@ -16,7 +16,7 @@ export function NavBar() {
   ];
   const actions = [
     { name: "Teste Gratis", hightlight: true, href: "https://sistema.agendai.tec.br/login/" },
-    { name: "Acessar", href: "https://sites.agendai.tec.br/" },
+    { name: "Acessar", href: "https://site.agendai.tec.br/" },
     { name: "Sou Cliente", href: "https://sistema.agendai.tec.br/login/" },
   ];
 
