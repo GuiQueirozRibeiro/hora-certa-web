@@ -3,7 +3,7 @@ import Image from 'next/image';
 export function Hero() {
   return (
     <section
-      className="relative w-full min-h-[100vh] md:h-[80vh] flex items-center justify-center bg-fixed bg-center bg-cover bg-no-repeat mt-16 md:mt-12"
+      className="relative w-full min-h-screen md:h-[80vh] flex items-center justify-center bg-fixed bg-center bg-cover bg-no-repeat mt-16 md:mt-12"
       style={{
         // Substitua por sua imagem de barbearia
         backgroundImage:
