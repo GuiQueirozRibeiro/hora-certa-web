@@ -25,7 +25,7 @@ export function Hero() {
           Inicie essa experiência
         </a>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 text-white/80">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 text-white/80 mt-10">
           <p className="text-sm md:text-base mb-2 sm:mb-0">Baixe o aplicativo nas Stores</p>
         </div>
 
@@ -37,7 +37,7 @@ export function Hero() {
                 alt="Baixar na App Store" 
                 width={140} 
                 height={47}
-                className="h-12 md:h-14 w-auto"
+                className="h-12 md:h-10 w-auto"
               />
             </a>
             <a href="#" className="hover:opacity-80 transition-opacity flex items-center">
