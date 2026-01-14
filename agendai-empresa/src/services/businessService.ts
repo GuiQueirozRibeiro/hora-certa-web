@@ -89,7 +89,7 @@ export const businessService = {
   async uploadBusinessImage(
     businessId: string, 
     file: File, 
-    type: 'logo' | 'cover'
+    type: 'logo' | 'cover' | 'gallery'
   ): Promise<string> {
     const supabase = createClient();
     

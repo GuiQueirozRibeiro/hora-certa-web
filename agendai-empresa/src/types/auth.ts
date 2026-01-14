@@ -22,6 +22,7 @@ export interface Business {
   whatsapp_link?: string;
   image_url?: string;
   cover_image_url?: string;
+  images?: string[];
   opening_hours?: any[]; // JSONB structure for opening hours
   is_active: boolean;
   average_rating: number;

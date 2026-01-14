@@ -6,6 +6,7 @@ export interface BusinessFormData {
   whatsapp_link?: string;
   image_url?: string;
   cover_image_url?: string;
+  images: string[];
 }
 
 export interface UpdateBusinessData extends Partial<BusinessFormData> {}
