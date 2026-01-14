@@ -80,8 +80,8 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <ToastContainer 
-        toasts={toasts} 
+      <ToastContainer
+        toasts={toasts}
         onClose={removeToast}
         position="top-right"
       />
@@ -130,7 +130,7 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
               type="number"
               min="5"
               max="480"
-              value={state.data.duration_minutes}
+              value={state.data.duration_minutes === 0 ? '' : state.data.duration_minutes}
               onChange={(e) => updateField('duration_minutes', Number(e.target.value))}
               error={getFieldError('duration_minutes')}
               required
@@ -139,10 +139,18 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
               label="Preço (R$) *"
               placeholder="50.00"
               type="number"
-              min="0"
+              min="1"
               step="0.01"
-              value={state.data.price}
-              onChange={(e) => updateField('price', Number(e.target.value))}
+              // O SEGREDO ESTÁ AQUI:
+              // Se o valor for 0, passamos uma string vazia para o componente.
+              // O navegador entende que o campo de número está "vazio" e mostra o placeholder.
+              value={state.data.price === 0 ? '' : state.data.price}
+              onChange={(e) => {
+                const val = e.target.value;
+                // Se o usuário apagar tudo (val === ''), salvamos 0 no estado para manter o tipo number.
+                // O 'value' acima vai transformar esse 0 em '' para a tela de novo.
+                updateField('price', val === '' ? 0 : Number(val));
+              }}
               error={getFieldError('price')}
               required
             />
@@ -182,8 +190,8 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
               {state.isSaving
                 ? 'Salvando...'
                 : isEditing
-                ? 'Salvar Alterações'
-                : 'Criar Serviço'}
+                  ? 'Salvar Alterações'
+                  : 'Criar Serviço'}
             </Button>
             <Button
               type="button"

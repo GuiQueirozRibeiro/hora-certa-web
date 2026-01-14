@@ -169,7 +169,7 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                 type="number"
                 min="0"
                 max="50"
-                value={experienceYears}
+                value={experienceYears === 0 ? '' : experienceYears}
                 onChange={(e) => setExperienceYears(Number(e.target.value))}
               />
 
