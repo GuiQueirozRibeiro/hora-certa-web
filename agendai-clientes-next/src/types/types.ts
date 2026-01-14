@@ -117,6 +117,15 @@ export type Service = {
   updated_at: string;
 };
 
+export type WorkingHoursDay = {
+  day: string;
+  start: string;
+  end: string;
+  enabled: boolean;
+};
+
+export type WorkingHours = WorkingHoursDay[];
+
 export type Professional = {
   id: string;
   business_id: string | null;
@@ -124,6 +133,7 @@ export type Professional = {
   bio: string | null;
   image_url: string | null;
   is_active: boolean;
+  working_hours?: WorkingHours | null;
   created_at: string;
   updated_at: string;
 };

@@ -61,18 +61,40 @@ export function useReservaModalViewModel({
     }
 
     const dayOfWeek = selectedDate.getDay();
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = dayNames[dayOfWeek];
+
+    // Buscar profissional
+    const professional = professionals.find((p) => p.id === selectedProfessionalId);
+    
+    // Primeiro tentar usar professional_schedules
     const schedule = schedules.find(
       (s) => s.professional_id === selectedProfessionalId && s.day_of_week === dayOfWeek && s.is_active
     );
 
-    if (!schedule && schedules.length > 0) {
+    let startTime: string | null = null;
+    let endTime: string | null = null;
+
+    // Se tem schedule na tabela professional_schedules, usar ele
+    if (schedule) {
+      startTime = schedule.start_time;
+      endTime = schedule.end_time;
+    } 
+    // Se não tem schedule, tentar usar working_hours (é um array)
+    else if (professional?.working_hours && Array.isArray(professional.working_hours)) {
+      const workingDay = professional.working_hours.find((day: any) => day.day === dayName);
+      if (workingDay && workingDay.enabled) {
+        startTime = workingDay.start + ':00';
+        endTime = workingDay.end + ':00';
+      }
+    }
+
+    // Se não encontrou horário de trabalho, mostrar erro
+    if (!startTime || !endTime) {
       setAvailableTimeSlots([]);
       setError('O profissional não trabalha neste dia');
       return;
     }
-
-    const startTime = schedule ? schedule.start_time : '09:00:00';
-    const endTime = schedule ? schedule.end_time : '18:00:00';
 
     const slots: TimeSlot[] = [];
     const [startHour, startMinute] = startTime.substring(0, 5).split(':').map(Number);
@@ -94,7 +116,7 @@ export function useReservaModalViewModel({
 
     setAvailableTimeSlots(slots);
     setError(null);
-  }, [selectedProfessionalId, selectedDate, schedules]);
+  }, [selectedProfessionalId, selectedDate, schedules, professionals]);
 
   // Gerar dias da semana
   const weekDays = useMemo(() => {
@@ -120,17 +142,40 @@ export function useReservaModalViewModel({
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
+      // Data no passado nunca está disponível
       if (date < today) return false;
-      if (!selectedProfessionalId) return true;
-      if (loadingSchedules) return true;
-      if (schedules.length === 0) return true;
+      
+      // Se não tem profissional selecionado, não marcar nenhum dia como disponível
+      if (!selectedProfessionalId) return false;
 
+      // Se está carregando dados, mostrar como disponível temporariamente
+      if (loadingSchedules || loadingProfessionals) return true;
+
+      const dayOfWeek = date.getDay();
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayName = dayNames[dayOfWeek];
+
+      // Buscar profissional
+      const professional = professionals.find((p) => p.id === selectedProfessionalId);
+
+      // Primeiro verificar se tem schedule na tabela professional_schedules
       const schedule = schedules.find(
-        (s) => s.professional_id === selectedProfessionalId && s.day_of_week === date.getDay() && s.is_active
+        (s) => s.professional_id === selectedProfessionalId && s.day_of_week === dayOfWeek && s.is_active
       );
-      return schedule !== undefined;
+      
+      if (schedule) return true;
+
+      // Se não tem schedule, verificar working_hours (é um array)
+      if (professional?.working_hours && Array.isArray(professional.working_hours)) {
+        const workingDay = professional.working_hours.find((day: any) => day.day === dayName);
+        if (workingDay) {
+          return workingDay.enabled === true;
+        }
+      }
+
+      return false;
     },
-    [selectedProfessionalId, loadingSchedules, schedules]
+    [selectedProfessionalId, loadingSchedules, loadingProfessionals, schedules, professionals]
   );
 
   // Formatar data para exibição

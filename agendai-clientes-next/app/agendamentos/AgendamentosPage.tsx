@@ -122,7 +122,7 @@ const AgendamentosPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-6 min-h-screen bg-zinc-800">
+    <div className="w-full mx-auto px-8 py-6 min-h-screen bg-zinc-800">
       {/* Cabeçalho */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>

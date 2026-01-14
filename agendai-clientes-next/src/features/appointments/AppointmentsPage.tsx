@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppointments } from '../../hooks/Useappointments';
-import type { AppointmentWithDetails } from '../../types/types';
-import { useDateFormatter } from './hooks/useDateFormatter';
 import { useAppointmentActions } from './hooks/useAppointmentActions';
-import { usePhoneCopy } from './hooks/usePhoneCopy';
 import { AppointmentCard } from './components/AppointmentCard';
 import { CancelModal } from './components/CancelModal';
 import { EmptyStates } from './components/EmptyStates';
@@ -21,36 +18,41 @@ export const AppointmentsPage: React.FC = () => {
   const { appointments: allAppointments, loading, refetch } = useAppointments({});
 
   // State Management
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithDetails | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
 
   // Custom Hooks
-  const { formatDate, formatTime } = useDateFormatter();
-  const { isProcessing, cancelAppointment, completeAppointment } = useAppointmentActions();
-  const { formatPhoneNumber, handleCopyPhone, copiedPhone } = usePhoneCopy();
+  const { isProcessing, cancelAppointment } = useAppointmentActions();
+
 
   // Computed Values
-  const confirmedAppointments = allAppointments.filter(
-    (apt) => apt.status === 'scheduled' || apt.status === 'confirmed'
-  );
-
-  const completedAppointments = allAppointments.filter(
+   const completedAppointments = allAppointments.filter(
     (apt) => apt.status === 'completed'
   );
 
   // Auto-select first appointment
-  useEffect(() => {
-    if (!selectedAppointment && confirmedAppointments.length > 0) {
-      setSelectedAppointment(confirmedAppointments[0]);
-    }
-  }, [confirmedAppointments, selectedAppointment]);
+ // 1. Mantenha o estado apenas como o ID ou o índice (mais estável)
+const [selectedId, setSelectedId] = useState<string | null>(null);
 
+// 2. Calcule as listas (use useMemo para performance e estabilidade)
+const confirmedAppointments = useMemo(() => 
+  allAppointments.filter(apt => apt.status === 'scheduled' || apt.status === 'confirmed'),
+  [allAppointments]
+);
+
+// 3. Descubra o item selecionado derivando do ID
+const selectedAppointment = useMemo(() => {
+  // Se tiver um ID selecionado, busca ele
+  if (selectedId) {
+    return allAppointments.find(apt => apt.id === selectedId) || null;
+  }
+  // Se não tiver seleção mas houver confirmados, pega o primeiro (Auto-select)
+  return confirmedAppointments[0] || null;
+}, [selectedId, confirmedAppointments, allAppointments]);
+
+// 4. No seu onClick das listas, mude para:
+// onClick={(apt) => setSelectedId(apt.id)}
   // Event Handlers
-  const handleOpenCancelModal = (appointmentId: string) => {
-    setAppointmentToCancel(appointmentId);
-    setShowCancelModal(true);
-  };
 
   const handleCloseCancelModal = () => {
     setShowCancelModal(false);
@@ -66,22 +68,11 @@ export const AppointmentsPage: React.FC = () => {
       await refetch();
       handleCloseCancelModal();
       
-      if (selectedAppointment?.id === appointmentToCancel) {
-        setSelectedAppointment(null);
+      if (selectedId === appointmentToCancel) {
+        setSelectedId(null);
       }
     } else {
       alert('Erro ao cancelar agendamento. Tente novamente.');
-    }
-  };
-
-  const handleCompleteAppointment = async (appointmentId: string) => {
-    const result = await completeAppointment(appointmentId);
-    
-    if (result.success) {
-      await refetch();
-      setSelectedAppointment(null);
-    } else {
-      alert('Erro ao finalizar agendamento. Tente novamente.');
     }
   };
 
@@ -131,7 +122,7 @@ export const AppointmentsPage: React.FC = () => {
                       statusLabel="Confirmado"
                       statusColor="bg-green-600"
                       isSelected={selectedAppointment?.id === appointment.id}
-                      onClick={(apt) => setSelectedAppointment(apt)}
+                      onClick={(apt) => setSelectedId(apt.id)}
                     />
                   ))}
                 </div>
@@ -154,7 +145,7 @@ export const AppointmentsPage: React.FC = () => {
                       statusLabel="Finalizado"
                       statusColor="bg-gray-600"
                       isSelected={selectedAppointment?.id === appointment.id}
-                      onClick={(apt) => setSelectedAppointment(apt)}
+                      onClick={(apt) => setSelectedId(apt.id)}
                     />
                   ))}
                 </div>
@@ -168,7 +159,7 @@ export const AppointmentsPage: React.FC = () => {
               <div className="bg-[#1a1a1a] rounded-lg p-4 sm:p-6">
                 {/* Botão voltar apenas em mobile */}
                 <button
-                  onClick={() => setSelectedAppointment(null)}
+                  onClick={() => setSelectedId(null)}
                   className="lg:hidden flex items-center gap-2 text-zinc-400 hover:text-white mb-4 text-sm"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

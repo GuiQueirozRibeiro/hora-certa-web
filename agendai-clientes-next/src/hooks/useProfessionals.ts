@@ -11,6 +11,7 @@ export interface Professional {
   is_active: boolean;
   average_rating: number;
   total_reviews: number;
+  working_hours?: string | number | null;
   created_at: string;
   updated_at: string;
   // Dados do usuário associado
@@ -38,7 +39,7 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
 
       let query = supabase
         .from('professionals')
-        .select('*')
+        .select('*, working_hours')
         .eq('is_active', true)
         .order('average_rating', { ascending: false });
 
