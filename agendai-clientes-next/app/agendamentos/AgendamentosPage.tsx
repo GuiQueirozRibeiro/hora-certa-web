@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../src/hooks/useAuth';
 import { useAppointments } from '../../src/hooks/Useappointments';
 import { useAppointmentActions } from '../../src/features/appointments/hooks/useAppointmentActions';
@@ -14,45 +14,38 @@ import { CancelModal } from '../../src/features/appointments/components/CancelMo
 import { EmptyStates } from '../../src/features/appointments/components/EmptyStates';
 import type { AppointmentWithDetails } from '../../src/types/types';
 
-/**
- * AgendamentosPage - Página de gerenciamento de agendamentos
- * 
- * Princípios SOLID aplicados:
- * - Single Responsibility: Página apenas orquestra componentes e lógica
- * - Open/Closed: Extensível via novos componentes
- * - Dependency Inversion: Depende de hooks (abstrações), não de Supabase direto
- */
 const AgendamentosPage: React.FC = () => {
-  // Hooks de autenticação e dados
   const { user } = useAuth();
   const { appointments: allAppointments, loading, refetch } = useAppointments({});
   const { cancelAppointment, completeAppointment, isProcessing } = useAppointmentActions();
 
-  // Estado local do componente
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithDetails | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
 
-  // Filtrar agendamentos por status
-  const confirmedAppointments = allAppointments.filter(
-    (apt) => apt.status === 'scheduled' || apt.status === 'confirmed'
+  // 1. Filtros Estáveis
+  const confirmedAppointments = useMemo(() => 
+    allAppointments.filter(apt => apt.status === 'scheduled' || apt.status === 'confirmed'),
+    [allAppointments]
   );
 
-  const completedAppointments = allAppointments.filter(
-    (apt) => apt.status === 'completed'
+  const completedAppointments = useMemo(() => 
+    allAppointments.filter(apt => apt.status === 'completed'),
+    [allAppointments]
   );
 
-  // Selecionar primeiro agendamento automaticamente
-  useEffect(() => {
-    if (!selectedAppointment && confirmedAppointments.length > 0) {
-      setSelectedAppointment(confirmedAppointments[0]);
+  // 2. Seleção Derivada (Mata o erro de loop infinito)
+  const selectedAppointment = useMemo(() => {
+    if (selectedId) {
+      return allAppointments.find(apt => apt.id === selectedId) || null;
     }
-  }, [confirmedAppointments, selectedAppointment]);
+    return confirmedAppointments[0] || null;
+  }, [selectedId, confirmedAppointments, allAppointments]);
 
-  // Handlers
+  // Handlers Otimizados
   const handleSelectAppointment = (appointment: AppointmentWithDetails) => {
-    setSelectedAppointment(appointment);
+    setSelectedId(appointment.id);
   };
 
   const openCancelModal = () => {
@@ -69,70 +62,53 @@ const AgendamentosPage: React.FC = () => {
 
   const handleCancelAppointment = async () => {
     if (!appointmentToCancel) return;
-
     const result = await cancelAppointment(appointmentToCancel);
 
     if (result.success) {
       await refetch();
       closeCancelModal();
-
-      if (selectedAppointment?.id === appointmentToCancel) {
-        setSelectedAppointment(null);
+      // Se o agendamento cancelado era o selecionado, limpamos a seleção
+      if (selectedId === appointmentToCancel) {
+        setSelectedId(null);
       }
     } else {
-      alert('Erro ao cancelar agendamento. Tente novamente.');
+      alert('Erro ao cancelar agendamento.');
     }
   };
 
   const handleCompleteAppointment = async () => {
     if (!selectedAppointment) return;
-
     const result = await completeAppointment(selectedAppointment.id);
 
     if (result.success) {
       await refetch();
-      setSelectedAppointment(null);
+      setSelectedId(null); // Limpa seleção após finalizar
     } else {
-      alert('Erro ao finalizar agendamento. Tente novamente.');
+      alert('Erro ao finalizar agendamento.');
     }
   };
 
-  // Estado de não autenticado
   if (!user) {
     return (
       <div className="min-h-screen bg-zinc-900">
         <EmptyStates.NotAuthenticated onLogin={() => setShowLoginModal(true)} />
-        
-        <LoginModal
-          isOpen={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-          onLoginSuccess={() => setShowLoginModal(false)}
-        />
+        <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLoginSuccess={() => setShowLoginModal(false)} />
       </div>
     );
   }
 
-  // Estado de carregamento
   if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-900">
-        <EmptyStates.Loading />
-      </div>
-    );
+    return <div className="min-h-screen bg-zinc-900"><EmptyStates.Loading /></div>;
   }
 
   return (
     <div className="w-full mx-auto px-8 py-6 min-h-screen bg-zinc-800">
-      {/* Cabeçalho */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
       </div>
 
-      {/* Layout de 2 colunas */}
       <div className="grid grid-cols-12 gap-6">
-        {/* COLUNA ESQUERDA - Lista de agendamentos */}
-        <div className="col-span-4">
-          {/* Agendamentos Confirmados */}
+        <div className="col-span-4 space-y-6">
           <AppointmentsList
             title="Confirmados"
             appointments={confirmedAppointments}
@@ -143,7 +119,6 @@ const AgendamentosPage: React.FC = () => {
             emptyMessage="Nenhum agendamento confirmado"
           />
 
-          {/* Agendamentos Finalizados */}
           <AppointmentsList
             title="Finalizados"
             appointments={completedAppointments}
@@ -155,33 +130,21 @@ const AgendamentosPage: React.FC = () => {
           />
         </div>
 
-        {/* COLUNA DIREITA - Detalhes do agendamento */}
         <div className="col-span-8">
           {selectedAppointment ? (
             <div className="bg-[#1E1E1E] rounded-xl p-6">
-              {/* Mapa e informações do estabelecimento */}
               <BusinessMap appointment={selectedAppointment} />
-
-              {/* Sobre nós */}
-              <div className="mb-6">
-                <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">
-                  Sobre nós
-                </h3>
+              
+              <div className="my-6">
+                <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">Sobre nós</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Bem-vindo à {selectedAppointment.business?.name || 'nosso estabelecimento'}, onde tradição encontra estilo. 
-                  Neste espaço acolhedor e refinado, oferecemos serviços de barbearia com um toque de 
-                  modernidade. Nossa equipe de profissionais especializados está pronta para proporcionar 
-                  a você uma experiência única e personalizada.
+                  Bem-vindo à {selectedAppointment.business?.name || 'nosso estabelecimento'}...
                 </p>
               </div>
 
-              {/* Contato */}
               <BusinessContact appointment={selectedAppointment} />
-
-              {/* Detalhes do serviço */}
               <ServiceDetails appointment={selectedAppointment} />
-
-              {/* Botões de ação */}
+              
               <AppointmentActions
                 onCancel={openCancelModal}
                 onComplete={handleCompleteAppointment}
@@ -194,7 +157,6 @@ const AgendamentosPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal de Cancelamento */}
       <CancelModal
         isOpen={showCancelModal}
         onClose={closeCancelModal}
