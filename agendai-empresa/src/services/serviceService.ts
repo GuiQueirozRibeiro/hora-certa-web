@@ -17,6 +17,7 @@ export const serviceService = {
         duration_minutes: data.duration_minutes,
         price: data.price,
         category: data.category,
+        image_url: data.image_url,
         is_active: data.is_active ?? true,
       })
       .select()

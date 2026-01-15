@@ -10,6 +10,7 @@ export function mapServiceToFormData(service: Service): ServiceFormData {
     duration_minutes: service.duration_minutes,
     price: service.price,
     category: service.category || '',
+    image_url: service.image_url || '',
     is_active: service.is_active,
   };
 }
@@ -31,6 +32,10 @@ export function sanitizeServiceFormData(data: ServiceFormData): CreateServiceDat
   
   if (data.category && data.category.trim()) {
     sanitized.category = data.category.trim();
+  }
+  
+  if (data.image_url && data.image_url.trim()) {
+    sanitized.image_url = data.image_url.trim();
   }
   
   return sanitized;

@@ -107,6 +107,30 @@ export const businessService = {
   },
 
   /**
+   * Upload de imagem dos serviços
+   */
+  async uploadServiceImage(businessId: string, file: File) {
+    const supabase = createClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
+
+    // CAMINHO CORRETO: Vai para a pasta services
+    const filePath = `businesses/${businessId}/services/${fileName}`;
+
+    const { error } = await supabase.storage
+      .from('business-images')
+      .upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('business-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  },
+
+  /**
    * Upload de imagem da empresa (Logo, Capa, Galeria)
    */
   async uploadBusinessImage(

@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { formatPrice, formatDuration } from '@/lib/mappers/serviceMapper';
 import type { Service } from '@/types/service';
 
+/* eslint-disable @next/next/no-img-element */
+
 // ========================================
 // TIPOS
 // ========================================
@@ -136,12 +138,27 @@ export function ServicoCard({ servico, onEdit, onDelete, onToggleStatus }: Servi
 
       <CardContent>
         {/* ========================================
-            CABEÇALHO: Ícone e Nome
+            CABEÇALHO: Ícone/Imagem e Nome
         ======================================== */}
         <div className="flex items-start gap-4 mb-4 mt-8">
-          {/* Ícone do serviço */}
-          <div className="w-14 h-14 rounded-full bg-indigo-500/20 flex items-center justify-center">
-            <Scissors className="h-6 w-6 text-indigo-400" />
+          {/* Ícone/Imagem do serviço */}
+          <div className="w-14 h-14 rounded-full bg-indigo-500/20 flex items-center justify-center overflow-hidden shrink-0">
+            {servico.image_url ? (
+              <img 
+                src={servico.image_url} 
+                alt={servico.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<svg class="h-6 w-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path></svg>';
+                  }
+                }}
+              />
+            ) : (
+              <Scissors className="h-6 w-6 text-indigo-400" />
+            )}
           </div>
 
           {/* Nome e Categoria */}

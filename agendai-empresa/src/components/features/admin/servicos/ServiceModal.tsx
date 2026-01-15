@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { useServiceForm } from '@/hooks/useServiceForm';
 import { serviceService } from '@/services/serviceService';
+import { businessService } from '@/services/businessService';
 import { validateServiceForm } from '@/lib/validations/serviceValidations';
 import { mapServiceToFormData, sanitizeServiceFormData } from '@/lib/mappers/serviceMapper';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -9,7 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import type { Service } from '@/types/service';
 
 interface ServiceModalProps {
@@ -21,6 +22,7 @@ interface ServiceModalProps {
 export function ServiceModal({ businessId, service, onClose }: ServiceModalProps) {
   const { toasts, removeToast, error: showError } = useToast();
   const isEditing = !!service;
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const {
     state,
@@ -36,6 +38,7 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
     duration_minutes: 30,
     price: 0,
     category: '',
+    image_url: '',
     is_active: true,
   });
 
@@ -46,6 +49,22 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
       resetForm(formData);
     }
   }, [service, resetForm]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !businessId) return;
+
+    setUploadingPhoto(true);
+    try {
+      const url = await businessService.uploadServiceImage(businessId, file);
+      updateField('image_url', url);
+    } catch (err: any) {
+      console.error("Erro no upload da imagem do serviço:", err);
+      showError('Erro no upload', 'Não foi possível fazer upload da imagem');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +120,31 @@ export function ServiceModal({ businessId, service, onClose }: ServiceModalProps
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Upload de Imagem */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-200 mb-2">
+              Imagem do Serviço
+            </label>
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <div className="relative w-32 h-32 rounded-lg bg-zinc-700 border-2 border-dashed border-zinc-600 flex items-center justify-center overflow-hidden">
+                {state.data.image_url ? (
+                  <img src={state.data.image_url} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <Plus className="text-zinc-500" size={40} />
+                )}
+                {uploadingPhoto && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full"></div>
+                  </div>
+                )}
+              </div>
+              <label className="cursor-pointer bg-zinc-700 hover:bg-zinc-600 text-zinc-200 px-4 py-2 rounded-lg text-sm transition-colors border border-zinc-600">
+                {state.data.image_url ? 'Trocar Imagem' : 'Adicionar Imagem'}
+                <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+              </label>
+            </div>
+          </div>
+
           {/* Nome */}
           <Input
             label="Nome do Serviço *"

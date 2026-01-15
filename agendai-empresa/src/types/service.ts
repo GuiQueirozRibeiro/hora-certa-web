@@ -7,6 +7,7 @@ export interface Service {
   duration_minutes: number;
   price: number;
   category?: string;
+  image_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -18,6 +19,7 @@ export interface ServiceFormData {
   duration_minutes: number;
   price: number;
   category?: string;
+  image_url?: string;
   is_active: boolean;
 }
 
@@ -27,6 +29,7 @@ export interface CreateServiceData {
   duration_minutes: number;
   price: number;
   category?: string;
+  image_url?: string;
   is_active?: boolean;
 }
 
