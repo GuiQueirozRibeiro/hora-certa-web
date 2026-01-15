@@ -45,6 +45,7 @@ export const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
           
           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-zinc-800 shrink-0">
             {business.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img 
                 src={business.image_url} 
                 alt={business.name}
