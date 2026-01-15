@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import LoginForm from '@/components/features/auth/LoginForm';
+import RegisterForm from '@/components/features/auth/RegisterForm';
 
-export default function LoginPage() {
+export default function CadastroPage() {
   const router = useRouter();
 
   return (
@@ -11,9 +11,11 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-zinc-900 rounded-2xl p-8 shadow-2xl border border-white/10">
           <h2 className="text-2xl font-semibold text-white text-center mb-6">
-            Fazer Login
+            Criar Conta
           </h2>
-          <LoginForm onSwitchToSignup={() => router.push('/cadastro')} />
+
+          {/* Passamos uma função que navega de volta para o login */}
+          <RegisterForm onSwitchToLogin={() => router.push('/login')} />
         </div>
       </div>
     </div>

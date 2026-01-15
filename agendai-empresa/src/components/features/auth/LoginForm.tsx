@@ -25,7 +25,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     try {
       await signIn(formData.email, formData.password);
       success('Login realizado com sucesso!');
-      // O useAuth já redireciona automaticamente
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       error('Erro ao fazer login', err.message);
     } finally {
