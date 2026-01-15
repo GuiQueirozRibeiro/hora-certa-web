@@ -4,12 +4,11 @@ export interface BusinessFormData {
   description?: string;
   business_type?: string;
   whatsapp_link?: string;
+  instagram_link?: string;
   image_url?: string;
   cover_image_url?: string;
   images: string[];
 }
-
-export interface UpdateBusinessData extends Partial<BusinessFormData> {}
 
 export interface BusinessValidationError {
   field: string;

@@ -10,6 +10,7 @@ export function mapBusinessToFormData(business: Business): BusinessFormData {
     description: business.description || '',
     business_type: business.business_type || '',
     whatsapp_link: business.whatsapp_link || '',
+    instagram_link: business.instagram_link || '',
     image_url: business.image_url || '',
     cover_image_url: business.cover_image_url || '',
     // CORREÇÃO: Usar 'business' em vez de 'data' e garantir que seja um array
@@ -23,7 +24,6 @@ export function mapBusinessToFormData(business: Business): BusinessFormData {
 export function sanitizeBusinessFormData(data: BusinessFormData): Partial<BusinessFormData> {
   const sanitized: Partial<BusinessFormData> = {
     name: data.name.trim(),
-    // IMPORTANTE: Incluir o array de imagens aqui para o banco receber o dado
     images: Array.isArray(data.images) ? data.images : []
   };
   
@@ -37,6 +37,9 @@ export function sanitizeBusinessFormData(data: BusinessFormData): Partial<Busine
   
   if (data.whatsapp_link && data.whatsapp_link.trim()) {
     sanitized.whatsapp_link = data.whatsapp_link.trim();
+  }
+  if (data.instagram_link && data.instagram_link.trim()) {
+    sanitized.instagram_link = data.instagram_link.trim();
   }
   
   if (data.image_url && data.image_url.trim()) {

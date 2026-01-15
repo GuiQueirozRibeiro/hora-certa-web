@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type UserType = 'client' | 'business' | 'professional';
 
 export interface User {
@@ -20,6 +21,7 @@ export interface Business {
   description?: string;
   business_type?: string;
   whatsapp_link?: string;
+  instagram_link?: string;
   image_url?: string;
   cover_image_url?: string;
   images?: string[];

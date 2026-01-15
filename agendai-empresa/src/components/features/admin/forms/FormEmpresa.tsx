@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -41,6 +42,7 @@ export function FormEmpresa() {
     description: '',
     business_type: '',
     whatsapp_link: '',
+    instagram_link: '',
     image_url: '',
     cover_image_url: '',
     images: [],
@@ -66,6 +68,7 @@ export function FormEmpresa() {
       updateField('image_url', imageUrl);
       await refreshBusiness();
       success('Logo atualizada com sucesso!');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       showError('Erro ao fazer upload', err.message);
     } finally {
@@ -102,6 +105,7 @@ export function FormEmpresa() {
       updateField('images', [...currentImages, ...newImageUrls] as any);
 
       success(`${newImageUrls.length} fotos adicionadas com sucesso!`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       showError('Erro no upload', 'Não foi possível carregar algumas imagens.');
     } finally {
@@ -124,6 +128,7 @@ export function FormEmpresa() {
       updateField('images', updatedImages as any);
 
       success('Imagem removida da galeria.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       showError('Erro ao remover', 'Tente novamente em instantes.');
     }
@@ -227,7 +232,6 @@ export function FormEmpresa() {
           isLoading={uploadingLogo}
         />
 
-        {/* --- ADICIONE A PARTIR DAQUI --- */}
         <div className="space-y-4">
           <label className="block text-sm font-medium text-zinc-200">
             Galeria de Fotos (Vitrime)
@@ -311,6 +315,16 @@ export function FormEmpresa() {
           value={state.data.whatsapp_link || ''}
           onChange={(e) => updateField('whatsapp_link', e.target.value)}
           error={getFieldError('whatsapp_link')}
+        />
+
+        {/* Instagram */}
+        <Input
+          label="Link do Instagram"
+          placeholder="https://www.instagram.com/sua_empresa/"
+          type="text"
+          value={state.data.instagram_link || ''}
+          onChange={(e) => updateField('instagram_link', e.target.value)}
+          error={getFieldError('instagram_link')}
         />
 
         {/* Descrição */}
