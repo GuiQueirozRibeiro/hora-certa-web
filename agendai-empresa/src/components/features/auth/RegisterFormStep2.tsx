@@ -148,7 +148,7 @@ const RegisterFormStep2: React.FC<RegisterFormStep2Props> = ({
       {/* Botão de submit */}
       <button
         type="submit"
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 cursor-pointer"
       >
         Confirmar
       </button>
@@ -157,7 +157,7 @@ const RegisterFormStep2: React.FC<RegisterFormStep2Props> = ({
       <button
         type="button"
         onClick={onBack}
-        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors mt-2"
+        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors mt-2 cursor-pointer"
       >
         ← Voltar
       </button>

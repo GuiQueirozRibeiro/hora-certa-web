@@ -73,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
         <button
           type="button"
           onClick={() => console.log('Recuperar senha')}
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer"
           disabled={loading}
         >
           Esqueceu a senha?
@@ -84,7 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {loading ? 'Entrando...' : 'Entrar'}
       </button>
@@ -96,7 +96,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
           <button
             type="button"
             onClick={onSwitchToSignup}
-            className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium cursor-pointer"
             disabled={loading}
           >
             Criar conta

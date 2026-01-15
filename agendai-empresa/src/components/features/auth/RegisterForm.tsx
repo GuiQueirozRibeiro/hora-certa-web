@@ -149,7 +149,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] mt-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {loading ? 'Criando conta...' : 'Criar Conta'}
         </button>
@@ -160,7 +160,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium cursor-pointer"
             disabled={loading}
           >
             Fazer login
