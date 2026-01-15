@@ -78,6 +78,7 @@ export class ProfessionalMapper {
         horario: this.extractWorkingSchedule(professional.working_hours),
       },
       avatar: '',
+      avatar_url: professional.avatar_url,
       corAvatar: 'bg-indigo-500',
       isActive: professional.is_active,
     };

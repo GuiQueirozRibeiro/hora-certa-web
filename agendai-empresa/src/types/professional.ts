@@ -19,6 +19,7 @@ export interface Professional {
   average_rating: number;
   total_reviews: number;
   working_hours?: WorkingHours;
+  avatar_url?: string;
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +32,7 @@ export interface ProfessionalFormData {
   bio?: string;
   experience_years?: number;
   working_hours?: WorkingHours;
+  avatar_url?: string;
 }
 
 export interface CreateProfessionalData {
@@ -42,6 +44,7 @@ export interface CreateProfessionalData {
   bio?: string;
   experience_years?: number;
   working_hours?: WorkingHours;
+  avatar_url?: string;
 }
 
 export interface UpdateProfessionalData {
@@ -51,6 +54,7 @@ export interface UpdateProfessionalData {
   experience_years?: number;
   is_active?: boolean;
   working_hours?: WorkingHours;
+  avatar_url?: string;
 }
 
 export interface ProfessionalValidationError {

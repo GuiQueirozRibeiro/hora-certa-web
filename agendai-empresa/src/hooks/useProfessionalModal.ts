@@ -38,6 +38,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
   const [experienceYears, setExperienceYears] = useState(0);
   const [workingHours, setWorkingHours] = useState<WorkingHours>(DEFAULT_WORKING_HOURS);
   const [isSaving, setIsSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   // Load data when editing
   useEffect(() => {
@@ -47,6 +48,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
       setSpecialties(professional.specialties || []);
       setBio(professional.bio || '');
       setExperienceYears(professional.experience_years || 0);
+      setAvatarUrl(professional.avatar_url || '');
       
       const loadedHours = professional.working_hours && typeof professional.working_hours === 'object'
         ? { ...DEFAULT_WORKING_HOURS, ...professional.working_hours }
@@ -100,6 +102,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
           bio: bio.trim() || undefined,
           experience_years: experienceYears,
           working_hours: workingHours,
+          avatar_url: avatarUrl,
         });
 
         // Update user name if changed
@@ -119,6 +122,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
           bio: bio.trim() || undefined,
           experience_years: experienceYears,
           working_hours: workingHours,
+          avatar_url: avatarUrl,
         });
 
         success('Profissional criado com sucesso!');
@@ -126,6 +130,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
 
       onSuccess();
       return true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       showError('Erro ao salvar', err.message);
       return false;
@@ -134,7 +139,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
     }
   }, [
     name, email, password, specialties, bio, experienceYears, workingHours,
-    isEditing, professional, businessId, success, showError, onSuccess, isSaving
+    isEditing, professional, businessId, success, showError, onSuccess, isSaving, avatarUrl
   ]);
 
   return {
@@ -149,6 +154,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
     experienceYears,
     workingHours,
     isSaving,
+    avatarUrl,
     
     // Setters
     setName,
@@ -158,6 +164,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
     setBio,
     setExperienceYears,
     setWorkingHours,
+    setAvatarUrl,
     
     // Actions
     addSpecialty,

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/features/admin/FuncionarioCard.tsx
 'use client';
 
@@ -19,6 +20,7 @@ export interface Funcionario {
     horario: string; // Ex: "09:00 - 18:00"
   };
   avatar?: string; // Iniciais ou URL da foto
+  avatar_url?: string; // URL da foto do Supabase
   corAvatar?: string; // Cor de fundo do avatar
   isActive?: boolean; // Status ativo/inativo
 }
@@ -63,16 +65,15 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus 
 
   return (
     <Card className="relative hover:border-zinc-600 transition-all">
-      
+
       {/* ========================================
           BADGE DE STATUS (Ativo/Inativo)
       ======================================== */}
       <div className="absolute top-4 left-4 z-10">
-        <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-          isActive 
-            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-            : 'bg-red-500/20 text-red-400 border border-red-500/30'
-        }`}>
+        <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${isActive
+          ? 'bg-green-500/30 text-green-400 border border-green-500/30'
+          : 'bg-red-500/20 text-red-400 border border-red-500/30'
+          }`}>
           {isActive ? 'Ativo' : 'Inativo'}
         </span>
       </div>
@@ -97,10 +98,10 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus 
               className="fixed inset-0 z-10"
               onClick={() => setIsMenuOpen(false)}
             />
-            
+
             {/* Menu de opções */}
             <div className="absolute right-0 top-12 z-20 w-48 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl overflow-hidden">
-              
+
               {/* Opção: Editar */}
               <button
                 onClick={() => {
@@ -120,11 +121,10 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus 
                     onToggleStatus(funcionario.id, isActive);
                     setIsMenuOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-                    isActive 
-                      ? 'text-amber-400 hover:bg-amber-500/10 hover:text-amber-300' 
-                      : 'text-green-400 hover:bg-green-500/10 hover:text-green-300'
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${isActive
+                    ? 'text-amber-400 hover:bg-amber-500/10 hover:text-amber-300'
+                    : 'text-green-400 hover:bg-green-500/10 hover:text-green-300'
+                    }`}
                 >
                   <Power className="h-4 w-4" />
                   <span>{isActive ? 'Desativar' : 'Ativar'}</span>
@@ -151,27 +151,26 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus 
         {/* ========================================
             CABEÇALHO: Avatar e Nome
         ======================================== */}
-        <div className="flex items-start gap-4 mb-4 mt-8">
-          {/* Avatar com iniciais */}
-          <div
-            className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-              funcionario.corAvatar || 'bg-indigo-500'
+        {/* No FuncionarioCard.tsx */}
+        <div
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden ${funcionario.corAvatar || 'bg-indigo-500'
             } ${!isActive ? 'opacity-50' : ''}`}
-          >
-            {funcionario.avatar || getInitials(funcionario.nome)}
-          </div>
-
-          {/* Nome e Tipo */}
-          <div className="flex-1 pr-8">
-            <h3 className={`text-lg font-semibold mb-1 ${
-              isActive ? 'text-zinc-100' : 'text-zinc-400'
-            }`}>
-              {funcionario.nome || 'Sem nome'}
-            </h3>
-            <span className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-medium rounded-full border border-indigo-500/30">
-              {funcionario.tipo || 'Sem especialidade'}
-            </span>
-          </div>
+        >
+          {/* Verifique se o nome da propriedade vinda do banco é exatamente avatar_url */}
+          {funcionario.avatar_url ? (
+            <img
+              src={funcionario.avatar_url}
+              alt={funcionario.nome}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback caso a imagem dê erro 400 ou 404
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = getInitials(funcionario.nome);
+              }}
+            />
+          ) : (
+            getInitials(funcionario.nome)
+          )}
         </div>
 
         {/* ========================================
@@ -201,7 +200,7 @@ export function FuncionarioCard({ funcionario, onEdit, onDelete, onToggleStatus 
             HORÁRIOS DE TRABALHO
         ======================================== */}
         <div className="space-y-3 pt-4 border-t border-zinc-700">
-          
+
           {/* Dias de trabalho */}
           {funcionario.horarioTrabalho?.dias && funcionario.horarioTrabalho.dias.length > 0 && (
             <div className="flex items-start gap-2">

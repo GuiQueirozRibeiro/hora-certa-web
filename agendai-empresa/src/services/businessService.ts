@@ -82,20 +82,45 @@ export const businessService = {
 
     return updatedBusiness;
   },
+  /**
+   * Upload de imagem dos funcionários
+   */
+  async uploadProfessionalImage(businessId: string, file: File) {
+    const supabase = createClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
+
+    // CAMINHO CORRETO: Vai para a pasta professionals
+    const filePath = `businesses/${businessId}/professionals/${fileName}`;
+
+    const { error } = await supabase.storage
+      .from('business-images')
+      .upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('business-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  },
 
   /**
-   * Upload de imagem da empresa
+   * Upload de imagem da empresa (Logo, Capa, Galeria)
    */
   async uploadBusinessImage(
-    businessId: string, 
-    file: File, 
+    businessId: string,
+    file: File,
     type: 'logo' | 'cover' | 'gallery'
   ): Promise<string> {
     const supabase = createClient();
-    
     const fileExt = file.name.split('.').pop();
-    const fileName = `${businessId}_${type}_${Date.now()}.${fileExt}`;
-    const filePath = `businesses/${businessId}/${fileName}`;
+    const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
+    
+    // CORREÇÃO AQUI: Antes estava enviando para /professionals/ por erro.
+    // Agora ele usa a pasta correta baseada no tipo (logo, cover ou gallery).
+    const filePath = `businesses/${businessId}/${type}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('business-images')
@@ -112,8 +137,11 @@ export const businessService = {
       .from('business-images')
       .getPublicUrl(filePath);
 
-    const updateField = type === 'logo' ? 'image_url' : 'cover_image_url';
-    await this.updateBusiness(businessId, { [updateField]: publicUrl } as any);
+    // Se for logo ou capa, atualiza a tabela da empresa automaticamente
+    if (type !== 'gallery') {
+      const updateField = type === 'logo' ? 'image_url' : 'cover_image_url';
+      await this.updateBusiness(businessId, { [updateField]: publicUrl } as any);
+    }
 
     return publicUrl;
   },
@@ -122,12 +150,12 @@ export const businessService = {
    * Remove imagem da empresa
    */
   async deleteBusinessImage(
-    businessId: string, 
-    imageUrl: string, 
+    businessId: string,
+    imageUrl: string,
     type: 'logo' | 'cover'
   ): Promise<void> {
     const supabase = createClient();
-    
+
     const urlParts = imageUrl.split('/');
     const filePath = urlParts.slice(urlParts.indexOf('businesses')).join('/');
 
@@ -136,6 +164,8 @@ export const businessService = {
       .remove([filePath]);
 
     const updateField = type === 'logo' ? 'image_url' : 'cover_image_url';
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.updateBusiness(businessId, { [updateField]: null } as any);
   },
 };

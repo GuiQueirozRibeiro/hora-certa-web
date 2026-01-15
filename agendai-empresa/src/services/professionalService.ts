@@ -131,6 +131,7 @@ export const professionalService = {
         bio: data.bio,
         experience_years: data.experience_years,
         working_hours: workingHoursToArray(data.working_hours),
+        avatar_url: data.avatar_url,
         is_active: true,
       })
       .select()
@@ -238,6 +239,9 @@ export const professionalService = {
     }
     if ('working_hours' in data) {
       updateData.working_hours = workingHoursToArray(data.working_hours);
+    }
+    if ('avatar_url' in data) {
+      updateData.avatar_url = data.avatar_url;
     }
 
     const { data: updatedProfessional, error } = await supabase
