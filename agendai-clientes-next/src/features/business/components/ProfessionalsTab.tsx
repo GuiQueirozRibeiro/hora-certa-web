@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { User, Star } from 'lucide-react';
 import { useProfessionals } from '../../../hooks/useProfessionals';
 
@@ -60,63 +61,80 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
         Profissionais ({professionals.length})
       </h3>
       <div className="space-y-3">
-        {professionals.map((professional) => (
-          <div
-            key={professional.id}
-            className="flex items-center justify-between bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
-          >
-            <div className="flex items-center gap-3 flex-1">
+        {professionals.map((professional) => {
+          const getInitials = (name: string) => {
+            if (!name) return '?';
+            const names = name.trim().split(' ');
+            if (names.length === 1) return names[0].charAt(0).toUpperCase();
+            return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+          };
+
+          return (
+            <div
+              key={professional.id}
+              className="flex items-center gap-3 bg-[#2a2a2a] rounded-lg p-3 hover:bg-[#333333] transition-colors"
+            >
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center shrink-0 overflow-hidden">
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg overflow-hidden bg-indigo-500 shrink-0 ${
+                  !professional.is_active ? 'opacity-50' : ''
+                }`}
+              >
                 {professional.user_avatar_url ? (
-                  <img 
-                    src={professional.user_avatar_url} 
-                    alt={professional.user_name}
+                  <Image
+                    src={professional.user_avatar_url}
+                    alt={professional.user_name || 'Profissional'}
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.textContent = getInitials(professional.user_name || 'Profissional');
+                      }
+                    }}
                   />
                 ) : (
-                  <span className="text-white font-semibold text-lg">
-                    {professional.user_name?.charAt(0).toUpperCase() || 'P'}
-                  </span>
+                  getInitials(professional.user_name || 'Profissional')
                 )}
               </div>
 
               {/* Informações */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-medium text-sm">
-                    {professional.user_name || 'Profissional'}
-                  </span>
-                  {professional.average_rating > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Star size={12} fill="#fbbf24" className="text-amber-400" />
-                      <span className="text-xs text-gray-400">
-                        {professional.average_rating.toFixed(1)}
-                      </span>
-                    </div>
-                  )}
-                </div>
+              <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-white font-medium text-sm">
+                  {professional.user_name || 'Profissional'}
+                </span>
+                {professional.average_rating > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Star size={12} fill="#fbbf24" className="text-amber-400" />
+                    <span className="text-xs text-gray-400">
+                      {professional.average_rating.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-                {/* Experiência e especialidades */}
-                <div className="flex flex-col gap-1 mt-1">
-                  {professional.experience_years && (
-                    <p className="text-xs text-gray-400">
-                      {professional.experience_years} anos de experiência
-                    </p>
-                  )}
-                  {professional.specialties && professional.specialties.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {professional.specialties.map((specialty, index) => (
-                        <span 
-                          key={index}
-                          className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded"
-                        >
-                          {specialty}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              {/* Experiência e especialidades */}
+              <div className="flex flex-col gap-1 mt-1">
+                {professional.experience_years && (
+                  <p className="text-xs text-gray-400">
+                    {professional.experience_years} anos de experiência
+                  </p>
+                )}
+                {professional.specialties && professional.specialties.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {professional.specialties.map((specialty, index) => (
+                      <span
+                        key={index}
+                        className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded"
+                      >
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -125,7 +143,8 @@ const ProfessionalsTab: React.FC<ProfessionalsTabProps> = ({ businessId }) => {
               Ver perfil
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

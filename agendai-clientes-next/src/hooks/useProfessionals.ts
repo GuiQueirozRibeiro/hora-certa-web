@@ -39,7 +39,14 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
 
       let query = supabase
         .from('professionals')
-        .select('*, working_hours')
+        .select(`
+          *,
+          working_hours,
+          avatar_url,
+          users:user_id (
+            name
+          )
+        `)
         .eq('is_active', true)
         .order('average_rating', { ascending: false });
 
@@ -54,35 +61,13 @@ export const useProfessionals = (businessId?: string): UseProfessionalsReturn =>
         throw professionalsError;
       }
 
-      // Buscar dados dos usuários associados
+      // Mapear os dados com o nome do usuário e avatar
       if (professionalsData && professionalsData.length > 0) {
-        const professionalsWithUserData = await Promise.all(
-          professionalsData.map(async (professional) => {
-            if (professional.user_id) {
-              // Buscar dados do usuário na tabela auth.users (através de uma query RPC ou metadata)
-              const { data: userData } = await supabase
-                .from('users')
-                .select('name, image_url')
-                .eq('id', professional.user_id)
-                .single();
-
-              if (userData) {
-                return {
-                  ...professional,
-                  user_name: userData.name || 'Profissional',
-                  user_avatar_url: userData.image_url || null,
-                };
-              }
-            }
-
-            // Se não tiver dados do usuário, retornar com valores padrão
-            return {
-              ...professional,
-              user_name: 'Profissional',
-              user_avatar_url: null,
-            };
-          })
-        );
+        const professionalsWithUserData = professionalsData.map((professional: any) => ({
+          ...professional,
+          user_name: professional.users?.name || 'Profissional',
+          user_avatar_url: professional.avatar_url || null,
+        }));
 
         setProfessionals(professionalsWithUserData);
       } else {

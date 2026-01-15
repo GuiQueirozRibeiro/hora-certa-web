@@ -43,7 +43,7 @@ export const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
 
           {/* DIV DA IMAGEM DO ESTABELECIMENTO  */}
           
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-zinc-800 shrink-0">
+          {/* <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-zinc-800 shrink-0">
             {business.image_url ? (
               <img 
                 src={business.image_url} 
@@ -55,7 +55,7 @@ export const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
                 <Store size={40} />
               </div>
             )}
-          </div>
+          </div> */}
           <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl md:text-2xl font-bold text-white mb-1 truncate">
               {business.name}
