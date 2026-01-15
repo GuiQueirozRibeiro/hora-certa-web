@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Clock, Scissors } from 'lucide-react';
 import type { TabType, Service, Professional } from '../types';
 import { formatPrice, formatTime } from '../utils';
@@ -56,9 +57,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSchedule })
       <div className="flex items-center gap-4 flex-1">
         <div className="w-16 h-16 rounded-full bg-zinc-900 shrink-0 overflow-hidden">
           {service.image_url ? (
-            <img
+            <Image
               src={service.image_url}
               alt={service.name}
+              width={64}
+              height={64}
               className="w-full h-full object-cover"
             />
           ) : (
