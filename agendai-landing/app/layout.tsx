@@ -19,7 +19,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Agendai - Sistema de Agendamento para Barbearias",
+  title: "Agendai",
   description: "Uma nova experiência para uma antiga tradição. Sistema completo de gestão e agendamento para barbearias.",
   icons: {
     icon: "/Ativo 2.svg",
