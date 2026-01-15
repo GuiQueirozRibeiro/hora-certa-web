@@ -1,151 +1,41 @@
-// src/components/features/admin/forms/FormFuncionarios.tsx
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { FuncionarioCard, Funcionario } from '../professionals/FuncionarioCard';
+import { useFormHandlers } from './useFormHandlers';
+import { FuncionarioCard } from '../../professionals/FuncionarioCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { ProfessionalModal } from '../professionals/ProfessionalModal';
-import { professionalService } from '@/services/professionalService';
+import { ProfessionalModal } from '../../professionals/ProfessionalModal';
 import { ProfessionalMapper } from '@/lib/utils/professionalMappers';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/useToast';
-import type { ProfessionalWithUser } from '@/types/professional';
 
-// ========================================
-// COMPONENTE: Formulário de Funcionários
-// ========================================
-export function FormFuncionarios() {
-  // ========================================
-  // HOOKS
-  // ========================================
-  const { business } = useAuth();
-  const { success, error: showError } = useToast();
-
-  // ========================================
-  // ESTADO
-  // ========================================
-  const [professionals, setProfessionals] = useState<ProfessionalWithUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [modalExcluir, setModalExcluir] = useState(false);
-  const [professionalParaExcluir, setProfessionalParaExcluir] = useState<string | null>(null);
-  const [modalProfessional, setModalProfessional] = useState(false);
-  const [professionalParaEditar, setProfessionalParaEditar] = useState<ProfessionalWithUser | null>(null);
-
-  // ========================================
-  // CARREGAMENTO INICIAL
-  // ========================================
-  useEffect(() => {
-    if (business?.id) {
-      loadProfessionals();
-    }
-  }, [business?.id]);
-
-  /**
-   * Carrega profissionais do banco de dados
-   */
-  const loadProfessionals = async () => {
-    if (!business?.id) return;
-    
-    setLoading(true);
-    try {
-      const data = await professionalService.getProfessionalsByBusinessId(business.id);
-      setProfessionals(data);
-    } catch (error: any) {
-      showError('Erro ao carregar profissionais', error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ========================================
-  // HANDLERS
-  // ========================================
-  
-  /**
-   * Abre modal para adicionar novo profissional
-   */
-  const handleAddProfessional = () => {
-    setProfessionalParaEditar(null);
-    setModalProfessional(true);
-  };
-
-  /**
-   * Abre modal para editar profissional existente
-   */
-  const handleEditProfessional = (funcionario: Funcionario) => {
-    const professional = professionals.find(p => p.id === funcionario.id);
-    if (professional) {
-      setProfessionalParaEditar(professional);
-      setModalProfessional(true);
-    }
-  };
-
-  /**
-   * Abre modal de confirmação para excluir profissional
-   */
-  const handleDeleteProfessional = (id: string) => {
-    setProfessionalParaExcluir(id);
-    setModalExcluir(true);
-  };
-
-  /**
-   * Confirma exclusão do profissional
-   */
-  const confirmarExclusao = async () => {
-    if (!professionalParaExcluir) return;
-    
-    try {
-      await professionalService.deleteProfessional(professionalParaExcluir);
-      setProfessionals(professionals.filter(p => p.id !== professionalParaExcluir));
-      success('Profissional excluído com sucesso!');
-      setModalExcluir(false);
-      setProfessionalParaExcluir(null);
-    } catch (error: any) {
-      showError('Erro ao excluir profissional', error.message);
-    }
-  };
-
-  /**
-   * Alterna o status do profissional (Ativo/Inativo)
-   */
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      const updatedProfessional = await professionalService.toggleProfessionalStatus(id, !currentStatus);
-      setProfessionals(professionals.map(p => p.id === id ? updatedProfessional : p));
-      success(`Profissional ${!currentStatus ? 'ativado' : 'desativado'} com sucesso!`);
-    } catch (error: any) {
-      showError('Erro ao alterar status', error.message);
-    }
-  };
-
-  /**
-   * Fecha modal de profissional e recarrega dados se necessário
-   */
-  const handleCloseModalProfessional = (saved: boolean) => {
-    setModalProfessional(false);
-    setProfessionalParaEditar(null);
-    if (saved) {
-      loadProfessionals();
-    }
-  };
-
-  // ========================================
-  // FILTRO DE BUSCA (Memoizado para performance)
-  // ========================================
-  const funcionariosFiltrados = useMemo(() => {
-    const funcionarios = ProfessionalMapper.toFuncionarioList(professionals);
-    
-    if (!searchTerm) return funcionarios;
-    
-    const searchLower = searchTerm.toLowerCase();
-    return funcionarios.filter(funcionario =>
-      funcionario.nome.toLowerCase().includes(searchLower) ||
-      funcionario.tipo.toLowerCase().includes(searchLower)
-    );
-  }, [professionals, searchTerm]);
+/**
+ * Componente de apresentação puro que renderiza o formulário de funcionários
+ * 
+ * Aplica o Princípio da Responsabilidade Única:
+ * - Responsabilidade: Renderização do JSX (UI pura)
+ * - Delega toda a lógica de negócio para o hook useFormHandlers
+ */
+export function FormContent() {
+  // Hook contém TODA a lógica de negócio
+  const {
+    business,
+    professionals,
+    loading,
+    searchTerm,
+    funcionariosFiltrados,
+    modalExcluir,
+    modalProfessional,
+    professionalParaExcluir,
+    professionalParaEditar,
+    setSearchTerm,
+    handleAddProfessional,
+    handleEditProfessional,
+    handleDeleteProfessional,
+    handleToggleStatus,
+    handleCloseModalProfessional,
+    handleCloseModalExcluir,
+    confirmarExclusao,
+  } = useFormHandlers();
 
   // Se não há empresa, exibir mensagem
   if (!business) {
@@ -156,9 +46,6 @@ export function FormFuncionarios() {
     );
   }
 
-  // ========================================
-  // RENDER
-  // ========================================
   return (
     <div>
       {/* ========================================
@@ -241,7 +128,7 @@ export function FormFuncionarios() {
           <p className="text-sm text-zinc-600">
             {searchTerm 
               ? 'Tente buscar com outros termos' 
-              : 'Clique em "Adicionar Funcionário" para começar'}
+              : 'Clique em &quot;Adicionar Funcionário&quot; para começar'}
           </p>
         </div>
       )}
@@ -262,10 +149,7 @@ export function FormFuncionarios() {
       ======================================== */}
       <Modal
         isOpen={modalExcluir}
-        onClose={() => {
-          setModalExcluir(false);
-          setProfessionalParaExcluir(null);
-        }}
+        onClose={handleCloseModalExcluir}
         onConfirm={confirmarExclusao}
         title="Excluir funcionário"
         description="Tem certeza que deseja excluir este funcionário? Esta ação não pode ser desfeita."

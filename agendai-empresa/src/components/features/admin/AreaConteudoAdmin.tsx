@@ -1,10 +1,10 @@
 // src/components/features/admin/AreaConteudoAdmin.tsx
 import { AbaAdminAtiva } from '@/app/administracao/page';
-import { FormEmpresa } from './forms/FormEmpresa';
+import { FormEmpresa } from './forms/empresa/FormEmpresa';
 import { FormEndereco } from './forms/FormEndereco';
-import { FormFuncionarios } from './forms/FormFuncionarios';
-import { FormServicos } from './forms/FormServicos';
-import { FormHorarios } from './forms/FormHorarios';
+import { FormFuncionarios } from './forms/funcionarios/FormFuncionarios';
+import { FormServicos } from './forms/servicos/FormServicos';
+import { FormHorarios } from './forms/horarios/FormHorarios';
 import { FormConfiguracoes } from './forms/FormConfiguracoes';
 
 

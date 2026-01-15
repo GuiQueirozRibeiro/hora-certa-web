@@ -1,241 +1,44 @@
-// src/components/features/admin/forms/FormHorarios.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Calendar, Copy, Save, RotateCcw } from 'lucide-react';
-import { DiaFuncionamentoCard, HorarioFuncionamento } from '../horarios/DiaFuncionamentoCard';
+import { useFormHandlers } from './useFormHandlers';
+import { useToast } from '@/hooks/useToast';
+import { DiaFuncionamentoCard } from '../../horarios/DiaFuncionamentoCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ToastContainer } from '@/components/ui/Toast';
-import { useToast } from '@/hooks/useToast';
-import { useAuth } from '@/hooks/useAuth';
-import { businessService } from '@/services/businessService';
 
-// ========================================
-// DADOS MOCK (Temporário - substituir por API)
-// ========================================
-const horariosPadrao: HorarioFuncionamento[] = [
-  {
-    dia: 'Segunda-feira',
-    diaAbreviado: 'SEG',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '12:00',
-    intervaloFim: '13:00'
-  },
-  {
-    dia: 'Terça-feira',
-    diaAbreviado: 'TER',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '12:00',
-    intervaloFim: '13:00'
-  },
-  {
-    dia: 'Quarta-feira',
-    diaAbreviado: 'QUA',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '12:00',
-    intervaloFim: '13:00'
-  },
-  {
-    dia: 'Quinta-feira',
-    diaAbreviado: 'QUI',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '12:00',
-    intervaloFim: '13:00'
-  },
-  {
-    dia: 'Sexta-feira',
-    diaAbreviado: 'SEX',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '12:00',
-    intervaloFim: '13:00'
-  },
-  {
-    dia: 'Sábado',
-    diaAbreviado: 'SÁB',
-    ativo: true,
-    horarioAbertura: '09:00',
-    horarioFechamento: '14:00',
-    intervaloInicio: '',
-    intervaloFim: ''
-  },
-  {
-    dia: 'Domingo',
-    diaAbreviado: 'DOM',
-    ativo: false,
-    horarioAbertura: '09:00',
-    horarioFechamento: '18:00',
-    intervaloInicio: '',
-    intervaloFim: ''
-  }
-];
-
-// ========================================
-// COMPONENTE: Formulário de Horários
-// ========================================
 /**
- * Componente para gerenciar horários de funcionamento.
- * Segue Clean Code e SOLID:
- * - Single Responsibility: Gerencia apenas os horários
- * - Separation of Concerns: Card de dia é um componente separado
+ * Componente de apresentação puro que renderiza o formulário de horários
+ * 
+ * Aplica o Princípio da Responsabilidade Única:
+ * - Responsabilidade: Renderização do JSX (UI pura)
+ * - Delega toda a lógica de negócio para o hook useFormHandlers
  */
-export function FormHorarios() {
-  // ========================================
-  // HOOKS
-  // ========================================
-  const { toasts, removeToast, success, warning, info, error: showError } = useToast();
-  const { business, refreshBusiness } = useAuth();
+export function FormContent() {
+  const { toasts, removeToast } = useToast();
 
-  // ========================================
-  // ESTADO
-  // ========================================
-  const [horarios, setHorarios] = useState<HorarioFuncionamento[]>(horariosPadrao);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [diaParaCopiar, setDiaParaCopiar] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Estados dos modais
-  const [modalCopiar, setModalCopiar] = useState(false);
-  const [modalResetar, setModalResetar] = useState(false);
-  const [modalSalvar, setModalSalvar] = useState(false);
+  // Hook contém TODA a lógica de negócio
+  const {
+    horarios,
+    hasChanges,
+    diaParaCopiar,
+    isLoading,
+    diasAbertos,
+    diasFechados,
+    modalCopiar,
+    modalResetar,
+    modalSalvar,
+    setDiaParaCopiar,
+    setModalCopiar,
+    setModalResetar,
+    setModalSalvar,
+    handleSaveDia,
+    handleSaveAll,
+    handleReset,
+    handleCopyToAll,
+  } = useFormHandlers();
 
-  // ========================================
-  // EFEITOS
-  // ========================================
-  useEffect(() => {
-    if (business) {
-      console.log('[FormHorarios] Dados da empresa carregados:', {
-        id: business.id,
-        opening_hours: business.opening_hours
-      });
-
-      if (business.opening_hours && Array.isArray(business.opening_hours) && business.opening_hours.length > 0) {
-        console.log('[FormHorarios] Aplicando horários do banco de dados');
-        setHorarios(business.opening_hours as HorarioFuncionamento[]);
-      } else {
-        console.log('[FormHorarios] Usando horários padrão (sem dados no banco)');
-      }
-    }
-  }, [business]);
-
-  // ========================================
-  // HANDLERS
-  // ========================================
-  
-  /**
-   * Salva alteração de um dia específico
-   */
-  const handleSaveDia = (horarioAtualizado: HorarioFuncionamento) => {
-    setHorarios(horarios.map(h => 
-      h.dia === horarioAtualizado.dia ? horarioAtualizado : h
-    ));
-    setHasChanges(true);
-    
-    // Notificação de alteração
-    info(
-      'Alteração registrada',
-      `Horário de ${horarioAtualizado.dia} foi atualizado. Clique em "Salvar alterações" para confirmar.`,
-      3000
-    );
-  };
-
-  /**
-   * Salva todas as alterações (chamada da API)
-   */
-  const handleSaveAll = async () => {
-    if (!business) return;
-
-    setIsLoading(true);
-    try {
-      await businessService.updateBusiness(business.id, {
-        opening_hours: horarios
-      });
-      
-      await refreshBusiness();
-      setHasChanges(false);
-      setModalSalvar(false);
-      
-      // Notificação de sucesso
-      success(
-        'Horários salvos com sucesso!',
-        'Os horários de funcionamento foram atualizados e já estão em vigor.',
-        4000
-      );
-    } catch (error: any) {
-      showError('Erro ao salvar horários', error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Reseta para os horários padrão
-   */
-  const handleReset = () => {
-    setHorarios(horariosPadrao);
-    setHasChanges(false);
-    
-    // Notificação de reset
-    warning(
-      'Horários resetados',
-      'Os horários foram restaurados para o padrão.',
-      3000
-    );
-  };
-
-  /**
-   * Copia horário de um dia para todos os outros dias úteis
-   */
-  const handleCopyToAll = () => {
-    if (!diaParaCopiar) return;
-
-    const diaOrigem = horarios.find(h => h.dia === diaParaCopiar);
-    if (!diaOrigem) return;
-
-    const diasAfetados = horarios.filter(h => h.ativo && h.dia !== diaParaCopiar).length;
-
-    setHorarios(horarios.map(h => {
-      // Não copia para o próprio dia ou dias inativos
-      if (h.dia === diaParaCopiar || !h.ativo) return h;
-      
-      return {
-        ...h,
-        horarioAbertura: diaOrigem.horarioAbertura,
-        horarioFechamento: diaOrigem.horarioFechamento,
-        intervaloInicio: diaOrigem.intervaloInicio,
-        intervaloFim: diaOrigem.intervaloFim
-      };
-    }));
-    setHasChanges(true);
-    setDiaParaCopiar('');
-    
-    // Notificação de cópia
-    success(
-      'Horários copiados!',
-      `O horário de ${diaOrigem.dia} foi aplicado em ${diasAfetados} dia(s).`,
-      4000
-    );
-  };
-
-  // ========================================
-  // ESTATÍSTICAS
-  // ========================================
-  const diasAbertos = horarios.filter(h => h.ativo).length;
-  const diasFechados = horarios.filter(h => !h.ativo).length;
-
-  // ========================================
-  // RENDER
-  // ========================================
   return (
     <div>
       {/* ========================================
@@ -335,7 +138,7 @@ export function FormHorarios() {
       ======================================== */}
       <div className="flex items-center justify-end gap-4 pt-6 border-t border-zinc-700">
         <p className="text-sm text-zinc-500">
-          Clique em "Salvar alterações" para aplicar os horários
+          Clique em &quot;Salvar alterações&quot; para aplicar os horários
         </p>
         <Button
           onClick={() => setModalSalvar(true)}
@@ -427,7 +230,7 @@ export function FormHorarios() {
         </p>
         <ul className="text-xs text-zinc-400 space-y-1">
           <li>• Clique no ícone de edição (lápis) para definir seus horários reais</li>
-          <li>• Se os horários forem iguais, configure um dia e use "Copiar para todos"</li>
+          <li>• Se os horários forem iguais, configure um dia e use &quot;Copiar para todos&quot;</li>
           <li>• Lembre-se de clicar em <strong>Salvar alterações</strong> para confirmar</li>
         </ul>
       </div>
@@ -443,4 +246,3 @@ export function FormHorarios() {
     </div>
   );
 }
-

@@ -1,170 +1,54 @@
-// src/components/features/admin/forms/FormServicos.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
-import { ServiceList } from '../servicos/ServiceList';
+import { useFormHandlers } from './useFormHandlers';
+import { useToast } from '@/hooks/useToast';
+import { ServiceList } from '../../servicos/ServiceList';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { ServiceModal } from '../servicos/ServiceModal';
-import { serviceService } from '@/services/serviceService';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/useToast';
+import { ServiceModal } from '../../servicos/ServiceModal';
 import { ToastContainer } from '@/components/ui/Toast';
-import type { Service } from '@/types/service';
 
-// ========================================
-// COMPONENTE: Formulário de Serviços
-// ========================================
 /**
- * Componente para gerenciar serviços oferecidos.
- * Segue Clean Code e SOLID:
- * - Single Responsibility: Gerencia apenas a lista de serviços
- * - Separation of Concerns: Card de serviço é um componente separado
+ * Componente de apresentação puro que renderiza o formulário de serviços
+ * 
+ * Aplica o Princípio da Responsabilidade Única:
+ * - Responsabilidade: Renderização do JSX (UI pura)
+ * - Delega toda a lógica de negócio para o hook useFormHandlers
  */
-export function FormServicos() {
-  // ========================================
-  // ESTADO
-  // ========================================
-  const [servicos, setServicos] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filtroCategoria, setFiltroCategoria] = useState<string>('todas');
-  const [filtroStatus, setFiltroStatus] = useState<string>('todos');
-  const [modalExcluir, setModalExcluir] = useState(false);
-  const [servicoParaExcluir, setServicoParaExcluir] = useState<string | null>(null);
-  const [modalServico, setModalServico] = useState(false);
-  const [servicoParaEditar, setServicoParaEditar] = useState<Service | null>(null);
-  
-  const { business } = useAuth();
-  const { success, error: showError, toasts, removeToast } = useToast();
+export function FormContent() {
+  const { toasts, removeToast } = useToast();
 
-  // ========================================
-  // CARREGAMENTO INICIAL
-  // ========================================
-  useEffect(() => {
-    if (business?.id) {
-      loadServicos();
-    }
-  }, [business?.id]);
-
-  /**
-   * Carrega serviços do banco de dados
-   */
-  const loadServicos = async () => {
-    if (!business?.id) return;
-    
-    setLoading(true);
-    try {
-      const data = await serviceService.getServicesByBusinessId(business.id);
-      setServicos(data);
-    } catch (error: any) {
-      showError('Erro ao carregar serviços', error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ========================================
-  // HANDLERS
-  // ========================================
-  
-  /**
-   * Abre modal para adicionar novo serviço
-   */
-  const handleAddServico = () => {
-    setServicoParaEditar(null);
-    setModalServico(true);
-  };
-
-  /**
-   * Abre modal para editar serviço existente
-   */
-  const handleEditServico = (servico: Service) => {
-    setServicoParaEditar(servico);
-    setModalServico(true);
-  };
-
-  /**
-   * Abre modal de confirmação para excluir serviço
-   */
-  const handleDeleteServico = (id: string) => {
-    setServicoParaExcluir(id);
-    setModalExcluir(true);
-  };
-
-  /**
-   * Confirma exclusão do serviço
-   */
-  const confirmarExclusao = async () => {
-    if (!servicoParaExcluir) return;
-    
-    try {
-      await serviceService.deleteService(servicoParaExcluir);
-      setServicos(servicos.filter(s => s.id !== servicoParaExcluir));
-      success('Serviço excluído com sucesso!');
-      setModalExcluir(false);
-      setServicoParaExcluir(null);
-    } catch (error: any) {
-      showError('Erro ao excluir serviço', error.message);
-    }
-  };
-
-  /**
-   * Alterna o status do serviço (Ativo/Inativo)
-   */
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      const updatedService = await serviceService.toggleServiceStatus(id, !currentStatus);
-      setServicos(servicos.map(s => s.id === id ? updatedService : s));
-      success(`Serviço ${!currentStatus ? 'ativado' : 'desativado'} com sucesso!`);
-    } catch (error: any) {
-      showError('Erro ao alterar status', error.message);
-    }
-  };
-
-  /**
-   * Fecha modal de serviço e recarrega dados se necessário
-   */
-  const handleCloseModalServico = (saved: boolean, message?: string) => {
-    setModalServico(false);
-    setServicoParaEditar(null);
-    if (saved) {
-      loadServicos();
-      if (message) {
-        success(message);
-      }
-    }
-  };
-
-  // ========================================
-  // FILTROS
-  // ========================================
-  
-  // Obter categorias únicas
-  const categorias = ['todas', ...Array.from(new Set(servicos.map(s => s.category).filter(Boolean)))];
-
-  // Aplicar filtros
-  const servicosFiltrados = servicos.filter(servico => {
-    // Filtro de busca
-    const matchBusca = servico.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       (servico.description || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Filtro de categoria
-    const matchCategoria = filtroCategoria === 'todas' || servico.category === filtroCategoria;
-    
-    // Filtro de status
-    const matchStatus = filtroStatus === 'todos' || 
-                       (filtroStatus === 'ativos' && servico.is_active) ||
-                       (filtroStatus === 'inativos' && !servico.is_active);
-    
-    return matchBusca && matchCategoria && matchStatus;
-  });
-
-  // Estatísticas
-  const totalServicos = servicos.length;
-  const servicosAtivos = servicos.filter(s => s.is_active).length;
-  const servicosInativos = servicos.filter(s => !s.is_active).length;
+  // Hook contém TODA a lógica de negócio
+  const {
+    business,
+    servicos,
+    loading,
+    searchTerm,
+    filtroCategoria,
+    filtroStatus,
+    servicosFiltrados,
+    categorias,
+    totalServicos,
+    servicosAtivos,
+    servicosInativos,
+    hasFiltrosAtivos,
+    modalExcluir,
+    modalServico,
+    servicoParaExcluir,
+    servicoParaEditar,
+    setSearchTerm,
+    setFiltroCategoria,
+    setFiltroStatus,
+    handleAddServico,
+    handleEditServico,
+    handleDeleteServico,
+    handleToggleStatus,
+    handleCloseModalServico,
+    handleCloseModalExcluir,
+    confirmarExclusao,
+    limparFiltros,
+  } = useFormHandlers();
 
   // Se não há empresa, exibir mensagem
   if (!business) {
@@ -175,9 +59,6 @@ export function FormServicos() {
     );
   }
 
-  // ========================================
-  // RENDER
-  // ========================================
   return (
     <div>
       <ToastContainer 
@@ -185,6 +66,7 @@ export function FormServicos() {
         onClose={removeToast}
         position="top-right"
       />
+      
       {/* ========================================
           CABEÇALHO COM ESTATÍSTICAS
       ======================================== */}
@@ -264,13 +146,9 @@ export function FormServicos() {
           </select>
 
           {/* Contador de filtros ativos */}
-          {(filtroCategoria !== 'todas' || filtroStatus !== 'todos' || searchTerm) && (
+          {hasFiltrosAtivos && (
             <button
-              onClick={() => {
-                setFiltroCategoria('todas');
-                setFiltroStatus('todos');
-                setSearchTerm('');
-              }}
+              onClick={limparFiltros}
               className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
             >
               Limpar filtros
@@ -306,10 +184,7 @@ export function FormServicos() {
       ======================================== */}
       <Modal
         isOpen={modalExcluir}
-        onClose={() => {
-          setModalExcluir(false);
-          setServicoParaExcluir(null);
-        }}
+        onClose={handleCloseModalExcluir}
         onConfirm={confirmarExclusao}
         title="Excluir serviço"
         description="Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita e afetará os agendamentos futuros."
@@ -332,4 +207,3 @@ export function FormServicos() {
     </div>
   );
 }
-
