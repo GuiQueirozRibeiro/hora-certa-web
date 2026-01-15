@@ -20,7 +20,7 @@ import { createBusinessSlug } from "../../lib/slugify";
 export const HomePage: React.FC = () => {
   // State Management
   const router = useRouter();
-  const [showNotification, setShowNotification] = useState(false);
+  const [showNotification] = useState(false);
 
   // Geolocation Context
   const { 
@@ -35,10 +35,8 @@ export const HomePage: React.FC = () => {
   // Custom Hooks
   const { searchTerm, debouncedValue, isSearching, setSearchTerm } = useSearchDebounce();
   const { user } = useAuth();
-  const { appointments } = useAppointments({});
   const { isFavorited, addFavorite, removeFavorite } = useFavorites();
 
-  // Data Fetching - só busca se tiver localização, passando lat/long do usuário
   const { businesses, loading, error } = useBusinessesWithAddresses({
     isActive: true,
     searchTerm: debouncedValue,
@@ -49,14 +47,7 @@ export const HomePage: React.FC = () => {
   // Data Transformation
   const businessList = useBusinessData(businesses);
 
-  // Verificar se deve mostrar estado de localização requerida
-  // Mostra quando: não tem localização E (permissão foi negada OU ainda não foi perguntado e modal fechou)
   const showLocationRequired = !hasLocation && hasPermission === false;
-
-  // Computed Values
-  const hasUpcomingAppointments = user && appointments.some(
-    (apt) => (apt.status === 'scheduled' || apt.status === 'confirmed')
-  );
 
   // Event Handlers
   const handleOpenBusiness = (business: Business) => {
