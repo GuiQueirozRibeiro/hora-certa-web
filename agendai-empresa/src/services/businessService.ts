@@ -141,31 +141,38 @@ export const businessService = {
     const supabase = createClient();
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
-    
-    // CORREÇÃO AQUI: Antes estava enviando para /professionals/ por erro.
-    // Agora ele usa a pasta correta baseada no tipo (logo, cover ou gallery).
     const filePath = `businesses/${businessId}/${type}/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('business-images')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true,
-      });
-
-    if (uploadError) {
-      throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('business-images')
-      .getPublicUrl(filePath);
-
-    // Se for logo ou capa, atualiza a tabela da empresa automaticamente
     if (type !== 'gallery') {
-      const updateField = type === 'logo' ? 'image_url' : 'cover_image_url';
-      await this.updateBusiness(businessId, { [updateField]: publicUrl } as any);
+    const { data: currentBusiness } = await supabase
+      .from('businesses')
+      .select('image_url, cover_image_url')
+      .eq('id', businessId)
+      .single();
+
+      const oldUrl = type === 'logo' ? currentBusiness?.image_url : currentBusiness?.cover_image_url;
+
+      if (oldUrl) {
+      const oldPath = oldUrl.split('/').slice(-4).join('/'); // Pega 'businesses/ID/logo/file.jpg'
+      await supabase.storage.from('business-images').remove([oldPath]);
     }
+  }
+
+  const { error: uploadError } = await supabase.storage
+    .from('business-images')
+    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+  if (uploadError) throw new Error(`Erro ao fazer upload: ${uploadError.message}`);
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('business-images')
+    .getPublicUrl(filePath);
+
+  // 4. Atualiza o banco com a nova URL
+  if (type !== 'gallery') {
+    const updateField = type === 'logo' ? 'image_url' : 'cover_image_url';
+    await this.updateBusiness(businessId, { [updateField]: publicUrl } as any);
+  }
 
     return publicUrl;
   },
