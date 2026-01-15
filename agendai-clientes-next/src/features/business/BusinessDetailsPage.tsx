@@ -14,7 +14,6 @@ import {
   ImageGalleryCard,
   LocationCard,
   OpeningHoursCard,
-  PaymentMethodsCard,
   SocialLinksCard,
   ContactCard,
   SuccessNotification,
@@ -118,9 +117,6 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
                 isCurrentlyOpen={isCurrentlyOpen} 
               />
             )}
-
-            {/* Formas de Pagamento */}
-            <PaymentMethodsCard />
 
             {/* Redes Sociais */}
             <SocialLinksCard whatsappLink={business.whatsapp_link} />
