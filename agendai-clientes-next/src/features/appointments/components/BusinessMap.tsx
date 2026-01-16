@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /**
  * Mapa e informações do estabelecimento (endereço, nome, imagem).
  */

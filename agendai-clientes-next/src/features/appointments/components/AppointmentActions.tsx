@@ -11,7 +11,6 @@ interface AppointmentActionsProps {
 
 export function AppointmentActions({
   onCancel,
-  onComplete,
   isProcessing,
 }: AppointmentActionsProps) {
   return (

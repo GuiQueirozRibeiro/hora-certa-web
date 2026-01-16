@@ -4,7 +4,7 @@
 'use client';
 
 import React from 'react';
-import { Calendar, UserCircle, AlertCircle } from 'lucide-react';
+import { Calendar, AlertCircle } from 'lucide-react';
 
 const NoSelection: React.FC = () => {
   return (

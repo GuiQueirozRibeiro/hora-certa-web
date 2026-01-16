@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React from 'react';
@@ -26,16 +27,6 @@ export const ImageGalleryCard: React.FC<ImageGalleryCardProps> = ({
 
   const totalImages = business.images.length;
   const hasMultipleImages = totalImages > 1;
-
-  const handlePrevious = () => {
-    const prevIndex = currentImageIndex === 0 ? totalImages - 1 : currentImageIndex - 1;
-    onNavigate(prevIndex);
-  };
-
-  const handleNext = () => {
-    const nextIndex = currentImageIndex === totalImages - 1 ? 0 : currentImageIndex + 1;
-    onNavigate(nextIndex);
-  };
 
   return (
     <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
