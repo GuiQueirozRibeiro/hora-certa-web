@@ -1,4 +1,3 @@
-// src/components/features/financeiro/CardAtendimentosProfissional.tsx
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
@@ -20,21 +19,21 @@ export function CardAtendimentosProfissional({ dados, mesAtual }: CardAtendiment
 
   return (
     <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-base">Atendimentos por Profissional - {mesAtual}</CardTitle>
+      <CardHeader className="p-4 md:p-6">
+        <CardTitle className="text-sm md:text-base">Atendimentos por Profissional - {mesAtual}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
+      <CardContent className="p-4 md:p-6 pt-0">
+        <div className="space-y-3">
           {dados.map((profissional, index) => (
             <div 
               key={index}
-              className="flex items-center justify-between p-3 bg-zinc-700/30 rounded-lg hover:bg-zinc-700/50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-zinc-700/30 rounded-lg hover:bg-zinc-700/50 transition-colors gap-2"
             >
               <div className="flex-1">
                 <p className="text-zinc-100 font-medium text-sm">{profissional.nome}</p>
                 <p className="text-xs text-zinc-400">{profissional.total} atendimentos</p>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-emerald-400 font-bold text-base">
                   {formatarMoeda(profissional.valor)}
                 </p>

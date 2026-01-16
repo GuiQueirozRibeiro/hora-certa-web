@@ -1,4 +1,3 @@
-// src/components/features/financeiro/CardRendimentoTotal.tsx
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
@@ -22,20 +21,18 @@ export function CardRendimentoTotal({ dados }: CardRendimentoTotalProps) {
 
   return (
     <Card className="h-full bg-linear-to-br from-emerald-900/20 to-zinc-800 border-emerald-700/50">
-      <CardHeader>
-        <CardTitle className="text-emerald-400 text-base">Rendimento Total</CardTitle>
+      <CardHeader className="p-4 md:p-6">
+        <CardTitle className="text-emerald-400 text-sm md:text-base">Rendimento Total</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 md:p-6 pt-0">
         <div className="space-y-4">
-          {/* Valor principal */}
           <div>
             <p className="text-xs text-zinc-400 mb-1">Mês Atual</p>
-            <p className="text-2xl font-bold text-zinc-100">
+            <p className="text-2xl md:text-3xl font-bold text-zinc-100">
               {formatarMoeda(dados.mesAtual)}
             </p>
           </div>
 
-          {/* Comparação com mês anterior */}
           <div className="flex items-center gap-2">
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
               crescimentoPositivo 
@@ -48,7 +45,6 @@ export function CardRendimentoTotal({ dados }: CardRendimentoTotalProps) {
             <span className="text-xs text-zinc-400">vs mês anterior</span>
           </div>
 
-          {/* Detalhes adicionais */}
           <div className="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-700">
             <div>
               <p className="text-xs text-zinc-400 mb-1">Mês Anterior</p>

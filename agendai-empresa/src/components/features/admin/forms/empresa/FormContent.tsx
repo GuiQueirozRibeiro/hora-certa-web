@@ -11,15 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { X } from 'lucide-react';
 
-/**
- * Componente de apresentação puro que renderiza o formulário
- * 
- * Aplica o Princípio da Responsabilidade Única:
- * - Responsabilidade: Renderização do JSX (UI pura)
- * - Delega toda a lógica de negócio para o hook useFormHandlers
- */
 export function FormContent({ business }: { business: any }) {
-  // Hook contém TODA a lógica de negócio
   const {
     state,
     uploadingLogo,
@@ -37,16 +29,15 @@ export function FormContent({ business }: { business: any }) {
     copyToClipboard,
   } = useFormHandlers(business);
 
-  // Função para gerar o slug (URL Amigável)
   const generateSlug = (text: string) => {
     return text
       .toLowerCase()
       .trim()
-      .normalize('NFD') // Remove acentos
+      .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\w\s-]/g, '') // Remove caracteres especiais
-      .replace(/[\s_-]+/g, '-') // Substitui espaços e underscores por hífen
-      .replace(/^-+|-+$/g, ''); // Remove hífens do início e fim
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   };
 
   const shareUrl = `https://site.agendai.tec.br/empresa/${generateSlug(state.data.name)}`;
@@ -56,14 +47,9 @@ export function FormContent({ business }: { business: any }) {
       title="Dados da Empresa"
       description="Essas informações serão exibidas na página de agendamento do seu cliente."
     >
-      <ToastContainer
-        toasts={toasts}
-        onClose={removeToast}
-        position="top-right"
-      />
+      <ToastContainer toasts={toasts} onClose={removeToast} position="top-right" />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* Upload de Logo */}
         <ImageUpload
           label="Logo da Empresa"
           preview={state.data.image_url || null}
@@ -72,14 +58,12 @@ export function FormContent({ business }: { business: any }) {
           isLoading={uploadingLogo}
         />
 
-        {/* Galeria de Fotos */}
         <div className="space-y-4">
           <label className="block text-sm font-medium text-zinc-200">
-            Galeria de Fotos (Vitrime)
+            Galeria de Fotos (Vitrine)
           </label>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Imagens Existentes */}
             {(state.data.images as string[])?.map((url, index) => (
               <div
                 key={url}
@@ -94,38 +78,26 @@ export function FormContent({ business }: { business: any }) {
                 <button
                   type="button"
                   onClick={() => handleGalleryRemove(url)}
-                  className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg"
+                  className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-500 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-lg"
                 >
                   <X size={14} />
                 </button>
               </div>
             ))}
 
-            {/* Botão para Adicionar Novas */}
             <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-zinc-700 hover:border-indigo-500 hover:bg-indigo-500/5 cursor-pointer transition-all">
               {uploadingGallery ? (
                 <div className="animate-spin h-6 w-6 border-2 border-indigo-500 border-t-transparent rounded-full" />
               ) : (
                 <>
                   <div className="p-2 bg-zinc-800 rounded-full mb-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-zinc-400"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                       <polyline points="17 8 12 3 7 8" />
                       <line x1="12" x2="12" y1="3" y2="15" />
                     </svg>
                   </div>
-                  <span className="text-xs text-zinc-500 font-medium">Adicionar fotos</span>
+                  <span className="text-xs text-zinc-500 font-medium">Adicionar</span>
                 </>
               )}
               <input
@@ -140,7 +112,6 @@ export function FormContent({ business }: { business: any }) {
           </div>
         </div>
 
-        {/* Nome da Empresa */}
         <Input
           label="Nome do Estabelecimento *"
           placeholder="Ex: Barbearia do Zé"
@@ -151,30 +122,27 @@ export function FormContent({ business }: { business: any }) {
           required
         />
 
-
-
         <div className="space-y-2">
           <label className="block text-sm font-medium text-zinc-200">
             Link de Compartilhamento
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-400 text-sm overflow-hidden text-ellipsis whitespace-nowrap">
               {shareUrl}
             </div>
             <Button
               type="button"
               onClick={() => copyToClipboard(shareUrl)}
-              className="bg-indigo-600 hover:bg-indigo-700 px-4 cursor-pointer"
+              className="bg-indigo-600 hover:bg-indigo-700 px-4 cursor-pointer w-full sm:w-auto"
             >
               Copiar Link
             </Button>
           </div>
           <p className="text-xs text-zinc-500">
-            Este é o link que você deve enviar para seus clientes realizarem agendamentos.
+            Link para clientes realizarem agendamentos.
           </p>
         </div>
 
-        {/* Tipo de Negócio */}
         <div>
           <label className="block text-sm font-medium text-zinc-200 mb-2">
             Tipo de Negócio
@@ -190,7 +158,6 @@ export function FormContent({ business }: { business: any }) {
           </select>
         </div>
 
-        {/* WhatsApp */}
         <Input
           label="Numero do Whatsapp"
           placeholder="11999999999"
@@ -203,7 +170,6 @@ export function FormContent({ business }: { business: any }) {
           error={getFieldError('whatsapp_number')}
         />
 
-        {/* Instagram */}
         <Input
           label="Link do Instagram"
           placeholder="https://www.instagram.com/sua_empresa/"
@@ -213,7 +179,6 @@ export function FormContent({ business }: { business: any }) {
           error={getFieldError('instagram_link')}
         />
 
-        {/* Descrição */}
         <Textarea
           label="Descrição"
           placeholder="Descreva sua empresa e seus serviços"
@@ -223,33 +188,30 @@ export function FormContent({ business }: { business: any }) {
           error={getFieldError('description')}
         />
 
-        {/* Contador de caracteres */}
         {state.data.description && (
           <p className="text-xs text-zinc-400 -mt-4">
             {state.data.description.length}/500 caracteres
           </p>
         )}
 
-        {/* Botões de ação */}
-        <div className="flex gap-3 pt-4">
-          <Button
-            type="submit"
-            disabled={state.isSaving || !state.isDirty}
-            className="flex-1"
-          >
-            {state.isSaving ? 'Salvando...' : 'Salvar Alterações'}
-          </Button>
-
+        <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
           {state.isDirty && (
             <Button
               type="button"
               onClick={handleReset}
               disabled={state.isSaving}
-              className="bg-zinc-700 hover:bg-zinc-600"
+              className="bg-zinc-700 hover:bg-zinc-600 w-full sm:w-auto"
             >
               Cancelar
             </Button>
           )}
+          <Button
+            type="submit"
+            disabled={state.isSaving || !state.isDirty}
+            className="flex-1 w-full sm:w-auto"
+          >
+            {state.isSaving ? 'Salvando...' : 'Salvar Alterações'}
+          </Button>
         </div>
       </form>
     </FormLayout>

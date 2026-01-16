@@ -1,4 +1,3 @@
-// src/components/features/financeiro/CardTotalAtendimentos.tsx
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
@@ -19,17 +18,17 @@ export function CardTotalAtendimentos({ dados }: CardTotalAtendimentosProps) {
 
   return (
     <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-base">Total de Atendimentos por Mês</CardTitle>
+      <CardHeader className="p-4 md:p-6">
+        <CardTitle className="text-sm md:text-base">Total de Atendimentos por Mês</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      <CardContent className="p-0 md:p-6 pt-0">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-sm min-w-[400px]">
             <thead>
-              <tr className="border-b border-zinc-700">
-                <th className="text-left py-2 px-3 text-zinc-300 font-medium text-xs">Mês</th>
-                <th className="text-right py-2 px-3 text-zinc-300 font-medium text-xs">Atendimentos</th>
-                <th className="text-right py-2 px-3 text-zinc-300 font-medium text-xs">Valor Total</th>
+              <tr className="border-b border-zinc-700 bg-zinc-800/50">
+                <th className="text-left py-3 px-4 text-zinc-300 font-medium text-xs">Mês</th>
+                <th className="text-right py-3 px-4 text-zinc-300 font-medium text-xs">Atendimentos</th>
+                <th className="text-right py-3 px-4 text-zinc-300 font-medium text-xs">Valor Total</th>
               </tr>
             </thead>
             <tbody>
@@ -38,9 +37,9 @@ export function CardTotalAtendimentos({ dados }: CardTotalAtendimentosProps) {
                   key={index} 
                   className="border-b border-zinc-800 hover:bg-zinc-700/30 transition-colors"
                 >
-                  <td className="py-2 px-3 text-zinc-100 text-sm">{item.mes}</td>
-                  <td className="py-2 px-3 text-right text-zinc-100 text-sm">{item.total}</td>
-                  <td className="py-2 px-3 text-right text-emerald-400 font-semibold text-sm">
+                  <td className="py-3 px-4 text-zinc-100 text-sm font-medium">{item.mes}</td>
+                  <td className="py-3 px-4 text-right text-zinc-100 text-sm">{item.total}</td>
+                  <td className="py-3 px-4 text-right text-emerald-400 font-semibold text-sm">
                     {formatarMoeda(item.valor)}
                   </td>
                 </tr>

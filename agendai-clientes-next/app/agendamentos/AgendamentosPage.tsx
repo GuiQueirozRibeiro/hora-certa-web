@@ -13,7 +13,6 @@ import { AppointmentActions } from '../../src/features/appointments/components/A
 import { CancelModal } from '../../src/features/appointments/components/CancelModal';
 import { EmptyStates } from '../../src/features/appointments/components/EmptyStates';
 import type { AppointmentWithDetails } from '../../src/types/types';
-import { Business } from '../../src/types/types';
 
 const AgendamentosPage: React.FC = () => {
   const { user } = useAuth();
@@ -25,7 +24,6 @@ const AgendamentosPage: React.FC = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(null);
 
-  // 1. Filtros Estáveis
   const confirmedAppointments = useMemo(() => 
     allAppointments.filter(apt => apt.status === 'scheduled' || apt.status === 'confirmed'),
     [allAppointments]
@@ -36,7 +34,6 @@ const AgendamentosPage: React.FC = () => {
     [allAppointments]
   );
 
-  // 2. Seleção Derivada (Mata o erro de loop infinito)
   const selectedAppointment = useMemo(() => {
     if (selectedId) {
       return allAppointments.find(apt => apt.id === selectedId) || null;
@@ -44,7 +41,6 @@ const AgendamentosPage: React.FC = () => {
     return confirmedAppointments[0] || null;
   }, [selectedId, confirmedAppointments, allAppointments]);
 
-  // Handlers Otimizados
   const handleSelectAppointment = (appointment: AppointmentWithDetails) => {
     setSelectedId(appointment.id);
   };
@@ -68,7 +64,6 @@ const AgendamentosPage: React.FC = () => {
     if (result.success) {
       await refetch();
       closeCancelModal();
-      // Se o agendamento cancelado era o selecionado, limpamos a seleção
       if (selectedId === appointmentToCancel) {
         setSelectedId(null);
       }
@@ -83,7 +78,7 @@ const AgendamentosPage: React.FC = () => {
 
     if (result.success) {
       await refetch();
-      setSelectedId(null); // Limpa seleção após finalizar
+      setSelectedId(null);
     } else {
       alert('Erro ao finalizar agendamento.');
     }
@@ -103,13 +98,13 @@ const AgendamentosPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full mx-auto px-8 py-6 min-h-screen bg-zinc-800">
+    <div className="w-full mx-auto px-4 md:px-8 py-6 min-h-screen bg-zinc-800">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-zinc-200 mb-1">Agendamentos</h1>
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-4 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-4 space-y-6 order-1">
           <AppointmentsList
             title="Confirmados"
             appointments={confirmedAppointments}
@@ -131,9 +126,9 @@ const AgendamentosPage: React.FC = () => {
           />
         </div>
 
-        <div className="col-span-8">
+        <div className="lg:col-span-8 order-2">
           {selectedAppointment ? (
-            <div className="bg-[#1E1E1E] rounded-xl p-6">
+            <div className="bg-[#1E1E1E] rounded-xl p-4 md:p-6">
               <BusinessMap appointment={selectedAppointment} />
               
               <div className="my-6">
@@ -143,17 +138,23 @@ const AgendamentosPage: React.FC = () => {
                 </p>
               </div>
 
-              <BusinessContact appointment={selectedAppointment} />
-              <ServiceDetails appointment={selectedAppointment} />
+              <div className="space-y-6">
+                <BusinessContact appointment={selectedAppointment} />
+                <ServiceDetails appointment={selectedAppointment} />
+              </div>
               
-              <AppointmentActions
-                onCancel={openCancelModal}
-                onComplete={handleCompleteAppointment}
-                isProcessing={isProcessing}
-              />
+              <div className="mt-8">
+                <AppointmentActions
+                  onCancel={openCancelModal}
+                  onComplete={handleCompleteAppointment}
+                  isProcessing={isProcessing}
+                />
+              </div>
             </div>
           ) : (
-            <EmptyStates.NoSelection />
+            <div className="hidden lg:block">
+              <EmptyStates.NoSelection />
+            </div>
           )}
         </div>
       </div>

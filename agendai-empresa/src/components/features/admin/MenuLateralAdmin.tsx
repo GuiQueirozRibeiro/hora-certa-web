@@ -11,106 +11,70 @@ import {
 import { AbaAdminAtiva } from '@/app/administracao/page';
 
 type MenuLateralAdminProps = {
-  abaAtiva: AbaAdminAtiva; // Estado atual da aba
-  setAbaAtiva: (aba: AbaAdminAtiva) => void; // Função para mudar o estado
+  abaAtiva: AbaAdminAtiva;
+  setAbaAtiva: (aba: AbaAdminAtiva) => void;
 }
 
-// ========================================
-// COMPONENTE DE MENU LATERAL
-// ========================================
-/**
- * Menu de navegação lateral para a área de administração.
- * Permite alternar entre diferentes seções de configuração.
- */
 export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProps) {
+  const getItemClass = (isActive: boolean) => `
+    flex cursor-pointer items-center gap-2 md:gap-3 rounded-md p-3 md:p-3 transition-all whitespace-nowrap
+    text-sm md:text-sm font-medium
+    ${isActive 
+      ? 'bg-zinc-700 text-white shadow-md' 
+      : 'text-zinc-400 hover:bg-zinc-700/50 hover:text-white'}
+  `;
+
   return (
-    <nav className="flex">
-      <ul className="flex flex-col gap-2 w-full">
-        
-        {/* ========================================
-            ITEM: Dados da Empresa
-        ======================================== */}
+    <nav className="flex w-full">
+      <ul className="flex flex-row lg:flex-col gap-2 w-full overflow-x-auto pb-2 lg:pb-0 no-scrollbar touch-pan-x">
         <li 
           onClick={() => setAbaAtiva('empresa')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'empresa' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'empresa')}
         >
-          <Building2Icon className="h-5 w-5" />
-          <span>Dados da Empresa</span>
+          <Building2Icon className="h-5 w-5 shrink-0" />
+          <span>Empresa</span>
         </li>
 
-        {/* ========================================
-            ITEM: Endereço
-        ======================================== */}
         <li 
           onClick={() => setAbaAtiva('endereco')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'endereco' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'endereco')}
         >
-          <MapPin className="h-5 w-5" />
+          <MapPin className="h-5 w-5 shrink-0" />
           <span>Endereço</span>
         </li>
 
-        {/* ========================================
-            ITEM: Funcionários
-        ======================================== */}
         <li 
           onClick={() => setAbaAtiva('funcionarios')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'funcionarios' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'funcionarios')}
         >
-          <UsersIcon className="h-5 w-5" />
+          <UsersIcon className="h-5 w-5 shrink-0" />
           <span>Funcionários</span>
         </li>
 
-        {/* ========================================
-            ITEM: Serviços
-        ======================================== */}
         <li 
           onClick={() => setAbaAtiva('servicos')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'servicos' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'servicos')}
         >
-          <ScissorsIcon className="h-5 w-5" />
+          <ScissorsIcon className="h-5 w-5 shrink-0" />
           <span>Serviços</span>
         </li>
-        {/* ========================================
-            ITEM: Horários
-        ======================================== */}
+
         <li 
           onClick={() => setAbaAtiva('horarios')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'horarios' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'horarios')}
         >
-          <ClockIcon className="h-5 w-5" />
-          <span>Horários de Funcionamento</span>
+          <ClockIcon className="h-5 w-5 shrink-0" />
+          <span>Horários</span>
         </li>
 
-        {/* ========================================
-            ITEM: Configurações
-        ======================================== */}
         <li 
           onClick={() => setAbaAtiva('configuracoes')}
-          className={`flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all
-            ${abaAtiva === 'configuracoes' 
-              ? 'bg-zinc-700 text-white font-semibold' 
-              : 'text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
+          className={getItemClass(abaAtiva === 'configuracoes')}
         >
-          <SettingsIcon className="h-5 w-5" />
+          <SettingsIcon className="h-5 w-5 shrink-0" />
           <span>Configurações</span>
         </li>
       </ul>
     </nav>
   );
 }
-

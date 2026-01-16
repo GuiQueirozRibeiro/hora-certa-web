@@ -9,17 +9,9 @@ import { Modal } from '@/components/ui/Modal';
 import { ServiceModal } from '../../servicos/ServiceModal';
 import { ToastContainer } from '@/components/ui/Toast';
 
-/**
- * Componente de apresentação puro que renderiza o formulário de serviços
- * 
- * Aplica o Princípio da Responsabilidade Única:
- * - Responsabilidade: Renderização do JSX (UI pura)
- * - Delega toda a lógica de negócio para o hook useFormHandlers
- */
 export function FormContent() {
   const { toasts, removeToast } = useToast();
 
-  // Hook contém TODA a lógica de negócio
   const {
     business,
     servicos,
@@ -50,10 +42,9 @@ export function FormContent() {
     limparFiltros,
   } = useFormHandlers();
 
-  // Se não há empresa, exibir mensagem
   if (!business) {
     return (
-      <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-12 text-center">
+      <div className="bg-zinc-900 rounded-lg border border-zinc-700 p-8 md:p-12 text-center">
         <p className="text-zinc-500 mb-2">Carregando informações da empresa...</p>
       </div>
     );
@@ -67,42 +58,34 @@ export function FormContent() {
         position="top-right"
       />
       
-      {/* ========================================
-          CABEÇALHO COM ESTATÍSTICAS
-      ======================================== */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
           <h2 className="text-xl font-semibold text-zinc-100 mb-2">
             Catálogo de Serviços
           </h2>
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="text-zinc-400">
-              {totalServicos} serviço{totalServicos !== 1 ? 's' : ''} cadastrado{totalServicos !== 1 ? 's' : ''}
+              {totalServicos} serviço{totalServicos !== 1 ? 's' : ''}
             </span>
-            <span className="text-green-400">
-              {servicosAtivos} ativo{servicosAtivos !== 1 ? 's' : ''}
+            <span className="text-green-400 bg-green-400/10 px-2 py-0.5 rounded text-xs">
+              {servicosAtivos} ativos
             </span>
-            <span className="text-red-400">
-              {servicosInativos} inativo{servicosInativos !== 1 ? 's' : ''}
+            <span className="text-red-400 bg-red-400/10 px-2 py-0.5 rounded text-xs">
+              {servicosInativos} inativos
             </span>
           </div>
         </div>
 
-        {/* Botão Adicionar */}
         <Button
           onClick={handleAddServico}
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Adicionar Serviço</span>
         </Button>
       </div>
 
-      {/* ========================================
-          BARRA DE BUSCA E FILTROS
-      ======================================== */}
       <div className="space-y-4 mb-6">
-        {/* Busca */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
           <input
@@ -114,42 +97,40 @@ export function FormContent() {
           />
         </div>
 
-        {/* Filtros */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <div className="flex items-center gap-2 mb-1 md:mb-0">
             <Filter className="h-4 w-4 text-zinc-500" />
-            <span className="text-sm text-zinc-400">Filtrar por:</span>
+            <span className="text-sm text-zinc-400">Filtrar:</span>
           </div>
 
-          {/* Filtro Categoria */}
-          <select
-            value={filtroCategoria}
-            onChange={(e) => setFiltroCategoria(e.target.value)}
-            className="px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-          >
-            {categorias.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat === 'todas' ? 'Todas as categorias' : cat}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <select
+              value={filtroCategoria}
+              onChange={(e) => setFiltroCategoria(e.target.value)}
+              className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+            >
+              {categorias.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat === 'todas' ? 'Todas as categorias' : cat}
+                </option>
+              ))}
+            </select>
 
-          {/* Filtro Status */}
-          <select
-            value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value)}
-            className="px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-          >
-            <option value="todos">Todos os status</option>
-            <option value="ativos">Apenas ativos</option>
-            <option value="inativos">Apenas inativos</option>
-          </select>
+            <select
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+              className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+            >
+              <option value="todos">Todos os status</option>
+              <option value="ativos">Apenas ativos</option>
+              <option value="inativos">Apenas inativos</option>
+            </select>
+          </div>
 
-          {/* Contador de filtros ativos */}
           {hasFiltrosAtivos && (
             <button
               onClick={limparFiltros}
-              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors text-right md:text-left pt-2 md:pt-0"
             >
               Limpar filtros
             </button>
@@ -157,9 +138,6 @@ export function FormContent() {
         </div>
       </div>
 
-      {/* ========================================
-          GRID DE SERVIÇOS
-      ======================================== */}
       <ServiceList
         services={servicosFiltrados}
         loading={loading}
@@ -168,9 +146,6 @@ export function FormContent() {
         onToggleStatus={handleToggleStatus}
       />
 
-      {/* ========================================
-          MODAL DE SERVIÇO (Criar/Editar)
-      ======================================== */}
       {modalServico && business && (
         <ServiceModal
           businessId={business.id}
@@ -179,9 +154,6 @@ export function FormContent() {
         />
       )}
 
-      {/* ========================================
-          MODAL DE CONFIRMAÇÃO EXCLUSÃO
-      ======================================== */}
       <Modal
         isOpen={modalExcluir}
         onClose={handleCloseModalExcluir}

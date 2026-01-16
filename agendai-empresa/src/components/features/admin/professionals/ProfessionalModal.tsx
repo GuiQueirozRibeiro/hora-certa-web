@@ -1,4 +1,3 @@
-// src/components/features/admin/professionals/ProfessionalModal.tsx
 'use client';
 import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
@@ -9,17 +8,14 @@ import { WorkingHoursInput } from './WorkingHoursInput';
 import { useProfessionalModal } from '@/hooks/useProfessionalModal';
 import type { ProfessionalWithUser } from '@/types/professional';
 import { businessService } from '@/services/businessService';
+
 interface ProfessionalModalProps {
   businessId: string;
   professional: ProfessionalWithUser | null;
   onClose: (saved: boolean) => void;
 }
 
-
-
 export function ProfessionalModal({ businessId, professional, onClose }: ProfessionalModalProps) {
-
-
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const {
@@ -50,8 +46,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
     try {
       const url = await businessService.uploadProfessionalImage(businessId, file);
       setAvatarUrl(url);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Erro no upload do profissional:", err);
     } finally {
@@ -64,14 +58,12 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
     await submitForm();
   };
 
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-800 rounded-xl border border-zinc-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-zinc-700 sticky top-0 bg-zinc-800 z-10">
-          <h2 className="text-xl font-bold text-white">
+    <div className="fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
+      <div className="bg-zinc-800 rounded-t-2xl md:rounded-xl border border-zinc-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col">
+        
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-zinc-700 bg-zinc-800 sticky top-0 z-10 shrink-0">
+          <h2 className="text-lg md:text-xl font-bold text-white">
             {isEditing ? 'Editar Profissional' : 'Novo Profissional'}
           </h2>
           <button
@@ -82,11 +74,9 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* SEÇÃO: Informações da Conta */}
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6 overflow-y-auto">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+            <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-indigo-500 rounded-full"></div>
               INFORMAÇÕES DA CONTA
             </h3>
@@ -111,7 +101,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             </div>
 
             <div className="space-y-4">
-              {/* Nome Completo */}
               <Input
                 label="Nome Completo *"
                 placeholder="Ex: João Silva"
@@ -121,7 +110,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                 required
               />
 
-              {/* Email */}
               <Input
                 label="Email *"
                 placeholder="joao.silva@email.com"
@@ -129,10 +117,9 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isEditing} // Email não pode ser alterado
+                disabled={isEditing}
               />
 
-              {/* Senha (só ao criar) */}
               {!isEditing && (
                 <Input
                   label="Senha *"
@@ -147,15 +134,13 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             </div>
           </div>
 
-          {/* SEÇÃO: Informações Profissionais */}
           <div>
-            <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+            <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-emerald-500 rounded-full"></div>
               INFORMAÇÕES PROFISSIONAIS
             </h3>
 
             <div className="space-y-4">
-              {/* Especialidades */}
               <div>
                 <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Especialidades
@@ -180,11 +165,10 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                     className="flex items-center gap-2"
                   >
                     <Plus size={16} />
-                    Adicionar
+                    <span className="hidden md:inline">Adicionar</span>
                   </Button>
                 </div>
 
-                {/* Lista de especialidades */}
                 {specialties.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {specialties.map((specialty, index) => (
@@ -206,7 +190,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                 )}
               </div>
 
-              {/* Anos de Experiência */}
               <Input
                 label="Anos de Experiência"
                 placeholder="0"
@@ -217,7 +200,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
                 onChange={(e) => setExperienceYears(Number(e.target.value))}
               />
 
-              {/* Bio */}
               <Textarea
                 label="Biografia"
                 placeholder="Conte um pouco sobre sua experiência profissional..."
@@ -228,9 +210,8 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             </div>
           </div>
 
-          {/* SEÇÃO: Horários de Trabalho */}
           <div>
-            <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+            <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-amber-500 rounded-full"></div>
               HORÁRIOS DE TRABALHO
             </h3>
@@ -241,26 +222,25 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             />
           </div>
 
-          {/* Botões */}
-          <div className="flex gap-3 pt-4 border-t border-zinc-700">
+          <div className="flex flex-col-reverse md:flex-row gap-3 pt-4 border-t border-zinc-700">
+            <Button
+              type="button"
+              onClick={() => onClose(false)}
+              disabled={isSaving}
+              className="bg-zinc-700 hover:bg-zinc-600 w-full md:w-auto"
+            >
+              Cancelar
+            </Button>
             <Button
               type="submit"
               disabled={isSaving}
-              className="flex-1"
+              className="flex-1 w-full md:w-auto"
             >
               {isSaving
                 ? 'Salvando...'
                 : isEditing
                   ? 'Salvar Alterações'
                   : 'Criar Profissional'}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => onClose(false)}
-              disabled={isSaving}
-              className="bg-zinc-700 hover:bg-zinc-600"
-            >
-              Cancelar
             </Button>
           </div>
         </form>

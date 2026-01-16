@@ -2,38 +2,16 @@
 
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { MapPin, Save, Truck } from 'lucide-react'; // Adicionei Truck para o ícone móvel
+import { MapPin, Save, Truck } from 'lucide-react';
 import { useAddressForm } from '@/hooks/useAddressForm';
 
 export function FormEndereco() {
   const {
-    // Adicione os novos itens vindos do hook
-    homeServiceOnly,
-    setHomeServiceOnly,
-    
-    country,
-    state,
-    city,
-    neighborhood,
-    street,
-    number,
-    complement,
-    postalCode,
-    isSaving,
-    isLoading,
-    
-    setCountry,
-    setState,
-    setCity,
-    setNeighborhood,
-    setStreet,
-    setNumber,
-    setComplement,
-    setPostalCode,
-    
-    handleSubmit,
-    handleCepBlur,
-    formatCep,
+    homeServiceOnly, setHomeServiceOnly,
+    country, state, city, neighborhood, street, number, complement, postalCode,
+    isSaving, isLoading,
+    setCountry, setState, setCity, setNeighborhood, setStreet, setNumber, setComplement, setPostalCode,
+    handleSubmit, handleCepBlur, formatCep,
   } = useAddressForm();
 
   if (isLoading) {
@@ -46,7 +24,6 @@ export function FormEndereco() {
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-zinc-100 mb-1 flex items-center gap-2">
           <MapPin className="h-5 w-5 text-indigo-500" />
@@ -57,7 +34,6 @@ export function FormEndereco() {
         </p>
       </div>
 
-      {/* SEÇÃO: Tipo de Atendimento (Toggle) */}
       <div className="mb-8 p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-500/10 rounded-lg">
@@ -65,7 +41,7 @@ export function FormEndereco() {
           </div>
           <div>
             <h4 className="text-sm font-medium text-zinc-100">Atendimento apenas em domicílio</h4>
-            <p className="text-xs text-zinc-500">Sua empresa não possui sede física para clientes.</p>
+            <p className="text-xs text-zinc-500 hidden sm:block">Sua empresa não possui sede física para clientes.</p>
           </div>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
@@ -81,13 +57,11 @@ export function FormEndereco() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {homeServiceOnly ? (
-          /* Mensagem quando é apenas Online/Móvel */
           <div className="py-8 px-4 border-2 border-dashed border-zinc-700 rounded-xl text-center">
             <p className="text-zinc-400 text-sm">
               Você marcou que sua empresa atende apenas em domicílio. <br />
-              O endereço físico não será exibido para os clientes, apenas a cidade de atuação.
+              O endereço físico não será exibido para os clientes.
             </p>
-            {/* Campo de Cidade e Estado ainda são úteis para filtros de busca */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-left">
                 <Input
                   label="Estado de Atuação *"
@@ -104,7 +78,6 @@ export function FormEndereco() {
             </div>
           </div>
         ) : (
-          /* Formulário Físico Completo */
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
@@ -180,7 +153,7 @@ export function FormEndereco() {
           <Button
             type="submit"
             disabled={isSaving}
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 w-full md:w-auto"
           >
             <Save size={16} />
             {isSaving ? 'Salvando...' : 'Salvar Configurações'}
