@@ -2,12 +2,15 @@
 
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { MapPin, Save } from 'lucide-react';
+import { MapPin, Save, Truck } from 'lucide-react'; // Adicionei Truck para o ícone móvel
 import { useAddressForm } from '@/hooks/useAddressForm';
 
 export function FormEndereco() {
   const {
-    // State
+    // Adicione os novos itens vindos do hook
+    homeServiceOnly,
+    setHomeServiceOnly,
+    
     country,
     state,
     city,
@@ -19,7 +22,6 @@ export function FormEndereco() {
     isSaving,
     isLoading,
     
-    // Setters
     setCountry,
     setState,
     setCity,
@@ -29,7 +31,6 @@ export function FormEndereco() {
     setComplement,
     setPostalCode,
     
-    // Actions
     handleSubmit,
     handleCepBlur,
     formatCep,
@@ -52,93 +53,129 @@ export function FormEndereco() {
           Endereço da Empresa
         </h2>
         <p className="text-sm text-zinc-400">
-          Configure o endereço completo do seu estabelecimento
+          Configure se possui local fixo ou se atende apenas em domicílio.
         </p>
       </div>
 
-      {/* Formulário */}
+      {/* SEÇÃO: Tipo de Atendimento (Toggle) */}
+      <div className="mb-8 p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-500/10 rounded-lg">
+            <Truck className="h-5 w-5 text-indigo-500" />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-zinc-100">Atendimento apenas em domicílio</h4>
+            <p className="text-xs text-zinc-500">Sua empresa não possui sede física para clientes.</p>
+          </div>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input 
+            type="checkbox" 
+            className="sr-only peer"
+            checked={homeServiceOnly}
+            onChange={(e) => setHomeServiceOnly(e.target.checked)}
+          />
+          <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+        </label>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        
-        {/* SEÇÃO: CEP e País */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
-            <Input
-              label="CEP *"
-              placeholder="00000-000"
-              value={postalCode}
-              onChange={(e) => setPostalCode(formatCep(e.target.value))}
-              onBlur={handleCepBlur}
-              maxLength={9}
-              required
-            />
-            <p className="mt-1 text-xs text-zinc-500">
-              💡 Digite o CEP para preencher automaticamente
+        {homeServiceOnly ? (
+          /* Mensagem quando é apenas Online/Móvel */
+          <div className="py-8 px-4 border-2 border-dashed border-zinc-700 rounded-xl text-center">
+            <p className="text-zinc-400 text-sm">
+              Você marcou que sua empresa atende apenas em domicílio. <br />
+              O endereço físico não será exibido para os clientes, apenas a cidade de atuação.
             </p>
+            {/* Campo de Cidade e Estado ainda são úteis para filtros de busca */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-left">
+                <Input
+                  label="Estado de Atuação *"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Cidade de Atuação *"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+            </div>
           </div>
-          <Input
-            label="País *"
-            placeholder="Brasil"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            required
-          />
-        </div>
+        ) : (
+          /* Formulário Físico Completo */
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <Input
+                  label="CEP *"
+                  placeholder="00000-000"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(formatCep(e.target.value))}
+                  onBlur={handleCepBlur}
+                  maxLength={9}
+                  required
+                />
+                <p className="mt-1 text-xs text-zinc-500">
+                  💡 Digite o CEP para preencher automaticamente
+                </p>
+              </div>
+              <Input
+                label="País *"
+                placeholder="Brasil"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                required
+              />
+            </div>
 
-        {/* SEÇÃO: Estado e Cidade */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Estado *"
-            placeholder="Ex: São Paulo"
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-            required
-          />
-          <Input
-            label="Cidade *"
-            placeholder="Ex: São Paulo"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            required
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Estado *"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                required
+              />
+              <Input
+                label="Cidade *"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+              />
+            </div>
 
-        {/* SEÇÃO: Bairro */}
-        <Input
-          label="Bairro"
-          placeholder="Ex: Centro"
-          value={neighborhood}
-          onChange={(e) => setNeighborhood(e.target.value)}
-        />
-
-        {/* SEÇÃO: Rua e Número */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
             <Input
-              label="Rua *"
-              placeholder="Ex: Rua das Flores"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-              required
+              label="Bairro"
+              value={neighborhood}
+              onChange={(e) => setNeighborhood(e.target.value)}
             />
-          </div>
-          <Input
-            label="Número *"
-            placeholder="123"
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            required
-          />
-        </div>
 
-        {/* SEÇÃO: Complemento */}
-        <Input
-          label="Complemento"
-          placeholder="Ex: Sala 101, Bloco A"
-          value={complement}
-          onChange={(e) => setComplement(e.target.value)}
-        />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <Input
+                  label="Rua *"
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  required
+                />
+              </div>
+              <Input
+                label="Número *"
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                required
+              />
+            </div>
 
-        {/* Botões */}
+            <Input
+              label="Complemento"
+              value={complement}
+              onChange={(e) => setComplement(e.target.value)}
+            />
+          </>
+        )}
+
         <div className="flex gap-3 pt-4 border-t border-zinc-700">
           <Button
             type="submit"
@@ -146,7 +183,7 @@ export function FormEndereco() {
             className="flex items-center gap-2"
           >
             <Save size={16} />
-            {isSaving ? 'Salvando...' : 'Salvar Endereço'}
+            {isSaving ? 'Salvando...' : 'Salvar Configurações'}
           </Button>
         </div>
       </form>

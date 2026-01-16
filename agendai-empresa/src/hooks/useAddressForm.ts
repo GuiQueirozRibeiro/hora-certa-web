@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useToast } from './useToast';
 import { createClient } from '@/lib/supabase/client';
+
+import { addressService } from '@/services/addressService'; // Importe o serviço
 
 interface AddressData {
   id?: string;
@@ -28,25 +31,25 @@ async function getCoordinatesFromAddress(address: {
   state: string;
   country: string;
 }): Promise<{ lat: number; long: number } | null> {
-  
+
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  
+
   if (!apiKey) {
     console.error('❌ Google Maps API Key não configurada');
     return null;
   }
-  
+
   // Monta o endereço completo
   const fullAddress = `${address.street}, ${address.number}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.country}`;
   const encodedAddress = encodeURIComponent(fullAddress);
-  
+
   try {
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`
     );
-    
+
     const data = await response.json();
-    
+
     if (data.status === 'OK' && data.results && data.results.length > 0) {
       const location = data.results[0].geometry.location;
       console.log('✅ Endereço encontrado:', fullAddress);
@@ -56,17 +59,17 @@ async function getCoordinatesFromAddress(address: {
         long: location.lng
       };
     }
-    
+
     // Se não encontrar com endereço completo, tenta sem o número
     const fallbackAddress = `${address.street}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.country}`;
     const encodedFallback = encodeURIComponent(fallbackAddress);
-    
+
     const fallbackResponse = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedFallback}&key=${apiKey}`
     );
-    
+
     const fallbackData = await fallbackResponse.json();
-    
+
     if (fallbackData.status === 'OK' && fallbackData.results && fallbackData.results.length > 0) {
       const location = fallbackData.results[0].geometry.location;
       console.log('✅ Endereço encontrado (fallback):', fallbackAddress);
@@ -76,11 +79,11 @@ async function getCoordinatesFromAddress(address: {
         long: location.lng
       };
     }
-    
+
     console.warn('⚠️ Não foi possível encontrar coordenadas para o endereço');
     console.warn('Status da API:', data.status, data.error_message || '');
     return null;
-    
+
   } catch (error) {
     console.error('❌ Erro ao buscar coordenadas:', error);
     return null;
@@ -97,9 +100,10 @@ interface UseAddressFormReturn {
   number: string;
   complement: string;
   postalCode: string;
+  homeServiceOnly: boolean;
   isSaving: boolean;
   isLoading: boolean;
-  
+
   // Setters
   setCountry: (value: string) => void;
   setState: (value: string) => void;
@@ -109,7 +113,8 @@ interface UseAddressFormReturn {
   setNumber: (value: string) => void;
   setComplement: (value: string) => void;
   setPostalCode: (value: string) => void;
-  
+  setHomeServiceOnly: (value: boolean) => void;
+
   // Actions
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   handleCepBlur: () => Promise<void>;
@@ -131,6 +136,7 @@ export function useAddressForm(): UseAddressFormReturn {
   const [postalCode, setPostalCode] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [homeServiceOnly, setHomeServiceOnly] = useState(false);
 
   // Load address on mount
   useEffect(() => {
@@ -141,7 +147,7 @@ export function useAddressForm(): UseAddressFormReturn {
       try {
         const supabase = createClient();
         const { data, error } = await supabase
-          .from('addresses_businesses')
+          .from('addresses_businesses_businesses')
           .select('*')
           .eq('business_id', business.id)
           .eq('is_primary', true)
@@ -205,72 +211,41 @@ export function useAddressForm(): UseAddressFormReturn {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!business?.id) {
-      showError('Erro', 'Empresa não encontrada');
+    // Usamos o business.id e business.owner_id que você já tem no hook
+    if (!business?.id || !business?.owner_id) {
+      showError('Erro', 'Empresa ou proprietário não encontrado');
       return;
     }
 
-    if (!validateForm()) {
+    // Se o atendimento NÃO for apenas em domicílio, validamos o endereço físico
+    if (!homeServiceOnly && !validateForm()) {
       return;
     }
 
     setIsSaving(true);
     try {
-      const supabase = createClient();
-      
-      // Buscar coordenadas do endereço
-      const coordinates = await getCoordinatesFromAddress({
-        street: street.trim(),
-        number: number.trim(),
-        neighborhood: neighborhood.trim(),
-        city: city.trim(),
-        state: state.trim(),
-        country: country.trim(),
-      });
-      
-      const addressData: Partial<AddressData> = {
-        business_id: business.id,
+      // 1. Prepara os dados no formato que o serviço espera
+      const addressInput = {
         country: country.trim(),
         state: state.trim(),
         city: city.trim(),
         neighborhood: neighborhood.trim(),
-        street_address: street.trim(),
+        streetAddress: street.trim(),
         number: number.trim(),
         complement: complement.trim(),
         zipcode: postalCode.trim(),
-        is_primary: true,
-        lat: coordinates?.lat,
-        long: coordinates?.long,
       };
 
-      // Verifica se já existe um endereço
-      const { data: existing } = await supabase
-        .from('addresses_businesses')
-        .select('id')
-        .eq('business_id', business.id)
-        .eq('is_primary', true)
-        .single();
+      // 2. Chama o serviço passando o owner_id da empresa
+      // O addressService usará esse ID para atualizar a flag na tabela 'businesses'
+      await addressService.saveAddress(
+        business.id,
+        business.owner_id,
+        addressInput,
+        homeServiceOnly
+      );
 
-      let error;
-      
-      if (existing) {
-        // Atualiza endereço existente
-        const result = await supabase
-          .from('addresses_businesses')
-          .update(addressData)
-          .eq('id', existing.id);
-        error = result.error;
-      } else {
-        // Cria novo endereço
-        const result = await supabase
-          .from('addresses_businesses')
-          .insert(addressData);
-        error = result.error;
-      }
-
-      if (error) throw error;
-
-      success('Endereço salvo com sucesso!');
+      success('Configurações salvas com sucesso!');
     } catch (err: any) {
       showError('Erro ao salvar endereço', err.message);
     } finally {
@@ -280,7 +255,7 @@ export function useAddressForm(): UseAddressFormReturn {
 
   const handleCepBlur = async () => {
     const cep = postalCode.replace(/\D/g, '');
-    
+
     if (cep.length !== 8) return;
 
     try {
@@ -321,7 +296,8 @@ export function useAddressForm(): UseAddressFormReturn {
     postalCode,
     isSaving,
     isLoading,
-    
+    homeServiceOnly,
+
     // Setters
     setCountry,
     setState,
@@ -331,7 +307,9 @@ export function useAddressForm(): UseAddressFormReturn {
     setNumber,
     setComplement,
     setPostalCode,
-    
+    setHomeServiceOnly,
+
+
     // Actions
     handleSubmit,
     handleCepBlur,
