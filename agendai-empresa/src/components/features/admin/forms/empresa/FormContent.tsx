@@ -19,13 +19,13 @@ import { X } from 'lucide-react';
  * - Delega toda a lógica de negócio para o hook useFormHandlers
  */
 export function FormContent({ business }: { business: any }) {
-  const { toasts, removeToast } = useToast();
-
   // Hook contém TODA a lógica de negócio
   const {
     state,
     uploadingLogo,
     uploadingGallery,
+    toasts,
+    removeToast,
     updateField,
     getFieldError,
     handleLogoUpload,
@@ -34,7 +34,22 @@ export function FormContent({ business }: { business: any }) {
     handleGalleryRemove,
     handleSubmit,
     handleReset,
+    copyToClipboard,
   } = useFormHandlers(business);
+
+  // Função para gerar o slug (URL Amigável)
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD') // Remove acentos
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '') // Remove caracteres especiais
+      .replace(/[\s_-]+/g, '-') // Substitui espaços e underscores por hífen
+      .replace(/^-+|-+$/g, ''); // Remove hífens do início e fim
+  };
+
+  const shareUrl = `https://site.agendai.tec.br/empresa/${generateSlug(state.data.name)}`;
 
   return (
     <FormLayout
@@ -135,6 +150,29 @@ export function FormContent({ business }: { business: any }) {
           error={getFieldError('name')}
           required
         />
+
+
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-zinc-200">
+            Link de Compartilhamento
+          </label>
+          <div className="flex gap-2">
+            <div className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-400 text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+              {shareUrl}
+            </div>
+            <Button
+              type="button"
+              onClick={() => copyToClipboard(shareUrl)}
+              className="bg-indigo-600 hover:bg-indigo-700 px-4 cursor-pointer"
+            >
+              Copiar Link
+            </Button>
+          </div>
+          <p className="text-xs text-zinc-500">
+            Este é o link que você deve enviar para seus clientes realizarem agendamentos.
+          </p>
+        </div>
 
         {/* Tipo de Negócio */}
         <div>

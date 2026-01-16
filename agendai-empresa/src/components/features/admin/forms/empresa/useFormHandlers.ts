@@ -19,6 +19,7 @@ export function useFormHandlers(business: any) {
   const { success, error: showError } = useToast();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const toast = useToast();
 
   // Inicializa o formulário com os dados mapeados do banco
   const {
@@ -145,7 +146,7 @@ export function useFormHandlers(business: any) {
     // Limpa erros anteriores e valida o formulário
     clearErrors();
     const validationErrors = validateBusinessForm(state.data);
-    
+
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       showError('Erro de validação', 'Verifique os campos destacados');
@@ -173,17 +174,28 @@ export function useFormHandlers(business: any) {
     resetForm(mapBusinessToFormData(business));
   };
 
+  // No useFormHandlers.ts
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Link copiado!', 'Compartilhe com seus clientes.');
+  };
+
   return {
     // Estados do formulário
     state,
     uploadingLogo,
     uploadingGallery,
-    
+
     // Funções de atualização
     updateField,
     getFieldError,
-    
+
+    // toast
+    toasts: toast.toasts,
+    removeToast: toast.removeToast,
+
     // Handlers de ações
+    copyToClipboard,
     handleLogoUpload,
     handleLogoRemove,
     handleGalleryUpload,
