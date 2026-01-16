@@ -7,6 +7,7 @@ import { DaySchedule } from '../../../types/types';
 export interface Business {
   id: string;
   nome: string;
+  descricao: string;
   endereco: string;
   horario: string;
   imagem: string;
@@ -62,6 +63,7 @@ export const useBusinessData = (rawBusinesses: any[]) => {
       return {
         id: business.id,
         nome: business.name,
+        descricao: business.description,
         endereco: addressString,
         horario: horarioHoje,
         imagem: business.image_url || business.images?.[0] || '/placeholder-business.png',
