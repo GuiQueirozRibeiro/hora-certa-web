@@ -140,45 +140,51 @@ export function useAddressForm(): UseAddressFormReturn {
 
   // Load address on mount
   useEffect(() => {
-    const loadAddress = async () => {
-      if (!business?.id) return;
+  const loadInitialData = async () => {
+    if (!business?.id) return;
 
-      setIsLoading(true);
-      try {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from('addresses_businesses_businesses')
-          .select('*')
-          .eq('business_id', business.id)
-          .eq('is_primary', true)
-          .single();
+    setIsLoading(true);
+    try {
+      const supabase = createClient();
 
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
+      // 1. Buscamos a flag booleana na tabela de EMPRESAS
+      const { data: bizData } = await supabase
+        .from('businesses')
+        .select('home_service_only')
+        .eq('id', business.id)
+        .single();
 
-        if (data) {
-          setCountry(data.country || 'Brasil');
-          setState(data.state || '');
-          setCity(data.city || '');
-          setNeighborhood(data.neighborhood || '');
-          setStreet(data.street_address || '');
-          setNumber(data.number || '');
-          setComplement(data.complement || '');
-          setPostalCode(data.zipcode || '');
-        }
-      } catch (err: any) {
-        showError('Erro ao carregar endereço', err.message);
-      } finally {
-        setIsLoading(false);
+      if (bizData) {
+        setHomeServiceOnly(bizData.home_service_only);
       }
-    };
 
-    if (business?.id) {
-      loadAddress();
+      // 2. Buscamos os dados de endereço na tabela de ENDEREÇOS
+      const { data: addrData, error: addrError } = await supabase
+        .from('addresses_businesses')
+        .select('*')
+        .eq('business_id', business.id)
+        .eq('is_primary', true)
+        .single();
+
+      if (addrData) {
+        setCountry(addrData.country || 'Brasil');
+        setState(addrData.state || '');
+        setCity(addrData.city || '');
+        setNeighborhood(addrData.neighborhood || '');
+        setStreet(addrData.street_address || '');
+        setNumber(addrData.number || '');
+        setComplement(addrData.complement || '');
+        setPostalCode(addrData.zipcode || '');
+      }
+    } catch (err: any) {
+      err('Erro ao carregar dados', err.message);
+    } finally {
+      setIsLoading(false);
     }
-  }, [business?.id]);
+  };
 
+  loadInitialData();
+}, [business?.id]);
   const validateForm = (): boolean => {
     if (!state.trim()) {
       showError('Erro de validação', 'Estado é obrigatório');
