@@ -65,7 +65,7 @@ export const useBusinessData = (rawBusinesses: any[]) => {
         endereco: addressString,
         horario: horarioHoje,
         imagem: business.image_url || business.images?.[0] || '/placeholder-business.png',
-        telefones: business.whatsapp_link ? [business.whatsapp_link] : ["Telefone não disponível"],
+        telefones: business.whatsapp_number ? [business.whatsapp_number] : ["Telefone não disponível"],
         formasPagamento: ["Dinheiro", "Cartão de crédito", "Cartão de débito", "Pix"],
         horariosFuncionamento,
         localizacao: {

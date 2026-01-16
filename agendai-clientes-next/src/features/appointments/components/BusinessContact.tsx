@@ -17,13 +17,13 @@ export function BusinessContact({ appointment }: BusinessContactProps) {
   const { business } = appointment;
   const { formatPhoneNumber, handleCopyPhone, copiedPhone } = usePhoneCopy();
 
-  if (!business?.whatsapp_link) {
+  if (!business?.whatsapp_number) {
     return null;
   }
 
-  const whatsappUrl = business.whatsapp_link.includes('wa.me')
-    ? business.whatsapp_link
-    : `https://wa.me/${business.whatsapp_link.replace(/\D/g, '')}`;
+  const whatsappUrl = business.whatsapp_number.includes('wa.me')
+    ? business.whatsapp_number
+    : `https://wa.me/${business.whatsapp_number.replace(/\D/g, '')}`;
 
   return (
     <div className="mb-6">
@@ -45,14 +45,14 @@ export function BusinessContact({ appointment }: BusinessContactProps) {
             <Phone size={20} className="text-gray-500" />
           </div>
           <span className="text-white text-sm">
-            {formatPhoneNumber(business.whatsapp_link)}
+            {formatPhoneNumber(business.whatsapp_number)}
           </span>
         </div>
         <button
-          onClick={() => handleCopyPhone(business.whatsapp_link!)}
+          onClick={() => handleCopyPhone(business.whatsapp_number!)}
           className="text-indigo-500 text-sm font-semibold hover:text-indigo-400"
         >
-          {copiedPhone === business.whatsapp_link ? 'Copiado!' : 'Copiar'}
+          {copiedPhone === business.whatsapp_number ? 'Copiado!' : 'Copiar'}
         </button>
       </div>
     </div>

@@ -17,7 +17,8 @@ export type Business = {
   description: string | null;
   business_type: string | null;
   phone: string | null;
-  whatsapp_link: string | null;
+  whatsapp_number: string | null;
+  instagram_link: string | null;
   image_url: string | null; // Logo do estabelecimento
   images: string[] | null; // Array de imagens para o carrossel
   opening_hours: OpeningHours | null;

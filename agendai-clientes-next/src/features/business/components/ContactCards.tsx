@@ -4,32 +4,51 @@ import React from 'react';
 import { Phone } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { formatPhone } from '../utils';
 
 interface SocialLinksCardProps {
-  whatsappLink?: string | null;
+  whatsapp_number?: string | null;
+  instagramLink?: string | null;
 }
 
 /**
  * Card de redes sociais com link do WhatsApp.
  */
-export const SocialLinksCard: React.FC<SocialLinksCardProps> = ({ whatsappLink }) => {
+export const SocialLinksCard: React.FC<SocialLinksCardProps> = ({ whatsapp_number, instagramLink }) => {
   const getWhatsappUrl = (link: string) => {
     return link.includes('wa.me') ? link : `https://wa.me/${link.replace(/\D/g, '')}`;
   };
 
+  if (!whatsapp_number && !instagramLink ) {
+    return null;
+  }
+
   return (
     <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
       <h3 className="text-white font-semibold text-lg mb-4">Redes Sociais</h3>
-      <div className="flex gap-4">
-        {whatsappLink && (
+      <div className="flex gap-4 justify-between">
+        {/* Ícone WhatsApp */}
+        {whatsapp_number && (
           <a
-            href={getWhatsappUrl(whatsappLink)}
+            href={getWhatsappUrl(whatsapp_number)}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-12 h-12 bg-green-600 hover:bg-green-700 rounded-full flex items-center justify-center transition-colors"
+            className="w-12 h-12 bg-green-600 hover:bg-green-700 rounded-full flex items-center justify-center transition-colors shadow-lg"
           >
             <FontAwesomeIcon icon={faWhatsapp} className="text-2xl text-white" />
+          </a>
+        )}
+
+        {/* Ícone Instagram */}
+        {instagramLink && (
+          <a
+            href={instagramLink.startsWith('http') ? instagramLink : `https://instagram.com/${instagramLink.replace('@', '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-12 h-12 bg-linear-to-tr from-yellow-400 via-red-500 to-purple-600 hover:opacity-90 rounded-full flex items-center justify-center transition-opacity shadow-lg"
+          >
+            <FontAwesomeIcon icon={faInstagram} className="text-2xl text-white" />
           </a>
         )}
       </div>

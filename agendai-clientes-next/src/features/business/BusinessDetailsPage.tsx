@@ -119,7 +119,10 @@ export const BusinessDetailsPage: React.FC<BusinessDetailsPageProps> = ({ busine
             )}
 
             {/* Redes Sociais */}
-            <SocialLinksCard whatsappLink={business.whatsapp_link} />
+            <SocialLinksCard 
+              whatsapp_number={business.whatsapp_number} 
+              instagramLink={business.instagram_link}
+            />
 
             {/* Contato */}
             <ContactCard phone={business.phone} />

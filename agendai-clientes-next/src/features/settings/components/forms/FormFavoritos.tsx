@@ -69,7 +69,7 @@ export function FormFavoritos() {
       endereco: addressString,
       horario: "08:00 as 18:00",
       imagem: business.images?.[0] || business.image_url || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500&h=300&fit=crop",
-      telefones: business.whatsapp_link ? [business.whatsapp_link] : ["Telefone não disponível"],
+      telefones: business.whatsapp_number ? [business.whatsapp_number] : ["Telefone não disponível"],
       formasPagamento: ["Dinheiro", "Cartão de crédito", "Cartão de débito", "Pix"],
       horariosFuncionamento,
       localizacao: { lat: -15.7942, lng: -47.8822 },
