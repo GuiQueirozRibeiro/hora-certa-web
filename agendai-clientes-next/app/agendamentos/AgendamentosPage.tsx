@@ -13,6 +13,7 @@ import { AppointmentActions } from '../../src/features/appointments/components/A
 import { CancelModal } from '../../src/features/appointments/components/CancelModal';
 import { EmptyStates } from '../../src/features/appointments/components/EmptyStates';
 import type { AppointmentWithDetails } from '../../src/types/types';
+import { Business } from '../../src/types/types';
 
 const AgendamentosPage: React.FC = () => {
   const { user } = useAuth();
@@ -138,7 +139,7 @@ const AgendamentosPage: React.FC = () => {
               <div className="my-6">
                 <h3 className="text-white font-semibold text-sm mb-3 uppercase tracking-wide">Sobre nós</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Bem-vindo à {selectedAppointment.business?.name || 'nosso estabelecimento'}...
+                  Bem-vindo à {selectedAppointment.business?.description}
                 </p>
               </div>
 
