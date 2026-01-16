@@ -21,7 +21,7 @@ export const businessService = {
         name: data.name,
         description: data.description,
         business_type: data.business_type,
-        whatsapp_link: data.whatsapp_link,
+        whatsapp_number: data.whatsapp_number,
       })
       .select()
       .single();

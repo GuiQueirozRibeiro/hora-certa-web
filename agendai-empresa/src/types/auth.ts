@@ -20,7 +20,7 @@ export interface Business {
   name: string;
   description?: string;
   business_type?: string;
-  whatsapp_link?: string;
+  whatsapp_number?: string;
   instagram_link?: string;
   image_url?: string;
   cover_image_url?: string;
@@ -37,6 +37,6 @@ export interface CreateBusinessData {
   name: string;
   description?: string;
   business_type?: string;
-  whatsapp_link?: string;
+  whatsapp_number?: string;
   opening_hours?: any[];
 }

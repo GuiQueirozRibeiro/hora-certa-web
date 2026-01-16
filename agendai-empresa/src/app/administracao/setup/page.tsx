@@ -19,7 +19,7 @@ export default function BusinessSetupPage() {
     name: '',
     description: '',
     business_type: '',
-    whatsapp_link: '',
+    whatsapp_number: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +35,7 @@ export default function BusinessSetupPage() {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         business_type: formData.business_type.trim() || undefined,
-        whatsapp_link: formData.whatsapp_link.trim() || undefined,
+        whatsapp_number: formData.whatsapp_number.trim() || undefined,
       });
 
       success('Empresa criada com sucesso!');
@@ -117,8 +117,8 @@ export default function BusinessSetupPage() {
             </label>
             <Input
               type="text"
-              value={formData.whatsapp_link}
-              onChange={(e) => setFormData({ ...formData, whatsapp_link: e.target.value })}
+              value={formData.whatsapp_number}
+              onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
               placeholder="https://wa.me/5511999999999"
             />
             <p className="text-xs text-gray-500 mt-1">
