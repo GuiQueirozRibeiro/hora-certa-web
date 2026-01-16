@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { X } from 'lucide-react';
+import { BUSINESS_CATEGORIES } from '@/constants/businessCategories'; // <--- IMPORTADO AQUI
 
 export function FormContent({ business }: { business: any }) {
   const {
@@ -114,7 +115,7 @@ export function FormContent({ business }: { business: any }) {
 
         <Input
           label="Nome do Estabelecimento *"
-          placeholder="Ex: Barbearia do Zé"
+          placeholder="Ex: Refrigeração Polar ou Barbearia do Zé"
           type="text"
           value={state.data.name}
           onChange={(e) => updateField('name', e.target.value)}
@@ -143,18 +144,22 @@ export function FormContent({ business }: { business: any }) {
           </p>
         </div>
 
+        {/* --- ATUALIZADO: CAMPO SELECT DE CATEGORIAS --- */}
         <div>
           <label className="block text-sm font-medium text-zinc-200 mb-2">
-            Tipo de Negócio
+            Tipo de Negócio / Categoria
           </label>
           <select
             value={state.data.business_type || ''}
             onChange={(e) => updateField('business_type', e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
           >
-            <option value="">Selecione o tipo</option>
-            <option value="barbearia">Barbearia</option>
-            <option value="salao_beleza">Salão de Beleza</option>
+            <option value="">Selecione o tipo de negócio</option>
+            {BUSINESS_CATEGORIES.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -181,7 +186,7 @@ export function FormContent({ business }: { business: any }) {
 
         <Textarea
           label="Descrição"
-          placeholder="Descreva sua empresa e seus serviços"
+          placeholder="Descreva sua empresa e seus serviços (Ex: Especialistas em manutenção de ar condicionado split e inverter...)"
           rows={4}
           value={state.data.description || ''}
           onChange={(e) => updateField('description', e.target.value)}
