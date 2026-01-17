@@ -17,8 +17,8 @@ type MenuLateralAdminProps = {
 
 export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProps) {
   const getItemClass = (isActive: boolean) => `
-    flex cursor-pointer items-center gap-2 md:gap-3 rounded-md p-3 md:p-3 transition-all whitespace-nowrap
-    text-sm md:text-sm font-medium
+    flex cursor-pointer items-center gap-3 rounded-md p-3 transition-all
+    text-sm font-medium
     ${isActive 
       ? 'bg-zinc-700 text-white shadow-md' 
       : 'text-zinc-400 hover:bg-zinc-700/50 hover:text-white'}
@@ -26,7 +26,7 @@ export function MenuLateralAdmin({ abaAtiva, setAbaAtiva }: MenuLateralAdminProp
 
   return (
     <nav className="flex w-full">
-      <ul className="flex flex-row lg:flex-col gap-2 w-full overflow-x-auto pb-2 lg:pb-0 no-scrollbar touch-pan-x">
+      <ul className="flex flex-col gap-2 w-full">
         <li 
           onClick={() => setAbaAtiva('empresa')}
           className={getItemClass(abaAtiva === 'empresa')}
