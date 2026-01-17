@@ -21,6 +21,7 @@ interface ProfessionalModalProps {
 
 export function ProfessionalModal({ businessId, professional, onClose }: ProfessionalModalProps) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { error: showError } = useToast();
 
   const {
@@ -89,6 +90,17 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
       return;
     }
 
+    // Se está criando um novo profissional, mostra modal de confirmação
+    if (!isEditing) {
+      setShowConfirmModal(true);
+      return;
+    }
+
+    // Se está editando, salva direto
+    await saveProfessional();
+  };
+
+  const saveProfessional = async () => {
     setIsSaving(true);
 
     try {
@@ -114,10 +126,57 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
       showError('Erro ao salvar', err.message || 'Ocorreu um erro inesperado');
     } finally {
       setIsSaving(false);
+      setShowConfirmModal(false);
     }
   };
+
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
+    <>
+      {/* Modal de Confirmação */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-60 p-4">
+          <div className="bg-zinc-800 rounded-xl border border-zinc-700 w-full max-w-md p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-zinc-100 mb-2">
+                  Atenção: Você será deslogado
+                </h3>
+                <p className="text-sm text-zinc-300 leading-relaxed">
+                  Ao criar um novo funcionário, você será automaticamente deslogado da sua conta atual 
+                  e será logado na conta do novo funcionário criado. Você precisará fazer login novamente 
+                  com suas credenciais para retornar à sua conta.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+              <Button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                disabled={isSaving}
+                className="bg-zinc-700 hover:bg-zinc-600 w-full sm:flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={saveProfessional}
+                disabled={isSaving}
+                className="bg-amber-600 hover:bg-amber-700 w-full sm:flex-1"
+              >
+                {isSaving ? 'Criando...' : 'Confirmar e Criar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
       <div className="bg-zinc-800 rounded-t-2xl md:rounded-xl border border-zinc-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col">
 
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-zinc-700 bg-zinc-800 sticky top-0 z-10 shrink-0">
@@ -333,5 +392,6 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
         </form>
       </div>
     </div>
+    </>
   );
 }
