@@ -73,12 +73,8 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
 
   // Form submission
   const handleSubmit = useCallback(async () => {
-    // Evitar múltiplos cliques
-    if (isSaving) {
-      return false;
-    }
+    if (isSaving) return null;
 
-    // Validate form
     const validation = ProfessionalFormValidator.validateForm({
       name,
       email,
@@ -89,14 +85,16 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
 
     if (!validation.isValid) {
       showError('Erro de validação', validation.error!);
-      return false;
+      return null;
     }
 
     setIsSaving(true);
     try {
+      let savedData;
+
       if (isEditing) {
-        // Update existing professional
-        await professionalService.updateProfessional(professional.id, {
+        // Update
+        savedData = await professionalService.updateProfessional(professional.id, {
           name: name.trim(),
           specialties: Array.isArray(specialties) ? specialties : [],
           bio: bio.trim() || undefined,
@@ -105,15 +103,14 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
           avatar_url: avatarUrl,
         });
 
-        // Update user name if changed
         if (name.trim() !== professional.user?.name) {
           await professionalService.updateProfessionalName(professional.user_id, name.trim());
         }
 
         success('Profissional atualizado com sucesso!');
       } else {
-        // Create new professional
-        await professionalService.createProfessional({
+        // Create - IMPORTANTE: O serviço deve retornar o objeto criado com o ID
+        savedData = await professionalService.createProfessional({
           email: email.trim(),
           password: password.trim(),
           name: name.trim(),
@@ -129,11 +126,11 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
       }
 
       onSuccess();
-      return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return savedData; // RETORNO CRUCIAL: Retorna os dados para o Modal pegar o ID
+      
     } catch (err: any) {
       showError('Erro ao salvar', err.message);
-      return false;
+      return null;
     } finally {
       setIsSaving(false);
     }
@@ -165,6 +162,7 @@ export function useProfessionalModal({ professional, businessId, onSuccess }: Us
     setExperienceYears,
     setWorkingHours,
     setAvatarUrl,
+    setIsSaving,
     
     // Actions
     addSpecialty,

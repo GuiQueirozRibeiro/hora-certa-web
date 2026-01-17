@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Users, Plus, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { appointmentService } from '@/services/appointmentService';
 import { professionalService } from '@/services/professionalService';
+import { AppointmentModal } from './AppointmetsModal';
 import type { AppointmentWithDetails } from '@/types/appointment';
 
 const PROFESSIONAL_COLORS = [
@@ -33,6 +35,7 @@ interface Professional {
 interface ScheduleEvent {
   id: string;
   professionalName: string;
+  clientName: string; // ← ADICIONADO
   serviceName: string;
   time: string;
   color: { bg: string; border: string };
@@ -52,47 +55,97 @@ export function SchedulerView() {
   // Estado para controlar visualização mobile (expandir filtros)
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   
+  // Estado para controlar o modal de criar agendamento
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  
   const knownAppointmentIds = useRef<Set<string>>(new Set());
   const knownAppointmentStatus = useRef<Map<string, string>>(new Map());
 
-  // ... (Mantenha o useEffect de loadData e checkNewAppointments exatamente iguais ao original)
-  // Vou omitir a lógica interna de fetch para economizar espaço na resposta, 
-  // mas você deve manter o código original de busca de dados aqui.
-  
-  useEffect(() => {
-    async function loadData() {
-      if (!business?.id) return;
-      setLoading(true);
-      try {
-        const profData = await professionalService.getProfessionalsByBusinessId(business.id);
-        const mappedProfs = profData.map((prof, index) => ({
-          id: prof.id,
-          name: prof.user?.name || (prof as any).name || prof.specialties?.[0] || 'Profissional',
-          color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length],
-        }));
-        setProfessionals(mappedProfs);
+  // Função para carregar dados
+  const loadData = useCallback(async () => {
+    if (!business?.id) return;
+    setLoading(true);
+    try {
+      const profData = await professionalService.getProfessionalsByBusinessId(business.id);
+      const mappedProfs = profData.map((prof, index) => ({
+        id: prof.id,
+        name: prof.user?.name || (prof as any).name || prof.specialties?.[0] || 'Profissional',
+        color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length],
+      }));
+      setProfessionals(mappedProfs);
 
+      const currentYear = new Date().getFullYear();
+      const startDate = `${currentYear}-01-01`;
+      const endDate = `${currentYear}-12-31`;
+      const apptData = await appointmentService.getAppointmentsByDateRange(business.id, startDate, endDate);
+      setAppointments(apptData);
+      
+      apptData.forEach(apt => {
+        knownAppointmentIds.current.add(apt.id);
+        knownAppointmentStatus.current.set(apt.id, apt.status || '');
+      });
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [business?.id]);
+
+  // Carregar dados na inicialização
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Polling para verificar novos agendamentos
+  useEffect(() => {
+    if (!business?.id) return;
+
+    const checkNewAppointments = async () => {
+      try {
         const currentYear = new Date().getFullYear();
         const startDate = `${currentYear}-01-01`;
         const endDate = `${currentYear}-12-31`;
         const apptData = await appointmentService.getAppointmentsByDateRange(business.id, startDate, endDate);
-        setAppointments(apptData);
-        
-        apptData.forEach(apt => {
-          knownAppointmentIds.current.add(apt.id);
-          knownAppointmentStatus.current.set(apt.id, apt.status || '');
-        });
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [business?.id]);
 
-  // ... (Mantenha o polling useEffect e as funções auxiliares calendarDays, todayEvents, etc.)
-  
+        // Verificar novos agendamentos
+        const newAppointments = apptData.filter(apt => !knownAppointmentIds.current.has(apt.id));
+        if (newAppointments.length > 0) {
+          info('Novo agendamento!', `${newAppointments.length} novo(s) agendamento(s) adicionado(s).`);
+          newAppointments.forEach(apt => {
+            knownAppointmentIds.current.add(apt.id);
+            knownAppointmentStatus.current.set(apt.id, apt.status || '');
+          });
+        }
+
+        // Verificar mudanças de status
+        apptData.forEach(apt => {
+          const previousStatus = knownAppointmentStatus.current.get(apt.id);
+          if (previousStatus && previousStatus !== apt.status) {
+            if (apt.status === 'completed') {
+              success('Agendamento concluído!', 'Um agendamento foi marcado como concluído.');
+            } else if (apt.status === 'cancelled') {
+              warning('Agendamento cancelado', 'Um agendamento foi cancelado.');
+            }
+            knownAppointmentStatus.current.set(apt.id, apt.status || '');
+          }
+        });
+
+        setAppointments(apptData);
+      } catch (error) {
+        console.error('Erro ao verificar agendamentos:', error);
+      }
+    };
+
+    const interval = setInterval(checkNewAppointments, 10000); // A cada 10 segundos
+    return () => clearInterval(interval);
+  }, [business?.id, info, success, warning]);
+
+  // Callback para quando um novo agendamento for criado
+  const handleAppointmentCreated = useCallback(() => {
+    // Recarrega os dados
+    loadData();
+  }, [loadData]);
+
   const calendarDays = useMemo(() => {
     const year = calendarDate.getFullYear();
     const month = calendarDate.getMonth();
@@ -135,6 +188,7 @@ export function SchedulerView() {
         return {
           id: apt.id,
           professionalName: prof?.name || 'Profissional',
+          clientName: apt.client_name || 'Cliente', // ← ADICIONADO
           serviceName: apt.service_name || 'Serviço',
           time: apt.appointment_time.slice(0, 5),
           color: prof?.color || PROFESSIONAL_COLORS[0],
@@ -173,6 +227,11 @@ export function SchedulerView() {
     if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return name.slice(0, 2).toUpperCase();
   };
+
+  // Formata a data selecionada para passar ao modal
+  const formattedSelectedDate = selectedDate 
+    ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+    : '';
 
   if (loading) {
     return (
@@ -313,18 +372,31 @@ export function SchedulerView() {
                         return (
                           <div 
                             key={event.id}
-                            className={`${cardClasses} rounded-md md:rounded-lg p-2 min-w-[110px] md:min-w-[140px] relative transition-all hover:brightness-110`}
+                            className={`${cardClasses} rounded-md md:rounded-lg p-2 min-w-[120px] md:min-w-[160px] relative transition-all hover:brightness-110`}
                           >
-                             {/* Conteúdo do card simplificado para mobile */}
+                             {/* Status badges */}
                              {isCompleted && <span className="block text-[8px] text-green-400 mb-1">✓ Concluído</span>}
                              {isCancelled && <span className="block text-[8px] text-red-400 mb-1">✕ Cancelado</span>}
                              
+                             {/* Nome do Profissional */}
                              <p className={`text-[10px] md:text-xs font-bold truncate ${isCancelled ? 'line-through text-zinc-500' : 'text-zinc-200'}`}>
                                {event.professionalName}
                              </p>
-                             <p className={`text-[9px] md:text-[10px] truncate ${isCancelled ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                             
+                             {/* Nome do Cliente - ADICIONADO */}
+                             <div className="flex items-center gap-1 mt-1">
+                               <User className="h-2.5 w-2.5 md:h-3 md:w-3 text-zinc-500 shrink-0" />
+                               <p className={`text-[9px] md:text-[10px] truncate ${isCancelled ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                                 {event.clientName}
+                               </p>
+                             </div>
+                             
+                             {/* Nome do Serviço */}
+                             <p className={`text-[9px] md:text-[10px] truncate mt-1 ${isCancelled ? 'text-zinc-600' : 'text-zinc-400'}`}>
                                {event.serviceName}
                              </p>
+                             
+                             {/* Horário */}
                              <p className="text-[9px] text-zinc-500 mt-1">{event.time}</p>
                           </div>
                         );
@@ -340,6 +412,31 @@ export function SchedulerView() {
           </div>
         </div>
       </div>
+
+      {/* Botão Flutuante para Criar Agendamento */}
+      {business && (
+        <button
+          onClick={() => setIsAppointmentModalOpen(true)}
+          className="fixed bottom-6 right-6 p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl transition-all hover:scale-110 flex items-center gap-2 z-40 group"
+          title="Criar novo agendamento"
+        >
+          <Plus className="h-6 w-6" />
+          <span className="hidden group-hover:inline-block text-sm font-medium pr-2 animate-in fade-in slide-in-from-left duration-200">
+            Novo Agendamento
+          </span>
+        </button>
+      )}
+
+      {/* Modal de Criação de Agendamento */}
+      {business && (
+        <AppointmentModal
+          businessId={business.id}
+          isOpen={isAppointmentModalOpen}
+          onClose={() => setIsAppointmentModalOpen(false)}
+          onSuccess={handleAppointmentCreated}
+          initialDate={formattedSelectedDate}
+        />
+      )}
     </>
   );
 }

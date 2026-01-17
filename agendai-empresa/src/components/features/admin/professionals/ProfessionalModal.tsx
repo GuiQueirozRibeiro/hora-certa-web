@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
@@ -5,7 +6,10 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { WorkingHoursInput } from './WorkingHoursInput';
+import { AddressFields } from './AddressFields';
 import { useProfessionalModal } from '@/hooks/useProfessionalModal';
+import { useProfessionalAddress } from '@/hooks/useProfessionalAddress';
+import { useToast } from '@/hooks/useToast';
 import type { ProfessionalWithUser } from '@/types/professional';
 import { businessService } from '@/services/businessService';
 
@@ -17,26 +21,48 @@ interface ProfessionalModalProps {
 
 export function ProfessionalModal({ businessId, professional, onClose }: ProfessionalModalProps) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const { error: showError } = useToast();
 
   const {
     isEditing,
     name, setName,
-    avatarUrl, setAvatarUrl, 
+    avatarUrl, setAvatarUrl,
     email, setEmail,
     password, setPassword,
     specialties, specialtyInput, setSpecialtyInput,
     bio, setBio,
     experienceYears, setExperienceYears,
     workingHours, setWorkingHours,
-    isSaving,
+    isSaving, setIsSaving, // Adicione setIsSaving se disponível
     addSpecialty,
     removeSpecialty,
-    handleSubmit: submitForm,
+    handleSubmit: originalSubmit,
   } = useProfessionalModal({
     professional,
     businessId,
-    onSuccess: () => onClose(true),
+    onSuccess: () => { }, // Não fecha aqui, vamos controlar manualmente
   });
+
+  // Hook para gerenciar endereço
+  const {
+    street,
+    number,
+    complement,
+    neighborhood,
+    city,
+    state,
+    zipCode,
+    setStreet,
+    setNumber,
+    setComplement,
+    setNeighborhood,
+    setCity,
+    setState,
+    setZipCode,
+    saveAddress,
+    hasAddressData,
+    validateAddress,
+  } = useProfessionalAddress({ professionalId: professional?.id });
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,13 +81,45 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await submitForm();
-  };
+    
+    // 1. Valida endereço (apenas se o usuário preencheu algo)
+    const addressError = validateAddress();
+    if (addressError) {
+      showError('Erro de validação', addressError);
+      return;
+    }
 
+    setIsSaving(true);
+
+    try {
+      // 2. Salva o Profissional usando o hook originalSubmit
+      // IMPORTANTE: O originalSubmit deve ser atualizado para retornar o profissional salvo
+      const savedProfessional = await originalSubmit();
+      
+      // 3. Captura o ID (seja da edição ou do novo criado)
+      // O savedProfessional.id vem do retorno do originalSubmit
+      const targetId = professional?.id || (savedProfessional as any)?.id;
+
+      console.log("Tentando salvar endereço para o ID:", targetId);
+
+      // 4. Se temos um ID e dados de endereço, salvamos agora
+      if (targetId && hasAddressData()) {
+        await saveAddress(targetId);
+        console.log('✅ Endereço do profissional salvo com sucesso');
+      }
+      
+      onClose(true);
+    } catch (err: any) {
+      console.error('❌ Erro ao salvar profissional:', err);
+      showError('Erro ao salvar', err.message || 'Ocorreu um erro inesperado');
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <div className="fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
       <div className="bg-zinc-800 rounded-t-2xl md:rounded-xl border border-zinc-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col">
-        
+
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-zinc-700 bg-zinc-800 sticky top-0 z-10 shrink-0">
           <h2 className="text-lg md:text-xl font-bold text-white">
             {isEditing ? 'Editar Profissional' : 'Novo Profissional'}
@@ -75,6 +133,7 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6 overflow-y-auto">
+          {/* INFORMAÇÕES DA CONTA */}
           <div>
             <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-indigo-500 rounded-full"></div>
@@ -134,6 +193,7 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             </div>
           </div>
 
+          {/* INFORMAÇÕES PROFISSIONAIS */}
           <div>
             <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-emerald-500 rounded-full"></div>
@@ -210,6 +270,7 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             </div>
           </div>
 
+          {/* HORÁRIOS DE TRABALHO */}
           <div>
             <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
               <div className="w-1 h-5 bg-amber-500 rounded-full"></div>
@@ -222,6 +283,32 @@ export function ProfessionalModal({ businessId, professional, onClose }: Profess
             />
           </div>
 
+          {/* ENDEREÇO PARA ATENDIMENTO DOMICILIAR */}
+          <div>
+            <h3 className="text-base md:text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+              <div className="w-1 h-5 bg-blue-500 rounded-full"></div>
+              ENDEREÇO PARA ATENDIMENTO DOMICILIAR
+            </h3>
+
+            <AddressFields
+              street={street}
+              number={number}
+              complement={complement}
+              neighborhood={neighborhood}
+              city={city}
+              state={state}
+              zipCode={zipCode}
+              onStreetChange={setStreet}
+              onNumberChange={setNumber}
+              onComplementChange={setComplement}
+              onNeighborhoodChange={setNeighborhood}
+              onCityChange={setCity}
+              onStateChange={setState}
+              onZipCodeChange={setZipCode}
+            />
+          </div>
+
+          {/* BOTÕES */}
           <div className="flex flex-col-reverse md:flex-row gap-3 pt-4 border-t border-zinc-700">
             <Button
               type="button"

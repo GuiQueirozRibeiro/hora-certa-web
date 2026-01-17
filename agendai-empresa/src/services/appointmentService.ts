@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@/lib/supabase/client';
 import type { Appointment, AppointmentWithDetails } from '@/types/appointment';
 
@@ -30,7 +31,8 @@ export const appointmentService = {
     return (data || []).map((item: any) => ({
       ...item,
       professional_name: item.professionals?.name,
-      client_name: item.client?.name || 'Cliente',
+      // Prioriza: 1) nome do user (app), 2) client_name manual, 3) fallback
+      client_name: item.client?.name || item.client_name || 'Cliente',
       service_name: item.services?.name,
       service_price: item.services?.price,
     }));
@@ -51,7 +53,8 @@ export const appointmentService = {
       .select(`
         *,
         professionals!inner(name),
-        services!inner(name, price)
+        services!inner(name, price),
+        client:users!appointments_client_id_fkey(id, name)
       `)
       .eq('business_id', businessId);
 
@@ -72,6 +75,8 @@ export const appointmentService = {
     return (data || []).map((item: any) => ({
       ...item,
       professional_name: item.professionals?.name,
+      // Prioriza: 1) nome do user (app), 2) client_name manual, 3) fallback
+      client_name: item.client?.name || item.client_name || 'Cliente',
       service_name: item.services?.name,
       service_price: item.services?.price,
     }));
@@ -92,7 +97,8 @@ export const appointmentService = {
       .select(`
         *,
         professionals!inner(name),
-        services!inner(name, price)
+        services!inner(name, price),
+        client:users!appointments_client_id_fkey(id, name)
       `)
       .eq('business_id', businessId)
       .in('status', ['completed', 'confirmed']);
@@ -114,6 +120,8 @@ export const appointmentService = {
     return (data || []).map((item: any) => ({
       ...item,
       professional_name: item.professionals?.name,
+      // Prioriza: 1) nome do user (app), 2) client_name manual, 3) fallback
+      client_name: item.client?.name || item.client_name || 'Cliente',
       service_name: item.services?.name,
       service_price: item.total_price || item.services?.price,
     }));
@@ -150,7 +158,8 @@ export const appointmentService = {
     return (data || []).map((item: any) => ({
       ...item,
       professional_name: item.professionals?.name,
-      client_name: item.client?.name || 'Cliente',
+      // Prioriza: 1) nome do user (app), 2) client_name manual, 3) fallback
+      client_name: item.client?.name || item.client_name || 'Cliente',
       service_name: item.services?.name,
       service_price: item.services?.price,
     }));
@@ -164,12 +173,10 @@ export const appointmentService = {
   ): Promise<Appointment> {
     const supabase = createClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { client_name, ...appointmentData } = appointment;
-
+    // Envia tudo, incluindo client_name
     const { data, error } = await supabase
       .from('appointments')
-      .insert(appointmentData)
+      .insert(appointment)
       .select()
       .single();
 
